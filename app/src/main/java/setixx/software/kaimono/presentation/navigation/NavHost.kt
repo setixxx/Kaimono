@@ -10,6 +10,7 @@ import setixx.software.kaimono.presentation.screen.account.AccountInfoScreen
 import setixx.software.kaimono.presentation.screen.favorites.FavouritesScreen
 import setixx.software.kaimono.presentation.screen.home.HomeScreen
 import setixx.software.kaimono.presentation.screen.account.AccountScreen
+import setixx.software.kaimono.presentation.screen.cart.CartScreen
 
 @Composable
 fun NavHost(
@@ -21,8 +22,9 @@ fun NavHost(
         startDestination = Routes.Home.route,
         modifier = modifier
     ) {
-        composable(Routes.Home.route) { HomeScreen() }
+        composable(Routes.Home.route) { HomeScreen(navController) }
         composable(Routes.Favorites.route) { FavouritesScreen() }
+        composable(Routes.Cart.route) { CartScreen(navController) }
 
         navigation(
             Routes.Account.route,

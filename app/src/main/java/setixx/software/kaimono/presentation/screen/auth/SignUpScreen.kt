@@ -19,8 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import setixx.software.kaimono.R
+
 @Composable
-fun SignInScreen(
+fun SignUpScreen(
     modifier: Modifier = Modifier,
     onAction: () -> Unit
 ){
@@ -33,13 +34,13 @@ fun SignInScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            stringResource(R.string.label_sign_in),
+            stringResource(R.string.label_sign_up),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
         )
         Text(
             modifier = Modifier.padding(bottom = 24.dp),
-            text = stringResource(R.string.sublabel_sign_in),
+            text = stringResource(R.string.sublabel_sign_up),
             style = MaterialTheme.typography.titleLarge,
         )
         OutlinedTextField(
@@ -55,7 +56,22 @@ fun SignInScreen(
                 .padding(vertical = 8.dp),
             value = "",
             onValueChange = {},
+            label = { Text(stringResource(R.string.hint_phone)) },
+        )
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth(),
+            value = "",
+            onValueChange = {},
             label = { Text(stringResource(R.string.hint_password)) },
+        )
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            value = "",
+            onValueChange = {},
+            label = { Text(stringResource(R.string.hint_password_confirmation)) },
         )
         Button(
             modifier = Modifier
@@ -80,6 +96,6 @@ fun SignInScreen(
 
 @Preview(showSystemUi = true)
 @Composable
-fun SignInScreenPreview(){
-    SignInScreen(onAction = {})
+fun SignUpScreenPreview(){
+    SignUpScreen(onAction = {})
 }

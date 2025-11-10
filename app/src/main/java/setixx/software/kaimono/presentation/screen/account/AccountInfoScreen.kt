@@ -36,8 +36,6 @@ fun AccountInfoScreen(
     navController: NavController
 ){
     Scaffold(
-        modifier = Modifier
-            .padding(horizontal = 16.dp),
         topBar = {
             TopAppBar(
                 title = {
@@ -62,7 +60,8 @@ fun AccountInfoScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(

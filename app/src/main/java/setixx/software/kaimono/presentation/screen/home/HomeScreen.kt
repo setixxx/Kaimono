@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
@@ -49,11 +51,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import setixx.software.kaimono.R
 import setixx.software.kaimono.core.component.ProductCard
+import setixx.software.kaimono.presentation.navigation.Routes
 
 @Composable
 fun HomeScreen(
+    navController: NavController
 ){
     val listState = rememberLazyGridState()
     var previousIndex by remember { mutableStateOf(0) }
@@ -75,27 +80,29 @@ fun HomeScreen(
     }
 
     Scaffold(
-        modifier = Modifier
-            .padding(horizontal = 16.dp),
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { /* do something */ },
+                onClick = { navController.navigate(Routes.Cart.route) },
                 expanded = isScrollingUp,
                 icon = { Icon(Icons.Filled.ShoppingCart,
-                    stringResource(R.string.action_check_out)) },
-                text = { Text(text = stringResource(R.string.action_check_out)) },
+                    stringResource(R.string.action_checkout)) },
+                text = { Text(text = stringResource(R.string.action_checkout)) },
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
     ) { paddingValues ->
         LazyVerticalGrid(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             columns = GridCells.Adaptive(minSize = 160.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            state = listState
+            state = listState,
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = paddingValues.calculateTopPadding(),
+                bottom = paddingValues.calculateBottomPadding()
+            )
         ) {
             items(20){ products ->
                 ProductCard(
@@ -113,5 +120,5 @@ fun HomeScreen(
 @Preview
 @Composable
 fun HomeScreenPreview(){
-    HomeScreen()
+    HomeScreen(navController = NavController(context = LocalContext.current))
 }

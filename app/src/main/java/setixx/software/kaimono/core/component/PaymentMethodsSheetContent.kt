@@ -12,6 +12,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +28,8 @@ import setixx.software.kaimono.R
 fun PaymentMethodsSheetContent(
     onClose: () -> Unit
 ) {
+    var selectedIndex by remember { mutableStateOf(0) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -39,25 +45,25 @@ fun PaymentMethodsSheetContent(
                 .padding(vertical = 16.dp)
                 .clip(MaterialTheme.shapes.large)
         ) {
-            CustomList(
-                icon = Icons.Outlined.CreditCard,
-                contentDescription = stringResource(R.string.label_credit_card),
+            PaymentList(
+                index = 0,
+                selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
-                onClick = {}
+                onSelect = { selectedIndex = it }
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-            CustomList(
-                icon = Icons.Outlined.CreditCard,
-                contentDescription = stringResource(R.string.label_credit_card),
+            PaymentList(
+                index = 1,
+                selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
-                onClick = {}
+                onSelect = { selectedIndex = it }
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-            CustomList(
-                icon = Icons.Outlined.CreditCard,
-                contentDescription = stringResource(R.string.label_credit_card),
+            PaymentList(
+                index = 2,
+                selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
-                onClick = {}
+                onSelect = { selectedIndex = it }
             )
         }
 

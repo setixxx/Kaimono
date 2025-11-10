@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import setixx.software.kaimono.core.component.CustomList
+import setixx.software.kaimono.core.component.AccountList
 import setixx.software.kaimono.R
 import setixx.software.kaimono.core.component.PaymentMethodsSheetContent
 import setixx.software.kaimono.presentation.navigation.Routes
@@ -42,8 +42,6 @@ fun AccountScreen(
     val sheetState = rememberModalBottomSheetState()
 
     Scaffold(
-        modifier = Modifier
-            .padding(horizontal = 16.dp),
         topBar = {
             TopAppBar(
                 title = {
@@ -59,14 +57,15 @@ fun AccountScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
         ) {
             Column(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .clip(shape = MaterialTheme.shapes.large)
             ) {
-                CustomList(
+                AccountList(
                     Icons.Outlined.Info,
                     stringResource(R.string.label_personal_info),
                     stringResource(R.string.label_personal_info),
@@ -81,21 +80,21 @@ fun AccountScreen(
                     .padding(vertical = 8.dp)
                     .clip(shape = MaterialTheme.shapes.large)
             ) {
-                CustomList(
+                AccountList(
                     Icons.Outlined.Collections,
                     stringResource(R.string.label_orders),
                     stringResource(R.string.label_orders),
                     onClick = {}
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-                CustomList(
+                AccountList(
                     Icons.Outlined.Reviews,
                     stringResource(R.string.label_reviews),
                     stringResource(R.string.label_reviews),
                     onClick = {}
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-                CustomList(
+                AccountList(
                     Icons.Outlined.Payment,
                     stringResource(R.string.label_payment_methods),
                     stringResource(R.string.label_payment_methods),
