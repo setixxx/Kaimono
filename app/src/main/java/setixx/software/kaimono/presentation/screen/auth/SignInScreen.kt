@@ -43,7 +43,7 @@ fun SignInScreen(
         OutlinedTextField(
             value = "",
             onValueChange = {},
-            label = { Text(stringResource(R.string.hint_email)) },
+            label = { Text(stringResource(R.string.hint_email_password)) },
         )
         OutlinedTextField(
             modifier = Modifier.padding(vertical = 8.dp),
@@ -58,18 +58,24 @@ fun SignInScreen(
         ){
             Button(
                 onClick = {
-                    onAction
+                    onAction()
                 }
             ) {
                 Text(text = stringResource(R.string.action_login))
             }
             Button(
                 onClick = {
-                    onAction
+                    onAction()
                 }
             ) {
                 Text(text = stringResource(R.string.action_register))
             }
         }
     }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun SignInScreenPreview(){
+    SignInScreen(onAction = {})
 }

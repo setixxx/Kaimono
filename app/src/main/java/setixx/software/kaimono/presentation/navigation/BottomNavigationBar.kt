@@ -58,9 +58,9 @@ object NavBarItems {
             route = "Favorites"
         ),
         BarItem(
-            title = "Profile",
+            title = "Account",
             image = Icons.Filled.Person,
-            route = "Profile"
+            route = "Account"
         )
     )
 }
