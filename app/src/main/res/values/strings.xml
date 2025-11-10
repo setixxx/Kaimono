@@ -30,5 +30,8 @@
     <string name="action_checkout">Check out</string>
     <string name="label_delivery_fee">Delivery fee</string>
     <string name="label_total">Total</string>
-    <string name="label_cash">Cash</string>
+    <string name="label_address">Address</string>
+    <string name="title_addresses">Your addresses</string>
+    <string name="action_add_address">Add address</string>
+    <string name="action_save">Save</string>
 </resources>

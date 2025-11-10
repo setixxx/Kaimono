@@ -53,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import setixx.software.kaimono.R
+import setixx.software.kaimono.core.component.CustomSearchBar
 import setixx.software.kaimono.core.component.ProductCard
 import setixx.software.kaimono.presentation.navigation.Routes
 

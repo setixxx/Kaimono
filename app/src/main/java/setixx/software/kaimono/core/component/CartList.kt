@@ -27,27 +27,21 @@ fun CartList(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable(onClick = onClick)
-            .padding(top = 12.dp, bottom = 12.dp, end = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp),
-                text = "$quantity",
-                style = MaterialTheme.typography.labelLarge
-            )
-            Text(
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
-                text = product,
-                style = MaterialTheme.typography.labelLarge
-            )
-        }
+        Text(
+            text = "$quantity",
+            style = MaterialTheme.typography.labelLarge
+        )
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+                .padding(vertical = 8.dp),
+            text = product,
+            style = MaterialTheme.typography.labelLarge
+        )
         Text(
             modifier = Modifier
                 .padding(vertical = 8.dp),

@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.CreditCard
-import androidx.compose.material.icons.outlined.Money
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -36,8 +38,8 @@ import androidx.navigation.NavController
 import setixx.software.kaimono.presentation.navigation.Routes
 import setixx.software.kaimono.R
 import setixx.software.kaimono.core.component.AccountList
+import setixx.software.kaimono.core.component.AddressSheetContent
 import setixx.software.kaimono.core.component.CartList
-import setixx.software.kaimono.core.component.PaymentList
 import setixx.software.kaimono.core.component.PaymentMethodsSheetContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,8 +50,10 @@ fun CartScreen(
     deliveryFee: Double = 0.00,
     total: Double = 0.00
 ){
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    var showCardsBottomSheet by remember { mutableStateOf(false) }
+    var showAddressBottomSheet by remember { mutableStateOf(false) }
+    val cardsSheetState = rememberModalBottomSheetState()
+    val addressSheetState = rememberModalBottomSheetState()
 
     Scaffold(
         floatingActionButton = {
@@ -87,11 +91,19 @@ fun CartScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState(0))
         ) {
             Column(
                 Modifier
                     .clip(MaterialTheme.shapes.large)
             ) {
+                CartList(
+                    quantity = 1,
+                    product = "Product name",
+                    price = 100.00,
+                    onClick = {}
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
                 CartList(
                     quantity = 1,
                     product = "Product name",
@@ -120,19 +132,26 @@ fun CartScreen(
             ) {
                 AccountList(
                     icon = Icons.Outlined.CreditCard,
-                    contentDescription = "Credit card",
-                    header = "Credit card",
+                    contentDescription = stringResource(R.string.label_credit_card),
+                    header = stringResource(R.string.label_credit_card),
                     onClick = {
-                        showBottomSheet = true
+                        showCardsBottomSheet = true
                     },
                     trailingIcon = Icons.Outlined.ChevronRight
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
+            }
+            Column(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.large)
+            ) {
                 AccountList(
-                    icon = Icons.Outlined.Money,
-                    contentDescription = stringResource(R.string.label_cash),
-                    header = stringResource(R.string.label_cash),
-                    onClick = {}
+                    icon = Icons.Outlined.LocationOn,
+                    contentDescription = stringResource(R.string.label_address),
+                    header = stringResource(R.string.label_address),
+                    onClick = {
+                        showAddressBottomSheet = true
+                    },
+                    trailingIcon = Icons.Outlined.ChevronRight
                 )
             }
             Row(
@@ -154,7 +173,8 @@ fun CartScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 80.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -170,13 +190,24 @@ fun CartScreen(
             }
         }
 
-        if (showBottomSheet) {
+        if (showCardsBottomSheet) {
             ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
-                sheetState = sheetState
+                onDismissRequest = { showCardsBottomSheet = false },
+                sheetState = cardsSheetState
             ) {
                 PaymentMethodsSheetContent(
-                    onClose = { showBottomSheet = false }
+                    onClose = { showCardsBottomSheet = false }
+                )
+            }
+        }
+
+        if (showAddressBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showAddressBottomSheet = false },
+                sheetState = addressSheetState
+            ) {
+                AddressSheetContent(
+                    onClose = { showAddressBottomSheet = false }
                 )
             }
         }

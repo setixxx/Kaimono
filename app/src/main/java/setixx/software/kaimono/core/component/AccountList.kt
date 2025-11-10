@@ -28,44 +28,42 @@ fun AccountList(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     trailingIcon: ImageVector? = null
-){
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable(onClick = onClick)
-            .padding(top = 12.dp, bottom = 12.dp, end = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
-        ){
-            Icon(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .size(24.dp),
-                imageVector = icon,
-                contentDescription = contentDescription)
-            Text(
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
-                text = header,
-                style = MaterialTheme.typography.labelLarge
-            )
-        }
+        Icon(
+            modifier = Modifier
+                .size(24.dp),
+            imageVector = icon,
+            contentDescription = contentDescription
+        )
+
+        Text(
+            text = header,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+                .padding(vertical = 8.dp)
+        )
+
         trailingIcon?.let {
             Icon(
                 modifier = Modifier
-                    .padding(vertical = 8.dp)
                     .size(24.dp),
                 imageVector = it,
-                contentDescription = "Credit card"
+                contentDescription = null
             )
         }
     }
 }
+
 
 @Preview
 @Composable
@@ -74,6 +72,7 @@ fun CustomListPreview(){
         icon = Icons.Outlined.CreditCard,
         contentDescription = "Credit card",
         header = "Credit card",
-        onClick = {}
+        onClick = {},
+        trailingIcon = Icons.Outlined.CreditCard
     )
 }

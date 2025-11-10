@@ -42,23 +42,20 @@ fun PaymentList(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable { onSelect(index) }
-            .padding(top = 8.dp, bottom = 8.dp, end = 16.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
-        ) {
-            RadioButton(
-                selected = index == selectedIndex,
-                onClick = { selected = !selected }
-            )
-            Text(
-                text = header,
-                style = MaterialTheme.typography.labelLarge
-            )
-        }
+        RadioButton(
+            selected = index == selectedIndex,
+            onClick = { selected = !selected }
+        )
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 16.dp),
+            text = header,
+            style = MaterialTheme.typography.labelLarge
+        )
         IconButton(
             onClick = {}
         ) {
