@@ -8,12 +8,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import setixx.software.kaimono.core.ui.theme.KaimonoTheme
 import setixx.software.kaimono.presentation.navigation.BottomNavigationBar
 import setixx.software.kaimono.presentation.navigation.NavHost
+import setixx.software.kaimono.presentation.navigation.Routes
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,9 +26,14 @@ class MainActivity : ComponentActivity() {
             KaimonoTheme {
                 val navController = rememberNavController()
 
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
                 Scaffold(
                     bottomBar = {
-                        BottomNavigationBar(navController = navController)
+                        if (Routes.shouldShowBottomBar(currentRoute)) {
+                            BottomNavigationBar(navController = navController)
+                        }
                     }
                 ) { innerPadding ->
                     NavHost(

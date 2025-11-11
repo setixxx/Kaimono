@@ -253,6 +253,7 @@ fun CartScreen(
                 PaymentMethodsSheetContent(
                     onClose = { showCardsBottomSheet = false },
                     onAddCard = {
+                        showCardsBottomSheet = false
                         navController.navigate(Routes.AccountAddCard.route)
                     }
                 )
@@ -265,7 +266,11 @@ fun CartScreen(
                 sheetState = addressSheetState
             ) {
                 AddressSheetContent(
-                    onClose = { showAddressBottomSheet = false }
+                    onClose = { showAddressBottomSheet = false },
+                    onAddAddress = {
+                        showAddressBottomSheet = false
+                        navController.navigate(Routes.AccountAddAddress.route)
+                    }
                 )
             }
         }

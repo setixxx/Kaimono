@@ -74,7 +74,7 @@ fun PasswordChangeSheetContent(
             Button(
                 onClick = onClose
             ) {
-                Text(stringResource(R.string.action_add_address))
+                Text(stringResource(R.string.action_change_password))
             }
         }
     }

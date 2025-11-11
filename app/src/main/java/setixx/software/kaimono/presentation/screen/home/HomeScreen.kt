@@ -2,6 +2,7 @@ package setixx.software.kaimono.presentation.screen.home
 
 import android.opengl.Matrix.length
 import android.text.TextUtils.replace
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +30,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.Scaffold
@@ -91,6 +93,20 @@ fun HomeScreen(
     }
 
     Scaffold(
+        topBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                CustomSearchBar(
+                    onSearch = { },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate(Routes.Cart.route) },

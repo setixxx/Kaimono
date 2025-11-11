@@ -24,7 +24,8 @@ import setixx.software.kaimono.R
 
 @Composable
 fun AddressSheetContent(
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onAddAddress: () -> Unit
 ) {
     var selectedIndex by remember { mutableStateOf(0) }
 
@@ -76,7 +77,7 @@ fun AddressSheetContent(
                 Text(stringResource(R.string.action_close))
             }
             Button(
-                onClick = onClose
+                onClick = onAddAddress
             ) {
                 Text(stringResource(R.string.action_add_address))
             }
@@ -87,5 +88,5 @@ fun AddressSheetContent(
 @Preview(showBackground = true)
 @Composable
 fun AddressSheetContentPreview(){
-    AddressSheetContent(onClose = {})
+    AddressSheetContent(onClose = {}, onAddAddress = {})
 }

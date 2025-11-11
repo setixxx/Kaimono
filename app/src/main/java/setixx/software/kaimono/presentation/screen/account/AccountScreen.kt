@@ -93,14 +93,18 @@ fun AccountScreen(
                     Icons.Outlined.Collections,
                     stringResource(R.string.label_orders),
                     stringResource(R.string.label_orders),
-                    onClick = {}
+                    onClick = {
+                        navController.navigate(Routes.AccountOrders.route)
+                    }
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
                 ListWithTwoIcons(
                     Icons.Outlined.Reviews,
                     stringResource(R.string.label_reviews),
                     stringResource(R.string.label_reviews),
-                    onClick = {}
+                    onClick = {
+                        navController.navigate(Routes.AccountReviews.route)
+                    }
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
                 ListWithTwoIcons(
@@ -147,6 +151,7 @@ fun AccountScreen(
                 PaymentMethodsSheetContent(
                     onClose = { showCardsBottomSheet = false },
                     onAddCard = {
+                        showCardsBottomSheet = false
                         navController.navigate(Routes.AccountAddCard.route)
                     }
                 )
@@ -159,7 +164,11 @@ fun AccountScreen(
                 sheetState = addressSheetState
             ) {
                 AddressSheetContent(
-                    onClose = { showAddressBottomSheet = false }
+                    onClose = { showAddressBottomSheet = false },
+                    onAddAddress = {
+                        showAddressBottomSheet = false
+                        navController.navigate(Routes.AccountAddAddress.route)
+                    }
                 )
             }
         }

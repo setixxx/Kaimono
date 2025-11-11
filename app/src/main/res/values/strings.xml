@@ -49,4 +49,13 @@
     <string name="hint_card_date">MM/YY</string>
     <string name="hint_card_code">Security code</string>
     <string name="action_save_card">Save card</string>
+    <string name="title_add_address">Add address</string>
+    <string name="hint_city">City</string>
+    <string name="hint_street">Street</string>
+    <string name="hint_house">House</string>
+    <string name="hint_apartment">Apartment</string>
+    <string name="hint_postal_code">Postal code</string>
+    <string name="hint_additional_info">Additional information</string>
+    <string name="hint_additional_info_description">Floor, intercom code, etc.</string>
+    <string name="action_save_address">Save address</string>
 </resources>

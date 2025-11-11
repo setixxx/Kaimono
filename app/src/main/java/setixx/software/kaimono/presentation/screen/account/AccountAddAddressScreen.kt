@@ -29,7 +29,7 @@ import setixx.software.kaimono.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountAddCartScreen(
+fun AccountAddAddressScreen(
     navController: NavController,
 ){
     Scaffold(
@@ -37,7 +37,7 @@ fun AccountAddCartScreen(
             TopAppBar(
                 title = {
                     Text(
-                        stringResource(R.string.title_add_card),
+                        stringResource(R.string.title_add_address),
                         style = MaterialTheme.typography.headlineMedium
                     )
                 },
@@ -64,11 +64,19 @@ fun AccountAddCartScreen(
                     .fillMaxWidth(),
                 value = "",
                 onValueChange = {  },
-                label = { Text(stringResource(R.string.hint_card_number)) }
+                label = { Text(stringResource(R.string.hint_city)) }
+            )
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                value = "",
+                onValueChange = {  },
+                label = { Text(stringResource(R.string.hint_street)) }
             )
             Row(
                 modifier = Modifier
-                    .padding(vertical = 16.dp)
+                    .padding(vertical = 8.dp)
             ){
                 OutlinedTextField(
                     modifier = Modifier
@@ -76,7 +84,7 @@ fun AccountAddCartScreen(
                         .padding(end = 8.dp),
                     value = "",
                     onValueChange = {  },
-                    label = { Text(stringResource(R.string.hint_card_date)) },
+                    label = { Text(stringResource(R.string.hint_house)) },
                 )
                 OutlinedTextField(
                     modifier = Modifier
@@ -84,7 +92,7 @@ fun AccountAddCartScreen(
                         .padding(start = 8.dp),
                     value = "",
                     onValueChange = {  },
-                    label = { Text(stringResource(R.string.hint_card_code)) }
+                    label = { Text(stringResource(R.string.hint_apartment)) }
                 )
             }
             OutlinedTextField(
@@ -92,7 +100,18 @@ fun AccountAddCartScreen(
                     .fillMaxWidth(),
                 value = "",
                 onValueChange = {  },
-                label = { Text(stringResource(R.string.hint_card_holder_name)) }
+                label = { Text(stringResource(R.string.hint_postal_code)) }
+            )
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                value = "",
+                onValueChange = {  },
+                label = { Text(stringResource(R.string.hint_additional_info)) },
+                supportingText = { Text(stringResource(R.string.hint_additional_info_description)) },
+                minLines = 3,
+                maxLines = 5
             )
             Column(
                 modifier = Modifier.weight(1f),
@@ -102,10 +121,13 @@ fun AccountAddCartScreen(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    onClick = {}
+                    onClick = {
+                        // Сохранение адреса
+                        navController.popBackStack()
+                    }
                 ) {
                     Text(
-                        stringResource(R.string.action_save_card)
+                        stringResource(R.string.action_save_address)
                     )
                 }
             }
@@ -115,6 +137,6 @@ fun AccountAddCartScreen(
 
 @Preview
 @Composable
-fun AddCartScreenPreview(){
-    AccountAddCartScreen(navController = NavController(LocalContext.current))
+fun AddAddressScreenPreview(){
+    AccountAddAddressScreen(navController = NavController(LocalContext.current))
 }
