@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import setixx.software.kaimono.presentation.screen.account.AccountInfoScreen
-import setixx.software.kaimono.presentation.screen.favorites.FavouritesScreen
 import setixx.software.kaimono.presentation.screen.home.HomeScreen
 import setixx.software.kaimono.presentation.screen.account.AccountScreen
 import setixx.software.kaimono.presentation.screen.account.AccountAddAddressScreen
@@ -15,6 +14,7 @@ import setixx.software.kaimono.presentation.screen.account.AccountAddCartScreen
 import setixx.software.kaimono.presentation.screen.account.AccountOrdersScreen
 import setixx.software.kaimono.presentation.screen.account.AccountReviewsScreen
 import setixx.software.kaimono.presentation.screen.cart.CartScreen
+import setixx.software.kaimono.presentation.screen.favorites.FavoritesScreen
 
 @Composable
 fun NavHost(
@@ -28,7 +28,7 @@ fun NavHost(
         modifier = modifier
     ) {
         composable(Routes.Home.route) { HomeScreen(navController) }
-        composable(Routes.Favorites.route) { FavouritesScreen() }
+        composable(Routes.Favorites.route) { FavoritesScreen(navController) }
         composable(Routes.Cart.route) { CartScreen(navController) }
 
         navigation(

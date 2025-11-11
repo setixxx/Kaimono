@@ -58,4 +58,7 @@
     <string name="hint_additional_info">Additional information</string>
     <string name="hint_additional_info_description">Floor, intercom code, etc.</string>
     <string name="action_save_address">Save address</string>
+    <string name="label_order">Order</string>
+    <string name="label_delivered">Delivered</string>
+    <string name="label_favorites">Favorites</string>
 </resources>
