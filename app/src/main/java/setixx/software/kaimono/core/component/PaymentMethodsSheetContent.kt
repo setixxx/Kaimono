@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +24,8 @@ import setixx.software.kaimono.R
 
 @Composable
 fun PaymentMethodsSheetContent(
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onAddCard: () -> Unit
 ) {
     var selectedIndex by remember { mutableStateOf(0) }
 
@@ -45,21 +44,21 @@ fun PaymentMethodsSheetContent(
                 .padding(vertical = 16.dp)
                 .clip(MaterialTheme.shapes.large)
         ) {
-            PaymentList(
+            ListWithRadioAndTrailing(
                 index = 0,
                 selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
                 onSelect = { selectedIndex = it }
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-            PaymentList(
+            ListWithRadioAndTrailing(
                 index = 1,
                 selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
                 onSelect = { selectedIndex = it }
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-            PaymentList(
+            ListWithRadioAndTrailing(
                 index = 2,
                 selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
@@ -78,7 +77,7 @@ fun PaymentMethodsSheetContent(
                 Text(stringResource(R.string.action_close))
             }
             Button(
-                onClick = onClose
+                onClick = onAddCard
             ) {
                 Text(stringResource(R.string.action_add_card))
             }
@@ -89,5 +88,5 @@ fun PaymentMethodsSheetContent(
 @Preview(showBackground = true)
 @Composable
 fun PaymentMethodsSheetContentPreview(){
-    PaymentMethodsSheetContent(onClose = {})
+    PaymentMethodsSheetContent(onClose = {}, onAddCard = {})
 }

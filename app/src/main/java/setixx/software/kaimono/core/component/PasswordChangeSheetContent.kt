@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,11 +24,9 @@ import androidx.compose.ui.unit.dp
 import setixx.software.kaimono.R
 
 @Composable
-fun AddressSheetContent(
+fun PasswordChangeSheetContent(
     onClose: () -> Unit
-) {
-    var selectedIndex by remember { mutableStateOf(0) }
-
+){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -35,35 +34,32 @@ fun AddressSheetContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.title_addresses),
+            text = stringResource(R.string.label_password_change),
             style = MaterialTheme.typography.headlineSmall
         )
-        Column(
+        OutlinedTextField(
             modifier = Modifier
-                .padding(vertical = 16.dp)
-                .clip(MaterialTheme.shapes.large)
-        ) {
-            ListWithRadioAndTrailing(
-                index = 0,
-                selectedIndex = selectedIndex,
-                header = "Санкт-Петербург",
-                onSelect = { selectedIndex = it }
-            )
-            HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-            ListWithRadioAndTrailing(
-                index = 1,
-                selectedIndex = selectedIndex,
-                header = stringResource(R.string.label_address),
-                onSelect = { selectedIndex = it }
-            )
-            HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-            ListWithRadioAndTrailing(
-                index = 2,
-                selectedIndex = selectedIndex,
-                header = stringResource(R.string.label_address),
-                onSelect = { selectedIndex = it }
-            )
-        }
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 16.dp),
+            value = "",
+            onValueChange = {  },
+            label = { Text(stringResource(R.string.hint_current_password)) }
+        )
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth(),
+            value = "",
+            onValueChange = {  },
+            label = { Text(stringResource(R.string.hint_new_password)) }
+        )
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 16.dp),
+            value = "",
+            onValueChange = {  },
+            label = { Text(stringResource(R.string.hint_password_confirmation)) }
+        )
 
         Row(
             modifier = Modifier
@@ -73,7 +69,7 @@ fun AddressSheetContent(
             Button(
                 onClick = onClose
             ) {
-                Text(stringResource(R.string.action_close))
+                Text(stringResource(R.string.action_cancel))
             }
             Button(
                 onClick = onClose
@@ -84,8 +80,8 @@ fun AddressSheetContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun AddressSheetContentPreview(){
-    AddressSheetContent(onClose = {})
+fun PasswordChangeSheetContent(){
+    PasswordChangeSheetContent(onClose = {})
 }

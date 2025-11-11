@@ -34,4 +34,19 @@
     <string name="title_addresses">Your addresses</string>
     <string name="action_add_address">Add address</string>
     <string name="action_save">Save</string>
+    <string name="action_add_to_card">Add to card</string>
+    <string name="label_select_size">Select size</string>
+    <string name="label_description">Description</string>
+    <string name="action_delete">Delete</string>
+    <string name="label_password_change">Password change</string>
+    <string name="action_change_password">Change</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="hint_current_password">Current password</string>
+    <string name="hint_new_password">New password</string>
+    <string name="title_add_card">Add credit or debit card</string>
+    <string name="hint_card_number">Card number</string>
+    <string name="hint_card_holder_name">Card holder name</string>
+    <string name="hint_card_date">MM/YY</string>
+    <string name="hint_card_code">Security code</string>
+    <string name="action_save_card">Save card</string>
 </resources>

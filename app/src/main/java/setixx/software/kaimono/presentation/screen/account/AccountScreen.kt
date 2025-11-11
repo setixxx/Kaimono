@@ -1,18 +1,17 @@
 package setixx.software.kaimono.presentation.screen.account
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Collections
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material.icons.outlined.Reviews
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import setixx.software.kaimono.core.component.AccountList
+import setixx.software.kaimono.core.component.ListWithTwoIcons
 import setixx.software.kaimono.R
 import setixx.software.kaimono.core.component.AddressSheetContent
 import setixx.software.kaimono.core.component.PaymentMethodsSheetContent
@@ -42,7 +42,8 @@ import setixx.software.kaimono.presentation.navigation.Routes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
-    navController: NavController
+    navController: NavController,
+    onLogout: () -> Unit
 ) {
     var showCardsBottomSheet by remember { mutableStateOf(false) }
     var showAddressBottomSheet by remember { mutableStateOf(false) }
@@ -73,7 +74,7 @@ fun AccountScreen(
                     .padding(vertical = 8.dp)
                     .clip(shape = MaterialTheme.shapes.large)
             ) {
-                AccountList(
+                ListWithTwoIcons(
                     Icons.Outlined.Info,
                     stringResource(R.string.label_personal_info),
                     stringResource(R.string.label_personal_info),
@@ -88,21 +89,21 @@ fun AccountScreen(
                     .padding(vertical = 8.dp)
                     .clip(shape = MaterialTheme.shapes.large)
             ) {
-                AccountList(
+                ListWithTwoIcons(
                     Icons.Outlined.Collections,
                     stringResource(R.string.label_orders),
                     stringResource(R.string.label_orders),
                     onClick = {}
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-                AccountList(
+                ListWithTwoIcons(
                     Icons.Outlined.Reviews,
                     stringResource(R.string.label_reviews),
                     stringResource(R.string.label_reviews),
                     onClick = {}
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-                AccountList(
+                ListWithTwoIcons(
                     Icons.Outlined.Payment,
                     stringResource(R.string.label_payment_methods),
                     stringResource(R.string.label_payment_methods),
@@ -111,7 +112,7 @@ fun AccountScreen(
                     }
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
-                AccountList(
+                ListWithTwoIcons(
                     Icons.Outlined.LocationOn,
                     stringResource(R.string.label_address),
                     stringResource(R.string.label_address),
@@ -119,6 +120,22 @@ fun AccountScreen(
                         showAddressBottomSheet = true
                     }
                 )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = onLogout
+                ){
+                    Text(
+                        stringResource(R.string.action_logout)
+                    )
+                }
             }
         }
 
@@ -128,7 +145,10 @@ fun AccountScreen(
                 sheetState = cardsSheetState
             ) {
                 PaymentMethodsSheetContent(
-                    onClose = { showCardsBottomSheet = false }
+                    onClose = { showCardsBottomSheet = false },
+                    onAddCard = {
+                        navController.navigate(Routes.AccountAddCard.route)
+                    }
                 )
             }
         }
@@ -149,5 +169,5 @@ fun AccountScreen(
 @Preview
 @Composable
 fun ProfileScreenPreview() {
-    AccountScreen(navController = NavController(LocalContext.current))
+    AccountScreen(navController = NavController(LocalContext.current), onLogout = {})
 }

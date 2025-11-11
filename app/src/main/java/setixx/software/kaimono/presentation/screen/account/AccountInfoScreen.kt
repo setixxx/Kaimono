@@ -1,5 +1,6 @@
 package setixx.software.kaimono.presentation.screen.account
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.ArrowBack
@@ -14,23 +17,30 @@ import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,8 +48,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import setixx.software.kaimono.presentation.navigation.Routes
 import setixx.software.kaimono.R
+import setixx.software.kaimono.core.component.ListWithTwoIcons
+import setixx.software.kaimono.core.component.PasswordChangeSheetContent
+import setixx.software.kaimono.core.component.PaymentMethodsSheetContent
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AccountInfoScreen(
     navController: NavController
@@ -49,6 +62,8 @@ fun AccountInfoScreen(
     var phoneFieldState by remember { mutableStateOf(false) }
     var emailFieldState by remember { mutableStateOf(false) }
     var dateOfBirthFieldState by remember { mutableStateOf(false) }
+    var showPasswordChangeSheet by remember { mutableStateOf(false) }
+    val passwordChangeSheetState = rememberModalBottomSheetState()
 
     val states = listOf(
         nameFieldState,
@@ -57,12 +72,15 @@ fun AccountInfoScreen(
         emailFieldState,
         dateOfBirthFieldState)
 
+    val options = listOf("Male", "Female")
+    var selectedIndex by remember { mutableIntStateOf(0) }
+
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Account Info",
+                    Text(stringResource(R.string.label_personal_info),
                         style = MaterialTheme.typography.headlineMedium
                     )
                 },
@@ -113,7 +131,7 @@ fun AccountInfoScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = "",
+                        value = "Maxim",
                         onValueChange = { nameFieldState = true },
                         label = { Text(stringResource(R.string.hint_name)) }
                     )
@@ -122,7 +140,7 @@ fun AccountInfoScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 48.dp, top = 8.dp, bottom = 8.dp),
-                    value = "",
+                    value = "Setixx",
                     onValueChange = { surnameFieldState = true },
                     label = { Text(stringResource(R.string.hint_surname)) }
                 )
@@ -139,7 +157,7 @@ fun AccountInfoScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = "",
+                        value = "+79999999999",
                         onValueChange = { phoneFieldState = true },
                         label = { Text(stringResource(R.string.hint_phone)) }
                     )
@@ -158,7 +176,7 @@ fun AccountInfoScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = "",
+                        value = "setixx@gmail.com",
                         onValueChange = { emailFieldState = true },
                         label = { Text(stringResource(R.string.hint_email)) }
                     )
@@ -175,11 +193,61 @@ fun AccountInfoScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = "",
+                        value = "09.10.2005",
                         onValueChange = { dateOfBirthFieldState = true },
                         label = { Text(stringResource(R.string.hint_date_of_birth)) }
                     )
                 }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        ButtonGroupDefaults.ConnectedSpaceBetween
+                    ),
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                ) {
+                    options.forEachIndexed { index, label ->
+                        ToggleButton(
+                            checked = selectedIndex == index,
+                            onCheckedChange = { selectedIndex = index },
+                            modifier = Modifier.weight(1f),
+                            shapes =
+                                when (index) {
+                                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                    options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                                },
+                        ) {
+                            if (selectedIndex == index) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null
+                                )
+                            }
+                            Text(label)
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.large)
+                ){
+                    ListWithTwoIcons(
+                        header = stringResource(R.string.label_password_change),
+                        contentDescription = stringResource(R.string.label_password_change),
+                        trailingIcon = Icons.Filled.ChevronRight,
+                        onClick = { showPasswordChangeSheet = true }
+                    )
+                }
+            }
+        }
+        if (showPasswordChangeSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showPasswordChangeSheet = false },
+                sheetState = passwordChangeSheetState
+            ) {
+                PasswordChangeSheetContent(
+                    onClose = { showPasswordChangeSheet = false }
+                )
             }
         }
     }

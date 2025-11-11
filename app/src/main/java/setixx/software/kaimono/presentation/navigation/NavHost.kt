@@ -10,10 +10,12 @@ import setixx.software.kaimono.presentation.screen.account.AccountInfoScreen
 import setixx.software.kaimono.presentation.screen.favorites.FavouritesScreen
 import setixx.software.kaimono.presentation.screen.home.HomeScreen
 import setixx.software.kaimono.presentation.screen.account.AccountScreen
+import setixx.software.kaimono.presentation.screen.account.AddCartScreen
 import setixx.software.kaimono.presentation.screen.cart.CartScreen
 
 @Composable
 fun NavHost(
+    onLogout: () -> Unit,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -30,10 +32,16 @@ fun NavHost(
             Routes.Account.route,
             Routes.AccountGraph.route
         ) {
-            composable(Routes.Account.route) { AccountScreen(navController) }
+            composable(Routes.Account.route) {
+                AccountScreen(
+                    navController,
+                    onLogout = onLogout
+                )
+            }
             composable(Routes.AccountInfo.route) { AccountInfoScreen(navController) }
             composable(Routes.AccountOrders.route) {  }
             composable(Routes.AccountReviews.route) {  }
+            composable(Routes.AccountAddCard.route) { AddCartScreen(navController) }
         }
     }
 }

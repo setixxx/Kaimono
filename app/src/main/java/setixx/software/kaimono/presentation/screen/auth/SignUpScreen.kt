@@ -23,7 +23,8 @@ import setixx.software.kaimono.R
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    onAction: () -> Unit
+    onSignUpSuccess: () -> Unit,
+    onNavigateToSignIn: () -> Unit
 ){
     Column(
         modifier = Modifier
@@ -76,20 +77,16 @@ fun SignUpScreen(
         Button(
             modifier = Modifier
                 .fillMaxWidth(),
-            onClick = {
-                onAction()
-            }
+            onClick = onSignUpSuccess
         ) {
-            Text(text = stringResource(R.string.action_sign_in))
+            Text(text = stringResource(R.string.action_sign_up))
         }
         OutlinedButton(
             modifier = Modifier
                 .fillMaxWidth(),
-            onClick = {
-                onAction()
-            }
+            onClick = onNavigateToSignIn
         ) {
-            Text(text = stringResource(R.string.action_sign_up))
+            Text(text = stringResource(R.string.action_sign_in))
         }
     }
 }
@@ -97,5 +94,5 @@ fun SignUpScreen(
 @Preview(showSystemUi = true)
 @Composable
 fun SignUpScreenPreview(){
-    SignUpScreen(onAction = {})
+    SignUpScreen(onSignUpSuccess = {}, onNavigateToSignIn = {})
 }

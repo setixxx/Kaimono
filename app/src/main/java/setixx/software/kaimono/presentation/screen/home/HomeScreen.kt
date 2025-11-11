@@ -24,15 +24,18 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -54,13 +57,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import setixx.software.kaimono.R
 import setixx.software.kaimono.core.component.CustomSearchBar
+import setixx.software.kaimono.core.component.PaymentMethodsSheetContent
 import setixx.software.kaimono.core.component.ProductCard
+import setixx.software.kaimono.core.component.ProductSheetContent
 import setixx.software.kaimono.presentation.navigation.Routes
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController
 ){
+    var showProductBottomSheet by remember { mutableStateOf(false) }
+    val productSheetState = rememberModalBottomSheetState(true)
+
+
     val listState = rememberLazyGridState()
     var previousIndex by remember { mutableStateOf(0) }
     var previousScrollOffset by remember { mutableStateOf(0) }
@@ -111,7 +121,24 @@ fun HomeScreen(
                     contentDescription = "",
                     header = "Product name",
                     price = 100,
-                    onClick = {}
+                    onClick = { showProductBottomSheet = true }
+                )
+            }
+        }
+        if (showProductBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showProductBottomSheet = false },
+                sheetState = productSheetState
+            ) {
+                ProductSheetContent(
+                    images = listOf(
+                        ImageBitmap.imageResource(R.drawable.placeholder),
+                        ImageBitmap.imageResource(R.drawable.placeholder),
+                        ImageBitmap.imageResource(R.drawable.placeholder),
+                    ),                    contentDescription = "",
+                    header = "Product name",
+                    price = 100,
+                    onClose = { showProductBottomSheet = false }
                 )
             }
         }

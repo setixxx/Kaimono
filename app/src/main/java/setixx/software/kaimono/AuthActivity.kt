@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import setixx.software.kaimono.presentation.screen.auth.SignInScreen
+import androidx.navigation.compose.rememberNavController
+import setixx.software.kaimono.presentation.navigation.AuthNavHost
 import setixx.software.kaimono.ui.theme.KaimonoTheme
 
 class AuthActivity : ComponentActivity() {
@@ -18,13 +19,17 @@ class AuthActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             KaimonoTheme {
+                val navController = rememberNavController()
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    SignInScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        onAction = {
+                    AuthNavHost(
+                        navController = navController,
+                        onAuthSuccess = {
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
-                        }
+                            finish()
+                        },
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             }

@@ -2,7 +2,6 @@ package setixx.software.kaimono.core.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CartList(
+fun ListWithPriceAndQuantity(
     quantity: Int,
     product: String,
     price: Double,
@@ -54,7 +53,7 @@ fun CartList(
 @Preview
 @Composable
 fun CartListPreview() {
-    CartList(
+    ListWithPriceAndQuantity(
         quantity = 1,
         product = "Product name",
         price = 100.00,

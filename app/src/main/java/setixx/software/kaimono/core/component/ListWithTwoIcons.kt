@@ -2,13 +2,11 @@ package setixx.software.kaimono.core.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AccountList(
-    icon: ImageVector,
+fun ListWithTwoIcons(
+    icon: ImageVector? = null,
     contentDescription: String,
     header: String,
     modifier: Modifier = Modifier,
@@ -37,19 +35,22 @@ fun AccountList(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            modifier = Modifier
-                .size(24.dp),
-            imageVector = icon,
-            contentDescription = contentDescription
-        )
+        icon?.let {
+            Icon(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .size(24.dp),
+                imageVector = icon,
+                contentDescription = contentDescription
+            )
+        }
 
         Text(
             text = header,
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 16.dp)
+                .padding(end = 16.dp)
                 .padding(vertical = 8.dp)
         )
 
@@ -68,7 +69,7 @@ fun AccountList(
 @Preview
 @Composable
 fun CustomListPreview(){
-    AccountList(
+    ListWithTwoIcons(
         icon = Icons.Outlined.CreditCard,
         contentDescription = "Credit card",
         header = "Credit card",
