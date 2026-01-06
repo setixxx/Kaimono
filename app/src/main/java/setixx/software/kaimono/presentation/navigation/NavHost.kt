@@ -6,15 +6,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import setixx.software.kaimono.presentation.screen.account.AccountInfoScreen
-import setixx.software.kaimono.presentation.screen.home.HomeScreen
-import setixx.software.kaimono.presentation.screen.account.AccountScreen
-import setixx.software.kaimono.presentation.screen.account.AccountAddAddressScreen
-import setixx.software.kaimono.presentation.screen.account.AccountAddCartScreen
-import setixx.software.kaimono.presentation.screen.account.AccountOrdersScreen
-import setixx.software.kaimono.presentation.screen.account.AccountReviewsScreen
-import setixx.software.kaimono.presentation.screen.cart.CartScreen
-import setixx.software.kaimono.presentation.screen.favorites.FavoritesScreen
+import setixx.software.kaimono.presentation.account.info.AccountInfoScreen
+import setixx.software.kaimono.presentation.home.HomeScreen
+import setixx.software.kaimono.presentation.account.AccountScreen
+import setixx.software.kaimono.presentation.account.address.AccountAddAddressScreen
+import setixx.software.kaimono.presentation.account.card.AccountAddCardScreen
+import setixx.software.kaimono.presentation.account.orders.AccountOrdersScreen
+import setixx.software.kaimono.presentation.account.reviews.AccountReviewsScreen
+import setixx.software.kaimono.presentation.cart.CartScreen
+import setixx.software.kaimono.presentation.favorites.FavoritesScreen
 
 @Composable
 fun NavHost(
@@ -44,7 +44,7 @@ fun NavHost(
             composable(Routes.AccountInfo.route) { AccountInfoScreen(navController) }
             composable(Routes.AccountOrders.route) { AccountOrdersScreen(navController) }
             composable(Routes.AccountReviews.route) { AccountReviewsScreen(navController) }
-            composable(Routes.AccountAddCard.route) { AccountAddCartScreen(navController) }
+            composable(Routes.AccountAddCard.route) { AccountAddCardScreen(navController) }
             composable(Routes.AccountAddAddress.route) { AccountAddAddressScreen(navController) }
         }
     }

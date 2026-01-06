@@ -61,4 +61,22 @@
     <string name="label_order">Order</string>
     <string name="label_delivered">Delivered</string>
     <string name="label_favorites">Favorites</string>
+    <string name="error_email_empty">An email cannot be empty</string>
+    <string name="error_email_format">Invalid email format</string>
+    <string name="error_phone_empty">A phone cannot be empty</string>
+    <string name="error_phone_format">Invalid phone format</string>
+    <string name="error_password_empty">The password cannot be empty</string>
+    <string name="hint_hide_password">Hide password</string>
+    <string name="hint_show_password">Show password</string>
+    <string name="error_invalid_credentials">Invalid email or password</string>
+    <string name="error_server_internal">Internal server error</string>
+    <string name="error_user_exists">User email or phone already exists</string>
+    <string name="error_no_internet">Internet connection error</string>
+    <string name="error_generic_api">Error %1$s</string>
+    <string name="error_unknown">Unknown error: %1$s</string>
+    <string name="error_password_length">Password must be at least 8 characters</string>
+    <string name="error_password_complexity">Password must contain uppercase, lowercase letters and digits</string>
+    <string name="error_confirm_password_empty">Please confirm your password</string>
+    <string name="error_passwords_mismatch">Passwords do not match</string>
+
 </resources>

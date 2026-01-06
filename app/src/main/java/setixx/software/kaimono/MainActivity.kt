@@ -13,11 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import setixx.software.kaimono.core.ui.theme.KaimonoTheme
+import dagger.hilt.android.AndroidEntryPoint
+import setixx.software.kaimono.presentation.theme.KaimonoTheme
 import setixx.software.kaimono.presentation.navigation.BottomNavigationBar
 import setixx.software.kaimono.presentation.navigation.NavHost
 import setixx.software.kaimono.presentation.navigation.Routes
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +51,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun BottomNavigationBarPreview() {
 }
