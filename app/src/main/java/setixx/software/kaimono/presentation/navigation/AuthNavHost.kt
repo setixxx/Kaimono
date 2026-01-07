@@ -5,9 +5,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import setixx.software.kaimono.presentation.auth.signin.LoginScreen
+import setixx.software.kaimono.presentation.auth.signin.SignInScreen
 import setixx.software.kaimono.presentation.auth.signin.SignInViewModel
-import setixx.software.kaimono.presentation.auth.signup.RegisterScreen
+import setixx.software.kaimono.presentation.auth.signup.SignUpScreen
 import setixx.software.kaimono.presentation.auth.signup.SignUpViewModel
 
 @Composable
@@ -24,7 +24,7 @@ fun AuthNavHost(
         modifier = modifier
     ) {
         composable(AuthRoutes.SignIn.route) {
-            LoginScreen(
+            SignInScreen(
                 onSignInSuccess = onAuthSuccess,
                 onNavigateToSignUp = {
                     navController.navigate(AuthRoutes.SignUp.route)
@@ -34,7 +34,7 @@ fun AuthNavHost(
         }
 
         composable(AuthRoutes.SignUp.route) {
-            RegisterScreen(
+            SignUpScreen(
                 onSignUpSuccess = onAuthSuccess,
                 onNavigateToSignIn = {
                     navController.popBackStack()

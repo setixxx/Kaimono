@@ -78,5 +78,5 @@
     <string name="error_password_complexity">Password must contain uppercase, lowercase letters and digits</string>
     <string name="error_confirm_password_empty">Please confirm your password</string>
     <string name="error_passwords_mismatch">Passwords do not match</string>
-
+    <string name="error_invalid_token">Invalid token</string>
 </resources>

@@ -26,11 +26,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,22 +57,24 @@ import setixx.software.kaimono.presentation.components.PasswordChangeSheetConten
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AccountInfoScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: AccountInfoViewModel
 ){
-    var nameFieldState by remember { mutableStateOf(false) }
-    var surnameFieldState by remember { mutableStateOf(false) }
-    var phoneFieldState by remember { mutableStateOf(false) }
-    var emailFieldState by remember { mutableStateOf(false) }
-    var dateOfBirthFieldState by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let { error ->
+            snackBarHostState.showSnackbar(
+                message = error,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.clearError()
+        }
+    }
+
     var showPasswordChangeSheet by remember { mutableStateOf(false) }
     val passwordChangeSheetState = rememberModalBottomSheetState()
-
-    val states = listOf(
-        nameFieldState,
-        surnameFieldState,
-        phoneFieldState,
-        emailFieldState,
-        dateOfBirthFieldState)
 
     val options = listOf("Male", "Female")
     var selectedIndex by remember { mutableIntStateOf(0) }
@@ -97,13 +104,16 @@ fun AccountInfoScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {  },
-                expanded = states.any { it },
+                expanded = false,
                 icon = { Icon(Icons.Filled.Save,
                     stringResource(R.string.action_save)) },
                 text = { Text(text = stringResource(R.string.action_save)) },
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
+        snackbarHost = {
+            SnackbarHost(snackBarHostState)
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -128,8 +138,8 @@ fun AccountInfoScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = "Maxim",
-                        onValueChange = { nameFieldState = true },
+                        value = state.name,
+                        onValueChange = viewModel::onNameChange,
                         label = { Text(stringResource(R.string.hint_name)) }
                     )
                 }
@@ -137,8 +147,8 @@ fun AccountInfoScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 48.dp, top = 8.dp, bottom = 8.dp),
-                    value = "Setixx",
-                    onValueChange = { surnameFieldState = true },
+                    value = state.surname,
+                    onValueChange = viewModel::onSurnameChange,
                     label = { Text(stringResource(R.string.hint_surname)) }
                 )
                 Row(
@@ -154,8 +164,8 @@ fun AccountInfoScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = "+79999999999",
-                        onValueChange = { phoneFieldState = true },
+                        value = state.phone,
+                        onValueChange = viewModel::onPhoneChange,
                         label = { Text(stringResource(R.string.hint_phone)) }
                     )
                 }
@@ -173,8 +183,8 @@ fun AccountInfoScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = "setixx@gmail.com",
-                        onValueChange = { emailFieldState = true },
+                        value = state.email,
+                        onValueChange = viewModel::onEmailChange,
                         label = { Text(stringResource(R.string.hint_email)) }
                     )
                 }
@@ -190,8 +200,8 @@ fun AccountInfoScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = "09.10.2005",
-                        onValueChange = { dateOfBirthFieldState = true },
+                        value = state.dateOfBirth,
+                        onValueChange = viewModel::onDateOfBirthChange,
                         label = { Text(stringResource(R.string.hint_date_of_birth)) }
                     )
                 }
@@ -248,10 +258,4 @@ fun AccountInfoScreen(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AccountInfoScreenPreview(){
-    AccountInfoScreen(navController = NavController(LocalContext.current))
 }

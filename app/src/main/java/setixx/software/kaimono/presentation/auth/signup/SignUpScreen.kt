@@ -34,12 +34,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import setixx.software.kaimono.R
 
 @Composable
-fun RegisterScreen(
+fun SignUpScreen(
     modifier: Modifier = Modifier,
     onSignUpSuccess: () -> Unit,
     onNavigateToSignIn: () -> Unit,
@@ -61,7 +60,7 @@ fun RegisterScreen(
         snackbarHost = {
             SnackbarHost(snackBarHostState)
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

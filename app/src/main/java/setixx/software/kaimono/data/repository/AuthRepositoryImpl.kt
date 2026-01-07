@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
 import setixx.software.kaimono.R
+import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.remote.AuthApi
 import setixx.software.kaimono.data.remote.dto.SignInRequest
 import setixx.software.kaimono.data.remote.dto.SignUpRequest
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authApi: AuthApi,
+    private val tokenManager: TokenManager,
     @ApplicationContext private val context: Context,
 ) : AuthRepository {
 
@@ -25,7 +27,9 @@ class AuthRepositoryImpl @Inject constructor(
     ): AuthResult<AuthTokens> {
         return try {
             val response = authApi.signIn(SignInRequest(email, password))
-            AuthResult.Success(AuthTokens(response.accessToken, response.refreshToken))
+            val tokens = AuthTokens(response.accessToken, response.refreshToken)
+            tokenManager.saveTokens(tokens)
+            AuthResult.Success(tokens)
         } catch (e: HttpException) {
             val errorMessage = when (e.code()) {
                 401 -> context.getString(R.string.error_invalid_credentials)
@@ -63,7 +67,8 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout(): AuthResult<Unit> {
-        TODO("Not yet implemented")
+        tokenManager.clearTokens()
+        return AuthResult.Success(Unit)
     }
 
     override suspend fun getCurrentUser(): AuthResult<User> {
@@ -75,7 +80,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isLoggedIn(): Boolean {
-        TODO("Not yet implemented")
+        return tokenManager.getAccessToken() != null
     }
 
     override suspend fun getSavedEmail(): String? {

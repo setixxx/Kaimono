@@ -11,9 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import setixx.software.kaimono.presentation.account.info.AccountInfoViewModel
 import setixx.software.kaimono.presentation.theme.KaimonoTheme
 import setixx.software.kaimono.presentation.navigation.BottomNavigationBar
 import setixx.software.kaimono.presentation.navigation.NavHost
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
 
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+                val accountInfoViewModel = hiltViewModel<AccountInfoViewModel>()
 
                 Scaffold(
                     bottomBar = {
@@ -45,7 +48,8 @@ class MainActivity : ComponentActivity() {
                             finish()
                         },
                         navController = navController,
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        accountInfoViewModel = accountInfoViewModel
                     )
                 }
             }
