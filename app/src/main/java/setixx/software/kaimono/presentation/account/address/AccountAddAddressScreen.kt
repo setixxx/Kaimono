@@ -122,7 +122,6 @@ fun AccountAddAddressScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onClick = {
-                        // Сохранение адреса
                         navController.popBackStack()
                     }
                 ) {

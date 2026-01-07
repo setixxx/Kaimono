@@ -1,23 +1,28 @@
 package setixx.software.kaimono.presentation.auth.signin
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import setixx.software.kaimono.R
 import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.usecase.SignInUseCase
+import setixx.software.kaimono.domain.validation.EmailValidator
+import setixx.software.kaimono.domain.validation.PasswordValidator
+import setixx.software.kaimono.domain.validation.ValidationResult
+import setixx.software.kaimono.presentation.common.ErrorMapper
+import setixx.software.kaimono.presentation.common.ValidationErrorMapper
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val signInUseCase: SignInUseCase
+    private val signInUseCase: SignInUseCase,
+    private val errorMapper: ErrorMapper,
+    private val validationErrorMapper: ValidationErrorMapper,
+    private val emailValidator: EmailValidator,
+    private val passwordValidator: PasswordValidator
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SignInState())
@@ -46,7 +51,9 @@ class SignInViewModel @Inject constructor(
     }
 
     fun onSignInClick(onSuccess: () -> Unit) {
+/*
         if (!validateInput()) return
+*/
 
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, errorMessage = null)
@@ -63,7 +70,7 @@ class SignInViewModel @Inject constructor(
                 is ApiResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = result.message
+                        errorMessage = errorMapper.mapToMessage(result.error)
                     )
                 }
 
@@ -73,33 +80,29 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun validateInput(): Boolean {
-        val email = _state.value.email.trim()
-        val password = _state.value.password
+        val emailResult = emailValidator.validate(_state.value.email)
+        val passwordResult = passwordValidator.validate(_state.value.password)
 
         var isValid = true
 
-        if (email.isEmpty()) {
-            _state.value = _state.value.copy(emailError = context.getString(R.string.error_email_empty))
-            isValid = false
-        } else if (!isValidEmail(email)) {
-            _state.value = _state.value.copy(emailError = context.getString(R.string.error_email_format))
+        if (emailResult is ValidationResult.Error) {
+            _state.value = _state.value.copy(
+                emailError = validationErrorMapper.mapToMessage(emailResult.error)
+            )
             isValid = false
         }
 
-        if (password.isEmpty()) {
-            _state.value = _state.value.copy(passwordError = context.getString(R.string.error_password_empty))
+        if (passwordResult is ValidationResult.Error) {
+            _state.value = _state.value.copy(
+                passwordError = validationErrorMapper.mapToMessage(passwordResult.error)
+            )
             isValid = false
         }
 
         return isValid
     }
 
-    private fun isValidEmail(email: String): Boolean {
-        return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))
-    }
-
     fun clearError() {
         _state.value = _state.value.copy(errorMessage = null)
     }
-
 }

@@ -1,28 +1,36 @@
 package setixx.software.kaimono.presentation.account.info
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import setixx.software.kaimono.R
 import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.model.Gender
 import setixx.software.kaimono.domain.model.UserUpdate
 import setixx.software.kaimono.domain.usecase.GetCurrentUserUseCase
 import setixx.software.kaimono.domain.usecase.UpdateUserInfoUseCase
+import setixx.software.kaimono.domain.validation.EmailValidator
+import setixx.software.kaimono.domain.validation.NameValidator
+import setixx.software.kaimono.domain.validation.PhoneValidator
+import setixx.software.kaimono.domain.validation.ValidationResult
+import setixx.software.kaimono.presentation.common.ErrorMapper
+import setixx.software.kaimono.presentation.common.ValidationErrorMapper
 import javax.inject.Inject
 
 @HiltViewModel
 class AccountInfoViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val updateUserInfoUseCase: UpdateUserInfoUseCase
+    private val updateUserInfoUseCase: UpdateUserInfoUseCase,
+    private val errorMapper: ErrorMapper,
+    private val validationErrorMapper: ValidationErrorMapper,
+    private val emailValidator: EmailValidator,
+    private val phoneValidator: PhoneValidator,
+    private val nameValidator: NameValidator
 ) : ViewModel() {
+
     private val _state = MutableStateFlow(AccountInfoState())
     val state: StateFlow<AccountInfoState> = _state.asStateFlow()
 
@@ -40,10 +48,10 @@ class AccountInfoViewModel @Inject constructor(
 
                     _state.value = _state.value.copy(
                         name = user.name,
-                        surname = user.surname!!,
+                        surname = user.surname ?: "Not specified",
                         phone = user.phone,
                         email = user.email,
-                        dateOfBirth = user.birthday!!,
+                        dateOfBirth = user.birthday ?: "Not specified",
                         gender = user.gender.toString(),
                         isLoading = false,
                         errorMessage = null
@@ -52,19 +60,17 @@ class AccountInfoViewModel @Inject constructor(
                 is ApiResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = result.message,
+                        errorMessage = errorMapper.mapToMessage(result.error)
                     )
                 }
                 else -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                    )
+                    _state.value = _state.value.copy(isLoading = false)
                 }
             }
         }
     }
 
-    private fun updateUserInfo(){
+    fun updateUserInfo(){
         if (!validateInputs()) return
 
         viewModelScope.launch {
@@ -85,10 +91,10 @@ class AccountInfoViewModel @Inject constructor(
 
                     _state.value = _state.value.copy(
                         name = data.name,
-                        surname = data.surname!!,
+                        surname = data.surname ?: "Not specified",
                         phone = data.phone,
                         email = data.email,
-                        dateOfBirth = data.birthday!!,
+                        dateOfBirth = data.birthday ?: "Not specified",
                         gender = data.gender.toString(),
                         isLoading = false,
                         errorMessage = null
@@ -97,13 +103,11 @@ class AccountInfoViewModel @Inject constructor(
                 is ApiResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = result.message,
+                        errorMessage = errorMapper.mapToMessage(result.error)
                     )
                 }
                 else -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                    )
+                    _state.value = _state.value.copy(isLoading = false)
                 }
             }
         }
@@ -154,72 +158,41 @@ class AccountInfoViewModel @Inject constructor(
     }
 
     private fun validateInputs(): Boolean {
-        val name = _state.value.name.trim()
-        val surname = _state.value.surname.trim()
-        val phone = _state.value.phone.trim()
-        val email = _state.value.email.trim()
+        val nameResult = nameValidator.validateName(_state.value.name)
+        val surnameResult = nameValidator.validateSurname(_state.value.surname)
+        val phoneResult = phoneValidator.validate(_state.value.phone)
+        val emailResult = emailValidator.validate(_state.value.email)
 
         var isValid = true
 
-        if (name.isBlank()) {
+        if (nameResult is ValidationResult.Error) {
             _state.value = _state.value.copy(
-                nameError = context.getString(R.string.error_name_empty)
-            )
-            isValid = false
-        } else if (!isValidNameOrSurname(name)) {
-            _state.value = _state.value.copy(
-                nameError = context.getString(R.string.error_name_format)
+                nameError = validationErrorMapper.mapToMessage(nameResult.error)
             )
             isValid = false
         }
 
-        if (surname.isBlank()) {
+        if (surnameResult is ValidationResult.Error) {
             _state.value = _state.value.copy(
-                surnameError = context.getString(R.string.error_surname_empty)
-            )
-            isValid = false
-        } else if (!isValidNameOrSurname(surname)) {
-            _state.value = _state.value.copy(
-                surnameError = context.getString(R.string.error_surname_format)
+                surnameError = validationErrorMapper.mapToMessage(surnameResult.error)
             )
             isValid = false
         }
 
-        if (phone.isBlank()) {
+        if (phoneResult is ValidationResult.Error) {
             _state.value = _state.value.copy(
-                phoneError = context.getString(R.string.error_phone_empty)
-            )
-            isValid = false
-        } else if (!isPhoneValid(phone)) {
-            _state.value = _state.value.copy(
-                phoneError = context.getString(R.string.error_phone_format)
+                phoneError = validationErrorMapper.mapToMessage(phoneResult.error)
             )
             isValid = false
         }
 
-        if (email.isBlank()) {
+        if (emailResult is ValidationResult.Error) {
             _state.value = _state.value.copy(
-                emailError = context.getString(R.string.error_email_empty)
-            )
-            isValid = false
-        } else if (!isValidEmail(email)) {
-            _state.value = _state.value.copy(
-                emailError = context.getString(R.string.error_email_format)
+                emailError = validationErrorMapper.mapToMessage(emailResult.error)
             )
             isValid = false
         }
+
         return isValid
-    }
-
-    private fun isValidEmail(email: String): Boolean {
-        return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))
-    }
-
-    private fun isValidNameOrSurname(nameOrSurname: String): Boolean {
-        return nameOrSurname.matches(Regex("^[a-zA-Zа-яА-Я]+$"))
-    }
-
-    private fun isPhoneValid(phone: String): Boolean {
-        return phone.matches(Regex("^\\d{10}$"))
     }
 }

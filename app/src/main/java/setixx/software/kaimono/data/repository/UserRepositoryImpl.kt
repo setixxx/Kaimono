@@ -1,14 +1,12 @@
 package setixx.software.kaimono.data.repository
 
-import android.content.Context
 import android.util.Log
-import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
-import setixx.software.kaimono.R
 import setixx.software.kaimono.data.remote.UserApi
 import setixx.software.kaimono.data.remote.dto.UpdateUserInfoRequest
 import setixx.software.kaimono.data.remote.dto.UpdateUserInfoResponse
 import setixx.software.kaimono.domain.model.ApiResult
+import setixx.software.kaimono.domain.validation.DomainError
 import setixx.software.kaimono.domain.model.Gender
 import setixx.software.kaimono.domain.model.User
 import setixx.software.kaimono.domain.model.UserUpdate
@@ -17,35 +15,35 @@ import java.io.IOException
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userApi: UserApi,
-    @ApplicationContext private val context: Context,
+    private val userApi: UserApi
 ) : UserRepository {
+
     override suspend fun getCurrentUser(): ApiResult<User> {
         return try {
             val response = userApi.getCurrentUser()
             val user = User(
                 id = response.id,
                 name = response.name,
-                surname = response.surname ?: context.getString(R.string.label_not_specified),
+                surname = response.surname,
                 phone = response.phone,
                 email = response.email,
-                birthday = response.birthDate ?: context.getString(R.string.label_not_specified),
+                birthday = response.birthDate,
                 gender = Gender.valueOf(response.gender)
             )
             ApiResult.Success(user)
         } catch (e: HttpException) {
             Log.d("UserInfo", e.message())
-            val errorMessage = when (e.code()) {
-                401 -> context.getString(R.string.error_invalid_token)
-                500 -> context.getString(R.string.error_server_internal)
-                else -> context.getString(R.string.error_generic_api, e.message())
+            val error = when (e.code()) {
+                401 -> DomainError.InvalidToken
+                500 -> DomainError.ServerInternal
+                else -> DomainError.HttpError(e.code(), e.message())
             }
-            ApiResult.Error(errorMessage)
+            ApiResult.Error(error)
         } catch (e: IOException) {
-            ApiResult.Error(context.getString(R.string.error_no_internet))
+            ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
             Log.d("UserInfo", e.message.toString())
-            ApiResult.Error(context.getString(R.string.error_unknown, e.message))
+            ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
 
@@ -62,21 +60,21 @@ class UserRepositoryImpl @Inject constructor(
             val response = userApi.updateUserInfo(request)
 
             if (!response.isConsistentWith(request)) {
-                ApiResult.Error(context.getString(R.string.error_data_consistent))
+                ApiResult.Error(DomainError.DataInconsistent)
             } else {
                 ApiResult.Success(userUpdate)
             }
         } catch (e: HttpException) {
-            val errorMessage = when (e.code()) {
-                409 -> context.getString(R.string.error_user_exists)
-                500 -> context.getString(R.string.error_server_internal)
-                else -> context.getString(R.string.error_generic_api, e.message())
+            val error = when (e.code()) {
+                409 -> DomainError.UserAlreadyExists
+                500 -> DomainError.ServerInternal
+                else -> DomainError.HttpError(e.code(), e.message())
             }
-            ApiResult.Error(errorMessage)
+            ApiResult.Error(error)
         } catch (e: IOException) {
-            ApiResult.Error(context.getString(R.string.error_no_internet))
+            ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            ApiResult.Error(context.getString(R.string.error_unknown, e.message))
+            ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
 }

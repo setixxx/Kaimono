@@ -1,24 +1,32 @@
 package setixx.software.kaimono.presentation.auth.signup
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import setixx.software.kaimono.R
 import setixx.software.kaimono.domain.usecase.SignUpUseCase
 import javax.inject.Inject
 import setixx.software.kaimono.domain.model.ApiResult
+import setixx.software.kaimono.domain.validation.EmailValidator
+import setixx.software.kaimono.domain.validation.PasswordValidator
+import setixx.software.kaimono.domain.validation.PhoneValidator
+import setixx.software.kaimono.domain.validation.ValidationResult
+import setixx.software.kaimono.presentation.common.ErrorMapper
+import setixx.software.kaimono.presentation.common.ValidationErrorMapper
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val signUpUseCase: SignUpUseCase
+    private val signUpUseCase: SignUpUseCase,
+    private val errorMapper: ErrorMapper,
+    private val validationErrorMapper: ValidationErrorMapper,
+    private val emailValidator: EmailValidator,
+    private val phoneValidator: PhoneValidator,
+    private val passwordValidator: PasswordValidator
 ) : ViewModel() {
+
     private val _state = MutableStateFlow(SignUpState())
     val state: StateFlow<SignUpState> = _state.asStateFlow()
 
@@ -84,7 +92,7 @@ class SignUpViewModel @Inject constructor(
                 is ApiResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = result.message
+                        errorMessage = errorMapper.mapToMessage(result.error)
                     )
                 }
                 else -> {}
@@ -93,82 +101,45 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun validateInput(): Boolean {
-        val email = _state.value.email.trim()
-        val phone = _state.value.phone
-        val password = _state.value.password
-        val confirmPassword = _state.value.confirmPassword
+        val emailResult = emailValidator.validate(_state.value.email)
+        val phoneResult = phoneValidator.validate(_state.value.phone)
+        val passwordResult = passwordValidator.validate(_state.value.password)
+        val confirmPasswordResult = passwordValidator.validateConfirmation(
+            _state.value.password,
+            _state.value.confirmPassword
+        )
 
         var isValid = true
 
-        if (email.isEmpty()) {
+        if (emailResult is ValidationResult.Error) {
             _state.value = _state.value.copy(
-                emailError = context.getString(R.string.error_email_empty)
-            )
-            isValid = false
-        } else if (!isValidEmail(email)) {
-            _state.value = _state.value.copy(
-                emailError = context.getString(R.string.error_email_format)
+                emailError = validationErrorMapper.mapToMessage(emailResult.error)
             )
             isValid = false
         }
 
-        if (phone.isEmpty()){
+        if (phoneResult is ValidationResult.Error) {
             _state.value = _state.value.copy(
-                phoneError = context.getString(R.string.error_phone_empty)
-            )
-            isValid = false
-        } else if (!isPhoneValid(phone)) {
-            _state.value = _state.value.copy(
-                phoneError = context.getString(R.string.error_phone_format)
+                phoneError = validationErrorMapper.mapToMessage(phoneResult.error)
             )
             isValid = false
         }
 
-        if (password.isEmpty()) {
+        if (passwordResult is ValidationResult.Error) {
             _state.value = _state.value.copy(
-                passwordError = context.getString(R.string.error_password_empty)
-            )
-            isValid = false
-        } else if (password.length < 8) {
-            _state.value = _state.value.copy(
-                passwordError = context.getString(R.string.error_password_length)
-            )
-            isValid = false
-        } else if (!isValidPassword(password)) {
-            _state.value = _state.value.copy(
-                passwordError = context.getString(R.string.error_password_complexity)
+                passwordError = validationErrorMapper.mapToMessage(passwordResult.error)
             )
             isValid = false
         }
 
-        if (confirmPassword.isEmpty()) {
+        if (confirmPasswordResult is ValidationResult.Error) {
             _state.value = _state.value.copy(
-                confirmPasswordError = context.getString(R.string.error_confirm_password_empty)
-            )
-            isValid = false
-        } else if (password != confirmPassword) {
-            _state.value = _state.value.copy(
-                confirmPasswordError = context.getString(R.string.error_passwords_mismatch)
+                confirmPasswordError = validationErrorMapper.mapToMessage(confirmPasswordResult.error)
             )
             isValid = false
         }
 
         return isValid
-    }
-
-    private fun isValidEmail(email: String): Boolean {
-        return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))
-    }
-
-    private fun isPhoneValid(phone: String): Boolean {
-        return phone.matches(Regex("^\\d{10}$"))
-    }
-
-    private fun isValidPassword(password: String): Boolean {
-        val hasUpperCase = password.any { it.isUpperCase() }
-        val hasLowerCase = password.any { it.isLowerCase() }
-        val hasDigit = password.any { it.isDigit() }
-        return hasUpperCase && hasLowerCase && hasDigit
     }
 
     fun clearError() {

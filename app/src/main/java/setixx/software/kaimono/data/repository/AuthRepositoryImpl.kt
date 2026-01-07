@@ -1,15 +1,13 @@
 package setixx.software.kaimono.data.repository
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
-import setixx.software.kaimono.R
 import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.remote.AuthApi
 import setixx.software.kaimono.data.remote.dto.SignInRequest
 import setixx.software.kaimono.data.remote.dto.SignUpRequest
 import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.model.AuthTokens
+import setixx.software.kaimono.domain.validation.DomainError
 import setixx.software.kaimono.domain.model.User
 import setixx.software.kaimono.domain.repository.AuthRepository
 import java.io.IOException
@@ -17,8 +15,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authApi: AuthApi,
-    private val tokenManager: TokenManager,
-    @ApplicationContext private val context: Context,
+    private val tokenManager: TokenManager
 ) : AuthRepository {
 
     override suspend fun signIn(
@@ -31,16 +28,16 @@ class AuthRepositoryImpl @Inject constructor(
             tokenManager.saveTokens(tokens)
             ApiResult.Success(tokens)
         } catch (e: HttpException) {
-            val errorMessage = when (e.code()) {
-                401 -> context.getString(R.string.error_invalid_credentials)
-                500 -> context.getString(R.string.error_server_internal)
-                else -> context.getString(R.string.error_generic_api, e.message())
+            val error = when (e.code()) {
+                401 -> DomainError.InvalidCredentials
+                500 -> DomainError.ServerInternal
+                else -> DomainError.HttpError(e.code(), e.message())
             }
-            ApiResult.Error(errorMessage)
+            ApiResult.Error(error)
         } catch (e: IOException) {
-            ApiResult.Error(context.getString(R.string.error_no_internet))
+            ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            ApiResult.Error(context.getString(R.string.error_unknown, e.message))
+            ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
 
@@ -53,16 +50,16 @@ class AuthRepositoryImpl @Inject constructor(
             val response = authApi.signUp(SignUpRequest(email, phone, password))
             ApiResult.Success(response.publicId)
         } catch (e: HttpException) {
-            val errorMessage = when (e.code()) {
-                409 -> context.getString(R.string.error_user_exists)
-                500 -> context.getString(R.string.error_server_internal)
-                else -> context.getString(R.string.error_generic_api, e.message())
+            val error = when (e.code()) {
+                409 -> DomainError.UserAlreadyExists
+                500 -> DomainError.ServerInternal
+                else -> DomainError.HttpError(e.code(), e.message())
             }
-            ApiResult.Error(errorMessage)
+            ApiResult.Error(error)
         } catch (e: IOException) {
-            ApiResult.Error(context.getString(R.string.error_no_internet))
+            ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            ApiResult.Error(context.getString(R.string.error_unknown, e.message))
+            ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
 
