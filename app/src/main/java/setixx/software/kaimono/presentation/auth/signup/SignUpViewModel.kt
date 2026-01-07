@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import setixx.software.kaimono.R
 import setixx.software.kaimono.domain.usecase.SignUpUseCase
 import javax.inject.Inject
-import setixx.software.kaimono.domain.model.AuthResult
+import setixx.software.kaimono.domain.model.ApiResult
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -77,11 +77,11 @@ class SignUpViewModel @Inject constructor(
                 phone = _state.value.phone,
                 password = _state.value.password
             )) {
-                is AuthResult.Success -> {
+                is ApiResult.Success -> {
                     _state.value = _state.value.copy(isLoading = false)
                     onSuccess()
                 }
-                is AuthResult.Error -> {
+                is ApiResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
                         errorMessage = result.message
@@ -117,7 +117,7 @@ class SignUpViewModel @Inject constructor(
                 phoneError = context.getString(R.string.error_phone_empty)
             )
             isValid = false
-        } else if (phone.length < 11) {
+        } else if (!isPhoneValid(phone)) {
             _state.value = _state.value.copy(
                 phoneError = context.getString(R.string.error_phone_format)
             )
@@ -158,6 +158,10 @@ class SignUpViewModel @Inject constructor(
 
     private fun isValidEmail(email: String): Boolean {
         return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))
+    }
+
+    private fun isPhoneValid(phone: String): Boolean {
+        return phone.matches(Regex("^\\d{10}$"))
     }
 
     private fun isValidPassword(password: String): Boolean {

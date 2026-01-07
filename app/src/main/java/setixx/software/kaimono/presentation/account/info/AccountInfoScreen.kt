@@ -44,9 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import setixx.software.kaimono.presentation.navigation.Routes
@@ -76,8 +74,8 @@ fun AccountInfoScreen(
     var showPasswordChangeSheet by remember { mutableStateOf(false) }
     val passwordChangeSheetState = rememberModalBottomSheetState()
 
-    val options = listOf("Male", "Female")
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    val genders = listOf(stringResource(R.string.label_male), stringResource(R.string.label_female))
+    var selectedGenderIndex by remember { mutableIntStateOf(0) }
 
 
     Scaffold(
@@ -212,19 +210,19 @@ fun AccountInfoScreen(
                     modifier = Modifier
                         .padding(vertical = 16.dp)
                 ) {
-                    options.forEachIndexed { index, label ->
+                    genders.forEachIndexed { index, label ->
                         ToggleButton(
-                            checked = selectedIndex == index,
-                            onCheckedChange = { selectedIndex = index },
+                            checked = selectedGenderIndex == index,
+                            onCheckedChange = { selectedGenderIndex = index },
                             modifier = Modifier.weight(1f),
                             shapes =
                                 when (index) {
                                     0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                    options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                    genders.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
                                     else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                                 },
                         ) {
-                            if (selectedIndex == index) {
+                            if (selectedGenderIndex == index) {
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = null

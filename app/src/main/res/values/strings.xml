@@ -79,4 +79,12 @@
     <string name="error_confirm_password_empty">Please confirm your password</string>
     <string name="error_passwords_mismatch">Passwords do not match</string>
     <string name="error_invalid_token">Invalid token</string>
+    <string name="label_not_specified">Not specified</string>
+    <string name="label_male">Male</string>
+    <string name="label_female">Female</string>
+    <string name="error_name_empty">Name cannot be empty</string>
+    <string name="error_name_format">Name must contain only letters</string>
+    <string name="error_surname_empty">Surname cannot be empty</string>
+    <string name="error_surname_format">Surname must contain only letters</string>
+    <string name="error_data_consistent">Something went wrong</string>
 </resources>

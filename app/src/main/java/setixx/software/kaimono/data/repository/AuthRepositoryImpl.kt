@@ -8,7 +8,7 @@ import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.remote.AuthApi
 import setixx.software.kaimono.data.remote.dto.SignInRequest
 import setixx.software.kaimono.data.remote.dto.SignUpRequest
-import setixx.software.kaimono.domain.model.AuthResult
+import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.model.AuthTokens
 import setixx.software.kaimono.domain.model.User
 import setixx.software.kaimono.domain.repository.AuthRepository
@@ -24,23 +24,23 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signIn(
         email: String,
         password: String
-    ): AuthResult<AuthTokens> {
+    ): ApiResult<AuthTokens> {
         return try {
             val response = authApi.signIn(SignInRequest(email, password))
             val tokens = AuthTokens(response.accessToken, response.refreshToken)
             tokenManager.saveTokens(tokens)
-            AuthResult.Success(tokens)
+            ApiResult.Success(tokens)
         } catch (e: HttpException) {
             val errorMessage = when (e.code()) {
                 401 -> context.getString(R.string.error_invalid_credentials)
                 500 -> context.getString(R.string.error_server_internal)
                 else -> context.getString(R.string.error_generic_api, e.message())
             }
-            AuthResult.Error(errorMessage)
+            ApiResult.Error(errorMessage)
         } catch (e: IOException) {
-            AuthResult.Error(context.getString(R.string.error_no_internet))
+            ApiResult.Error(context.getString(R.string.error_no_internet))
         } catch (e: Exception) {
-            AuthResult.Error(context.getString(R.string.error_unknown, e.message))
+            ApiResult.Error(context.getString(R.string.error_unknown, e.message))
         }
     }
 
@@ -48,34 +48,34 @@ class AuthRepositoryImpl @Inject constructor(
         email: String,
         phone: String,
         password: String
-    ): AuthResult<String> {
+    ): ApiResult<String> {
         return try {
             val response = authApi.signUp(SignUpRequest(email, phone, password))
-            AuthResult.Success(response.publicId)
+            ApiResult.Success(response.publicId)
         } catch (e: HttpException) {
             val errorMessage = when (e.code()) {
                 409 -> context.getString(R.string.error_user_exists)
                 500 -> context.getString(R.string.error_server_internal)
                 else -> context.getString(R.string.error_generic_api, e.message())
             }
-            AuthResult.Error(errorMessage)
+            ApiResult.Error(errorMessage)
         } catch (e: IOException) {
-            AuthResult.Error(context.getString(R.string.error_no_internet))
+            ApiResult.Error(context.getString(R.string.error_no_internet))
         } catch (e: Exception) {
-            AuthResult.Error(context.getString(R.string.error_unknown, e.message))
+            ApiResult.Error(context.getString(R.string.error_unknown, e.message))
         }
     }
 
-    override suspend fun logout(): AuthResult<Unit> {
+    override suspend fun logout(): ApiResult<Unit> {
         tokenManager.clearTokens()
-        return AuthResult.Success(Unit)
+        return ApiResult.Success(Unit)
     }
 
-    override suspend fun getCurrentUser(): AuthResult<User> {
+    override suspend fun getCurrentUser(): ApiResult<User> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun refreshAccessToken(): AuthResult<String> {
+    override suspend fun refreshAccessToken(): ApiResult<String> {
         TODO("Not yet implemented")
     }
 

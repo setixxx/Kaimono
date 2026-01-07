@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import setixx.software.kaimono.R
-import setixx.software.kaimono.domain.model.AuthResult
+import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.usecase.SignInUseCase
 import javax.inject.Inject
 
@@ -55,12 +55,12 @@ class SignInViewModel @Inject constructor(
                 email = _state.value.email.trim(),
                 password = _state.value.password,
             )) {
-                is AuthResult.Success -> {
+                is ApiResult.Success -> {
                     _state.value = _state.value.copy(isLoading = false)
                     onSuccess()
                 }
 
-                is AuthResult.Error -> {
+                is ApiResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
                         errorMessage = result.message

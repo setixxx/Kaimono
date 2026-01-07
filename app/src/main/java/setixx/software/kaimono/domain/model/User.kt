@@ -11,6 +11,15 @@ data class User(
 )
 
 enum class Gender {
-    MALE,
-    FEMALE
+    Male,
+    Female
 }
+
+data class UserUpdate(
+    val name: String,
+    val surname: String?,
+    val phone: String,
+    val email: String,
+    val birthday: String?,
+    val gender: Gender
+)
