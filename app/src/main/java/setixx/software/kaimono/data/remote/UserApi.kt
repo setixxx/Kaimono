@@ -4,6 +4,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import setixx.software.kaimono.data.remote.dto.UpdatePasswordRequest
+import setixx.software.kaimono.data.remote.dto.UpdatePasswordResponse
 import setixx.software.kaimono.data.remote.dto.UpdateUserInfoRequest
 import setixx.software.kaimono.data.remote.dto.UpdateUserInfoResponse
 import setixx.software.kaimono.data.remote.dto.UserInfoResponse
@@ -14,4 +16,7 @@ interface UserApi {
 
     @POST("user/update-user")
     suspend fun updateUserInfo(@Body updateUserInfoRequest: UpdateUserInfoRequest): UpdateUserInfoResponse
+
+    @POST("user/update-password")
+    suspend fun updatePassword(@Body updatePasswordRequest: UpdatePasswordRequest): UpdatePasswordResponse
 }

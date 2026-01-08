@@ -1,5 +1,6 @@
 package setixx.software.kaimono.presentation.account.info
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,10 +49,10 @@ class AccountInfoViewModel @Inject constructor(
 
                     _state.value = _state.value.copy(
                         name = user.name,
-                        surname = user.surname ?: "Not specified",
+                        surname = user.surname ?: "",
                         phone = user.phone,
                         email = user.email,
-                        dateOfBirth = user.birthday ?: "Not specified",
+                        dateOfBirth = user.birthday ?: "",
                         gender = user.gender.toString(),
                         isLoading = false,
                         errorMessage = null
@@ -78,12 +79,14 @@ class AccountInfoViewModel @Inject constructor(
 
             val request = UserUpdate(
                 name = _state.value.name,
-                surname = _state.value.surname,
+                surname = if (_state.value.isSurnameChanged || _state.value.surname.isNotEmpty()) _state.value.surname else null,
                 phone = _state.value.phone,
                 email = _state.value.email,
-                birthday = _state.value.dateOfBirth,
+                birthday = if (_state.value.isBirthdateChanged || _state.value.dateOfBirth.isNotEmpty()) _state.value.dateOfBirth else null,
                 gender = Gender.valueOf(_state.value.gender)
             )
+            Log.d("UserUpdate", request.toString())
+
 
             when (val result = updateUserInfoUseCase(request)){
                 is ApiResult.Success -> {
@@ -91,13 +94,14 @@ class AccountInfoViewModel @Inject constructor(
 
                     _state.value = _state.value.copy(
                         name = data.name,
-                        surname = data.surname ?: "Not specified",
+                        surname = data.surname ?: "",
                         phone = data.phone,
                         email = data.email,
-                        dateOfBirth = data.birthday ?: "Not specified",
+                        dateOfBirth = data.birthday ?: "",
                         gender = data.gender.toString(),
                         isLoading = false,
-                        errorMessage = null
+                        errorMessage = null,
+                        isFieldsChanged = false
                     )
                 }
                 is ApiResult.Error -> {
@@ -117,7 +121,8 @@ class AccountInfoViewModel @Inject constructor(
         _state.value = _state.value.copy(
             name = name,
             nameError = null,
-            errorMessage = null
+            errorMessage = null,
+            isFieldsChanged = true
         )
     }
 
@@ -125,7 +130,9 @@ class AccountInfoViewModel @Inject constructor(
         _state.value = _state.value.copy(
             surname = surname,
             surnameError = null,
-            errorMessage = null
+            errorMessage = null,
+            isSurnameChanged = true,
+            isFieldsChanged = true
         )
     }
 
@@ -133,7 +140,8 @@ class AccountInfoViewModel @Inject constructor(
         _state.value = _state.value.copy(
             phone = phone,
             phoneError = null,
-            errorMessage = null
+            errorMessage = null,
+            isFieldsChanged = true
         )
     }
 
@@ -141,7 +149,8 @@ class AccountInfoViewModel @Inject constructor(
         _state.value = _state.value.copy(
             email = email,
             emailError = null,
-            errorMessage = null
+            errorMessage = null,
+            isFieldsChanged = true
         )
     }
 
@@ -149,7 +158,17 @@ class AccountInfoViewModel @Inject constructor(
         _state.value = _state.value.copy(
             dateOfBirth = dateOfBirth,
             dateOfBirthError = null,
-            errorMessage = null
+            errorMessage = null,
+            isBirthdateChanged = true,
+            isFieldsChanged = true
+        )
+    }
+
+    fun onGenderChange(gender: String) {
+        _state.value = _state.value.copy(
+            gender = gender,
+            errorMessage = null,
+            isFieldsChanged = true
         )
     }
 
@@ -172,7 +191,7 @@ class AccountInfoViewModel @Inject constructor(
             isValid = false
         }
 
-        if (surnameResult is ValidationResult.Error) {
+        if (surnameResult is ValidationResult.Error && _state.value.isSurnameChanged) {
             _state.value = _state.value.copy(
                 surnameError = validationErrorMapper.mapToMessage(surnameResult.error)
             )

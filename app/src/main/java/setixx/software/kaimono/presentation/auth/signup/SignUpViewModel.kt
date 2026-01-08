@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import setixx.software.kaimono.domain.usecase.SignUpUseCase
 import javax.inject.Inject
 import setixx.software.kaimono.domain.model.ApiResult
+import setixx.software.kaimono.domain.usecase.SignInUseCase
 import setixx.software.kaimono.domain.validation.EmailValidator
 import setixx.software.kaimono.domain.validation.PasswordValidator
 import setixx.software.kaimono.domain.validation.PhoneValidator
@@ -20,6 +21,7 @@ import setixx.software.kaimono.presentation.common.ValidationErrorMapper
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
+    private val signInUseCase: SignInUseCase,
     private val errorMapper: ErrorMapper,
     private val validationErrorMapper: ValidationErrorMapper,
     private val emailValidator: EmailValidator,
@@ -86,8 +88,25 @@ class SignUpViewModel @Inject constructor(
                 password = _state.value.password
             )) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(isLoading = false)
-                    onSuccess()
+                    val signInResult = signInUseCase(
+                        email = _state.value.email.trim(),
+                        password = _state.value.password
+                    )
+                    when (signInResult) {
+                        is ApiResult.Success -> {
+                            _state.value = _state.value.copy(isLoading = false)
+                            onSuccess()
+                        }
+                        is ApiResult.Error -> {
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                errorMessage = errorMapper.mapToMessage(signInResult.error)
+                            )
+                        }
+                        else -> {
+                            _state.value = _state.value.copy(isLoading = false)
+                        }
+                    }
                 }
                 is ApiResult.Error -> {
                     _state.value = _state.value.copy(

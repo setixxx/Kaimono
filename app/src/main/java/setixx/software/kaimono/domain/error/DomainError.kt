@@ -7,6 +7,7 @@ sealed class DomainError {
     data object NoInternet : DomainError()
     data object InvalidToken : DomainError()
     data object DataInconsistent : DomainError()
+    data object InvalidData : DomainError()
     data class HttpError(val code: Int, val message: String) : DomainError()
     data class Unknown(val message: String?) : DomainError()
 }

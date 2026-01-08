@@ -14,10 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,11 +27,11 @@ fun ListWithRadioAndTrailing(
     selectedIndex: Int,
     header: String,
     modifier: Modifier = Modifier,
-    onSelect: (Int) -> Unit
+    onSelect: (Int) -> Unit,
+    onDelete: () -> Unit
 ){
-    var selected by remember { mutableStateOf(false) }
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable { onSelect(index) }
@@ -44,7 +40,7 @@ fun ListWithRadioAndTrailing(
     ) {
         RadioButton(
             selected = index == selectedIndex,
-            onClick = { selected = !selected }
+            onClick = { onSelect(index) }
         )
         Text(
             modifier = Modifier
@@ -54,7 +50,7 @@ fun ListWithRadioAndTrailing(
             style = MaterialTheme.typography.labelLarge
         )
         IconButton(
-            onClick = {}
+            onClick = onDelete
         ) {
             Icon(
                 modifier = Modifier
@@ -73,6 +69,7 @@ fun PaymentListPreview(){
         index = 0,
         selectedIndex = 0,
         header = "Credit card",
-        onSelect = {}
+        onSelect = {},
+        onDelete = {}
     )
 }

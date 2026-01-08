@@ -11,6 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.local.TokenRefresher
+import setixx.software.kaimono.data.remote.AddressApi
 import setixx.software.kaimono.data.remote.AuthApi
 import setixx.software.kaimono.data.remote.UserApi
 import setixx.software.kaimono.data.remote.interceptor.AuthInterceptor
@@ -156,5 +157,25 @@ object NetworkModule {
             .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
             .create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAddressApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): AddressApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(AddressApi::class.java)
     }
 }

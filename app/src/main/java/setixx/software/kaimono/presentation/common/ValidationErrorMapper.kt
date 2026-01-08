@@ -46,6 +46,24 @@ class ValidationErrorMapper(private val context: Context) {
 
             ValidationError.SurnameInvalidFormat ->
                 context.getString(R.string.error_surname_format)
+
+            ValidationError.CityEmpty ->
+                context.getString(R.string.error_city_empty)
+
+            ValidationError.StreetEmpty ->
+                context.getString(R.string.error_street_empty)
+
+            ValidationError.HouseEmpty ->
+                context.getString(R.string.error_house_empty)
+
+            ValidationError.ApartmentEmpty ->
+                context.getString(R.string.error_apartment_empty)
+
+            ValidationError.ZipCodeEmpty ->
+                context.getString(R.string.error_zip_code_empty)
+
+            ValidationError.ZipCodeInvalidFormat ->
+                context.getString(R.string.error_zip_code_format)
         }
     }
 }

@@ -14,4 +14,7 @@ data class AccountInfoState(
     val phoneError: String? = null,
     val emailError: String? = null,
     val dateOfBirthError: String? = null,
+    val isSurnameChanged: Boolean = false,
+    val isBirthdateChanged: Boolean = false,
+    val isFieldsChanged: Boolean = false
 )

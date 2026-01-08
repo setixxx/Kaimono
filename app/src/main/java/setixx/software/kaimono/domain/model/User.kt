@@ -23,3 +23,9 @@ data class UserUpdate(
     val birthday: String?,
     val gender: Gender
 )
+
+data class PasswordUpdate(
+    val currentPassword: String,
+    val newPassword: String,
+    val confirmPassword: String
+)

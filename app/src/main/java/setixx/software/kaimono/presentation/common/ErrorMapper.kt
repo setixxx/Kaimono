@@ -26,6 +26,9 @@ class ErrorMapper(private val context: Context) {
             is DomainError.DataInconsistent ->
                 context.getString(R.string.error_data_consistent)
 
+            is DomainError.InvalidData ->
+                context.getString(R.string.error_invalid_data)
+
             is DomainError.HttpError ->
                 context.getString(R.string.error_generic_api, error.message)
 

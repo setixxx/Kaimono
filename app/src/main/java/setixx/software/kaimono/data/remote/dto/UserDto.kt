@@ -37,3 +37,17 @@ data class UpdateUserInfoResponse(
     val birthDate: String?,
     val gender: String
 )
+
+@Serializable
+data class UpdatePasswordRequest(
+    @SerialName("old_password")
+    val oldPassword: String,
+    @SerialName("new_password")
+    val newPassword: String,
+)
+
+@Serializable
+data class UpdatePasswordResponse(
+    @SerialName("password_update_status")
+    val passwordUpdateStatus: String
+)

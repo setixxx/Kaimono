@@ -46,7 +46,7 @@ import androidx.navigation.NavController
 import setixx.software.kaimono.presentation.navigation.Routes
 import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.components.ListWithTwoIcons
-import setixx.software.kaimono.presentation.components.AddressSheetContent
+import setixx.software.kaimono.presentation.account.address.AddressSheetContent
 import setixx.software.kaimono.presentation.components.ListWithPriceAndQuantity
 import setixx.software.kaimono.presentation.components.PaymentMethodsSheetContent
 
@@ -263,13 +263,13 @@ fun CartScreen(
                 onDismissRequest = { showAddressBottomSheet = false },
                 sheetState = addressSheetState
             ) {
-                AddressSheetContent(
+/*                AddressSheetContent(
                     onClose = { showAddressBottomSheet = false },
                     onAddAddress = {
                         showAddressBottomSheet = false
                         navController.navigate(Routes.AccountAddAddress.route)
-                    }
-                )
+                    },
+                )*/
             }
         }
     }

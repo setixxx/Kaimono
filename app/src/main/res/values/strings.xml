@@ -87,4 +87,11 @@
     <string name="error_surname_empty">Surname cannot be empty</string>
     <string name="error_surname_format">Surname must contain only letters</string>
     <string name="error_data_consistent">Something went wrong</string>
+    <string name="error_invalid_data">Invalid data</string>
+    <string name="error_city_empty">City cannot be empty</string>
+    <string name="error_street_empty">Street cannot be empty</string>
+    <string name="error_house_empty">House cannot be empty</string>
+    <string name="error_apartment_empty">Apartment cannot be empty</string>
+    <string name="error_zip_code_empty">Postal code cannot be empty</string>
+    <string name="error_zip_code_format">Invalid postal code format</string>
 </resources>

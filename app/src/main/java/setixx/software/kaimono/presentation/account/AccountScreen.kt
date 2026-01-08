@@ -18,10 +18,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,15 +33,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import setixx.software.kaimono.presentation.components.ListWithTwoIcons
 import setixx.software.kaimono.R
-import setixx.software.kaimono.presentation.components.AddressSheetContent
+import setixx.software.kaimono.presentation.account.address.AddressSheetContent
+import setixx.software.kaimono.presentation.account.address.AddressViewModel
 import setixx.software.kaimono.presentation.components.PaymentMethodsSheetContent
 import setixx.software.kaimono.presentation.navigation.Routes
 
@@ -50,6 +52,17 @@ fun AccountScreen(
     viewModel: AccountViewModel
 ) {
     val state by viewModel.state.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let { error ->
+            snackBarHostState.showSnackbar(
+                message = error,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.clearError()
+        }
+    }
 
     var showCardsBottomSheet by remember { mutableStateOf(false) }
     var showAddressBottomSheet by remember { mutableStateOf(false) }
@@ -172,12 +185,19 @@ fun AccountScreen(
                 onDismissRequest = { showAddressBottomSheet = false },
                 sheetState = addressSheetState
             ) {
+                val addressViewModel: AddressViewModel = hiltViewModel()
+
+                LaunchedEffect(Unit) {
+                    addressViewModel.loadAddresses()
+                }
+
                 AddressSheetContent(
                     onClose = { showAddressBottomSheet = false },
                     onAddAddress = {
                         showAddressBottomSheet = false
                         navController.navigate(Routes.AccountAddAddress.route)
-                    }
+                    },
+                    viewModel = addressViewModel
                 )
             }
         }

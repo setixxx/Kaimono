@@ -19,4 +19,11 @@ sealed class ValidationError {
 
     data object SurnameEmpty : ValidationError()
     data object SurnameInvalidFormat : ValidationError()
+
+    data object CityEmpty : ValidationError()
+    data object StreetEmpty : ValidationError()
+    data object HouseEmpty : ValidationError()
+    data object ApartmentEmpty : ValidationError()
+    data object ZipCodeEmpty : ValidationError()
+    data object ZipCodeInvalidFormat : ValidationError()
 }

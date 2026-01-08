@@ -73,4 +73,8 @@ class AccountViewModel @Inject constructor(
             }
         }
     }
+
+    fun clearError() {
+        _state.value = _state.value.copy(errorMessage = null)
+    }
 }

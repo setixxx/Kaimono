@@ -48,21 +48,24 @@ fun PaymentMethodsSheetContent(
                 index = 0,
                 selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
-                onSelect = { selectedIndex = it }
+                onSelect = { selectedIndex = it },
+                onDelete = {}
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
             ListWithRadioAndTrailing(
                 index = 1,
                 selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
-                onSelect = { selectedIndex = it }
+                onSelect = { selectedIndex = it },
+                onDelete = {}
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.background, thickness = 2.dp)
             ListWithRadioAndTrailing(
                 index = 2,
                 selectedIndex = selectedIndex,
                 header = stringResource(R.string.label_credit_card),
-                onSelect = { selectedIndex = it }
+                onSelect = { selectedIndex = it },
+                onDelete = {}
             )
         }
 

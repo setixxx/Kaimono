@@ -13,6 +13,6 @@ class PhoneValidator {
     }
 
     private fun isValidFormat(phone: String): Boolean {
-        return phone.matches(Regex("^\\d{10}$"))
+        return phone.matches(Regex("^\\d{11}$"))
     }
 }
