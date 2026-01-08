@@ -3,7 +3,6 @@ package setixx.software.kaimono.data.repository
 import retrofit2.HttpException
 import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.remote.AuthApi
-import setixx.software.kaimono.data.remote.dto.RefreshTokenRequest
 import setixx.software.kaimono.data.remote.dto.SignInRequest
 import setixx.software.kaimono.data.remote.dto.SignUpRequest
 import setixx.software.kaimono.domain.model.ApiResult
@@ -13,9 +12,11 @@ import setixx.software.kaimono.domain.model.User
 import setixx.software.kaimono.domain.repository.AuthRepository
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Named
 
 class AuthRepositoryImpl @Inject constructor(
-    private val authApi: AuthApi,
+    @Named("public") private val publicAuthApi: AuthApi,
+    @Named("refresh") private val refreshAuthApi: AuthApi,
     private val tokenManager: TokenManager
 ) : AuthRepository {
 
@@ -24,7 +25,7 @@ class AuthRepositoryImpl @Inject constructor(
         password: String
     ): ApiResult<AuthTokens> {
         return try {
-            val response = authApi.signIn(SignInRequest(email, password))
+            val response = publicAuthApi.signIn(SignInRequest(email, password))
             val tokens = AuthTokens(response.accessToken, response.refreshToken)
             tokenManager.saveTokens(tokens)
             ApiResult.Success(tokens)
@@ -48,7 +49,7 @@ class AuthRepositoryImpl @Inject constructor(
         password: String
     ): ApiResult<String> {
         return try {
-            val response = authApi.signUp(SignUpRequest(email, phone, password))
+            val response = publicAuthApi.signUp(SignUpRequest(email, phone, password))
             ApiResult.Success(response.publicId)
         } catch (e: HttpException) {
             val error = when (e.code()) {
@@ -66,7 +67,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun logout(): ApiResult<Unit> {
         return try {
-            authApi.logout()
+            refreshAuthApi.logout()
             tokenManager.clearTokens()
             ApiResult.Success(Unit)
         } catch (e: HttpException) {
@@ -85,16 +86,14 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentUser(): ApiResult<User> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun refreshAccessToken(): ApiResult<String> {
         return try {
             val refreshToken = tokenManager.getRefreshToken()
                 ?: return ApiResult.Error(DomainError.InvalidToken)
 
-            val response = authApi.refreshToken(RefreshTokenRequest(refreshToken))
+            val response = refreshAuthApi.refreshToken(
+                setixx.software.kaimono.data.remote.dto.RefreshTokenRequest(refreshToken)
+            )
             val tokens = AuthTokens(response.accessToken, response.refreshToken)
             tokenManager.saveTokens(tokens)
             ApiResult.Success(response.accessToken)
@@ -115,9 +114,5 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun isLoggedIn(): Boolean {
         return tokenManager.getAccessToken() != null
-    }
-
-    override suspend fun getSavedEmail(): String? {
-        TODO("Not yet implemented")
     }
 }

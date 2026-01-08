@@ -16,21 +16,15 @@ class AuthInterceptor @Inject constructor(
         val originalRequest = chain.request()
         val requestBuilder = originalRequest.newBuilder()
 
-        if (originalRequest.url.encodedPath.endsWith("auth/logout")) {
-            val refreshToken = runBlocking { tokenManager.getRefreshToken() }
-            if (!refreshToken.isNullOrBlank()) {
-                requestBuilder.addHeader("Authorization", "Bearer $refreshToken")
-            }
-        } else {
-            val token = runBlocking { tokenManager.getAccessToken() }
-            if (!token.isNullOrBlank()) {
-                requestBuilder.addHeader("Authorization", "Bearer $token")
-            }
+        val token = runBlocking { tokenManager.getAccessToken() }
+
+        if (!token.isNullOrBlank()) {
+            requestBuilder.addHeader("Authorization", "Bearer $token")
         }
 
         val response = chain.proceed(requestBuilder.build())
 
-        if (response.code == 401 && !originalRequest.url.encodedPath.contains("/auth/")) {
+        if (response.code == 401) {
             response.close()
 
             val newToken = runBlocking { tokenRefresher.refreshToken() }

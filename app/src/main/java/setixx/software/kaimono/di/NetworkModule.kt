@@ -14,6 +14,8 @@ import setixx.software.kaimono.data.local.TokenRefresher
 import setixx.software.kaimono.data.remote.AuthApi
 import setixx.software.kaimono.data.remote.UserApi
 import setixx.software.kaimono.data.remote.interceptor.AuthInterceptor
+import setixx.software.kaimono.data.remote.interceptor.RefreshInterceptor
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -25,9 +27,33 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(
+    @Named("public")
+    fun providePublicOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRefreshInterceptor(tokenManager: TokenManager): RefreshInterceptor {
+        return RefreshInterceptor(tokenManager)
+    }
+
+    @Provides
+    @Singleton
+    @Named("refresh")
+    fun provideRefreshOkHttpClient(refreshInterceptor: RefreshInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(refreshInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("refresh")
+    fun provideRefreshAuthApi(
         baseUrl: String,
-        okHttpClient: OkHttpClient
+        @Named("refresh") okHttpClient: OkHttpClient
     ): AuthApi {
         val networkJson = Json {
             ignoreUnknownKeys = true
@@ -46,7 +72,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideTokenRefresher(
-        authApi: AuthApi,
+        @Named("refresh") authApi: AuthApi,
         tokenManager: TokenManager
     ): TokenRefresher {
         return TokenRefresher(authApi, tokenManager)
@@ -63,7 +89,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+    @Named("protected")
+    fun provideProtectedOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .build()
@@ -71,9 +98,51 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @Named("public")
+    fun providePublicAuthApi(
+        baseUrl: String,
+        @Named("public") okHttpClient: OkHttpClient
+    ): AuthApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("protected")
+    fun provideProtectedAuthApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): AuthApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideUserApi(
         baseUrl: String,
-        okHttpClient: OkHttpClient
+        @Named("protected") okHttpClient: OkHttpClient
     ): UserApi {
         val networkJson = Json {
             ignoreUnknownKeys = true
