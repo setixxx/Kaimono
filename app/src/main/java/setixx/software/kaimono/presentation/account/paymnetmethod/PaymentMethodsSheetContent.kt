@@ -1,4 +1,4 @@
-package setixx.software.kaimono.presentation.account.address
+package setixx.software.kaimono.presentation.account.paymnetmethod
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,10 +29,10 @@ import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.components.ListWithRadioAndTrailing
 
 @Composable
-fun AddressSheetContent(
+fun PaymentMethodsSheetContent(
     onClose: () -> Unit,
-    onAddAddress: () -> Unit,
-    viewModel: AddressViewModel
+    onAddCard: () -> Unit,
+    viewModel: PaymentMethodsViewModel
 ) {
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -47,12 +47,12 @@ fun AddressSheetContent(
         }
     }
 
-    val selectedIndex = remember(state.addresses, state.selectedAddress) {
-        val selectedId = state.selectedAddress?.id
+    val selectedIndex = remember(state.paymentMethods, state.selectedPaymentMethod) {
+        val selectedId = state.selectedPaymentMethod?.id
         if (selectedId != null) {
-            state.addresses.indexOfFirst { it.id == selectedId }
+            state.paymentMethods.indexOfFirst { it.id == selectedId }
         } else {
-            state.addresses.indexOfFirst { it.isDefault }
+            state.paymentMethods.indexOfFirst { it.isDefault }
         }
     }
 
@@ -66,7 +66,7 @@ fun AddressSheetContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.title_addresses),
+                text = stringResource(R.string.title_payment_methods),
                 style = MaterialTheme.typography.headlineSmall
             )
             LazyColumn(
@@ -74,22 +74,27 @@ fun AddressSheetContent(
                     .padding(vertical = 16.dp)
                     .clip(MaterialTheme.shapes.large)
             ) {
-                items(state.addresses.size) { index ->
-                    val address = state.addresses[index]
+                items(state.paymentMethods.size) { index ->
+                    val paymentMethod = state.paymentMethods[index]
+                    val month = paymentMethod.expiryMonth.toString().padStart(2, '0')
+                    val year = paymentMethod.expiryYear.toString().padStart(2, '0')
+                    
                     ListWithRadioAndTrailing(
                         index = index,
                         selectedIndex = selectedIndex,
-                        header = "${address.city}, ${address.street}, ${address.house}",
+                        header = "${stringResource(R.string.label_credit_card)} *${paymentMethod.cardNumberLast4} ($month/$year)",
                         onSelect = {
-                            viewModel.setDefaultAddress(address.id)
+                            viewModel.setDefaultPaymentMethod(paymentMethod.id)
                         },
                         onDelete = {
-                            viewModel.deleteAddress(address.id)
+                            viewModel.deletePaymentMethod(paymentMethod.id)
                         }
                     )
-                    HorizontalDivider(color = if (state.addresses.size == 1) MaterialTheme.colorScheme.surfaceContainer
-                    else MaterialTheme.colorScheme.background,
-                        thickness = 2.dp)
+                    HorizontalDivider(
+                        color = if (state.paymentMethods.size == 1) MaterialTheme.colorScheme.surfaceContainer
+                        else MaterialTheme.colorScheme.background, 
+                        thickness = 2.dp
+                    )
                 }
             }
 
@@ -104,9 +109,9 @@ fun AddressSheetContent(
                     Text(stringResource(R.string.action_close))
                 }
                 Button(
-                    onClick = onAddAddress
+                    onClick = onAddCard
                 ) {
-                    Text(stringResource(R.string.action_add_address))
+                    Text(stringResource(R.string.action_add_card))
                 }
             }
         }

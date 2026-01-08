@@ -42,13 +42,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import setixx.software.kaimono.presentation.navigation.Routes
 import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.components.ListWithTwoIcons
-import setixx.software.kaimono.presentation.account.address.AddressSheetContent
 import setixx.software.kaimono.presentation.components.ListWithPriceAndQuantity
-import setixx.software.kaimono.presentation.components.PaymentMethodsSheetContent
+import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsSheetContent
+import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -248,12 +249,15 @@ fun CartScreen(
                 onDismissRequest = { showCardsBottomSheet = false },
                 sheetState = cardsSheetState
             ) {
+                val paymentMethodsViewModel: PaymentMethodsViewModel = hiltViewModel()
+
                 PaymentMethodsSheetContent(
                     onClose = { showCardsBottomSheet = false },
                     onAddCard = {
                         showCardsBottomSheet = false
                         navController.navigate(Routes.AccountAddCard.route)
-                    }
+                    },
+                    viewModel = paymentMethodsViewModel
                 )
             }
         }

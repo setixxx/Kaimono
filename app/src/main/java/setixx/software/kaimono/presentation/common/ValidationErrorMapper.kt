@@ -64,6 +64,30 @@ class ValidationErrorMapper(private val context: Context) {
 
             ValidationError.ZipCodeInvalidFormat ->
                 context.getString(R.string.error_zip_code_format)
+
+            ValidationError.CardNumberEmpty ->
+                context.getString(R.string.error_card_number_empty)
+
+            ValidationError.CardNumberInvalidFormat ->
+                context.getString(R.string.error_card_number_format)
+
+            ValidationError.CardHolderNameEmpty ->
+                context.getString(R.string.error_card_holder_empty)
+
+            ValidationError.ExpiryDateEmpty ->
+                context.getString(R.string.error_card_date_empty)
+
+            ValidationError.ExpiryDateInvalidFormat ->
+                context.getString(R.string.error_card_date_format)
+
+            ValidationError.ExpiryDateExpired ->
+                context.getString(R.string.error_card_date_expired)
+
+            ValidationError.CvvEmpty ->
+                context.getString(R.string.error_card_cvv_empty)
+
+            ValidationError.CvvInvalidFormat ->
+                context.getString(R.string.error_card_cvv_format)
         }
     }
 }

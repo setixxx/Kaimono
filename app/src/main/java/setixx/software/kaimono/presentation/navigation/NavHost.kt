@@ -12,7 +12,7 @@ import setixx.software.kaimono.presentation.account.AccountViewModel
 import setixx.software.kaimono.presentation.account.info.AccountInfoScreen
 import setixx.software.kaimono.presentation.home.HomeScreen
 import setixx.software.kaimono.presentation.account.address.AddAddressScreen
-import setixx.software.kaimono.presentation.account.card.AccountAddCardScreen
+import setixx.software.kaimono.presentation.account.paymnetmethod.AddPaymentMethodScreen
 import setixx.software.kaimono.presentation.account.info.AccountInfoViewModel
 import setixx.software.kaimono.presentation.account.orders.AccountOrdersScreen
 import setixx.software.kaimono.presentation.account.reviews.AccountReviewsScreen
@@ -55,7 +55,7 @@ fun NavHost(
             }
             composable(Routes.AccountOrders.route) { AccountOrdersScreen(navController) }
             composable(Routes.AccountReviews.route) { AccountReviewsScreen(navController) }
-            composable(Routes.AccountAddCard.route) { AccountAddCardScreen(navController) }
+            composable(Routes.AccountAddCard.route) { AddPaymentMethodScreen(navController) }
             composable(Routes.AccountAddAddress.route) { AddAddressScreen(navController) }
         }
     }

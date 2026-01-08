@@ -1,4 +1,4 @@
-package setixx.software.kaimono.presentation.account.address
+package setixx.software.kaimono.presentation.account.paymnetmethod
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,37 +8,38 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import setixx.software.kaimono.domain.model.ApiResult
-import setixx.software.kaimono.domain.usecase.DeleteAddressUseCase
-import setixx.software.kaimono.domain.usecase.GetAddressesUseCase
-import setixx.software.kaimono.domain.usecase.SetDefaultAddressUseCase
+import setixx.software.kaimono.domain.usecase.DeletePaymentMethodUseCase
+import setixx.software.kaimono.domain.usecase.GetPaymentMethodsUseCase
+import setixx.software.kaimono.domain.usecase.SetDefaultPaymentMethodUseCase
 import setixx.software.kaimono.presentation.common.ErrorMapper
 import javax.inject.Inject
 
 @HiltViewModel
-class AddressViewModel @Inject constructor(
-    private val getAddressesUseCase: GetAddressesUseCase,
-    private val setDefaultAddressUseCase: SetDefaultAddressUseCase,
-    private val deleteAddressUseCase: DeleteAddressUseCase,
+class PaymentMethodsViewModel @Inject constructor(
+    private val getPaymentMethodsUseCase: GetPaymentMethodsUseCase,
+    private val setDefaultPaymentMethodUseCase: SetDefaultPaymentMethodUseCase,
+    private val deletePaymentMethodUseCase: DeletePaymentMethodUseCase,
     private val errorMapper: ErrorMapper
-): ViewModel() {
-    private val _state = MutableStateFlow(AddressViewModelState())
-    val state: StateFlow<AddressViewModelState> = _state.asStateFlow()
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(PaymentMethodsViewModelState())
+    val state: StateFlow<PaymentMethodsViewModelState> = _state.asStateFlow()
 
     init {
-        loadAddresses()
+        loadPaymentMethods()
     }
 
-    fun loadAddresses() {
+    fun loadPaymentMethods() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
 
-            when (val result = getAddressesUseCase()) {
+            when (val result = getPaymentMethodsUseCase()) {
                 is ApiResult.Success -> {
                     _state.value = _state.value.copy(
-                        addresses = result.data,
                         isLoading = false,
-                        errorMessage = null,
-                        selectedAddress = result.data.find { it.isDefault }
+                        paymentMethods = result.data,
+                        selectedPaymentMethod = result.data.find { it.isDefault },
+                        errorMessage = null
                     )
                 }
                 is ApiResult.Error -> {
@@ -47,27 +48,27 @@ class AddressViewModel @Inject constructor(
                         errorMessage = errorMapper.mapToMessage(result.error)
                     )
                 }
-                else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                is ApiResult.Loading -> {
+                    _state.value = _state.value.copy(isLoading = true)
                 }
             }
         }
     }
 
-    fun setDefaultAddress(addressId: Long) {
+    fun setDefaultPaymentMethod(paymentMethodId: Long) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
 
-            when (val result = setDefaultAddressUseCase(addressId)) {
+            when (val result = setDefaultPaymentMethodUseCase(paymentMethodId)) {
                 is ApiResult.Success -> {
-                    loadAddresses()
+                    loadPaymentMethods()
                 }
                 is ApiResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error),
+                        errorMessage = errorMapper.mapToMessage(result.error)
                     )
-                    loadAddresses()
+                    loadPaymentMethods()
                 }
                 else -> {
                     _state.value = _state.value.copy(isLoading = false)
@@ -76,13 +77,13 @@ class AddressViewModel @Inject constructor(
         }
     }
 
-    fun deleteAddress(addressId: Long) {
+    fun deletePaymentMethod(paymentMethodId: Long) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
 
-            when (val result = deleteAddressUseCase(addressId)) {
+            when (val result = deletePaymentMethodUseCase(paymentMethodId)) {
                 is ApiResult.Success -> {
-                    loadAddresses()
+                    loadPaymentMethods()
                 }
                 is ApiResult.Error -> {
                     _state.value = _state.value.copy(

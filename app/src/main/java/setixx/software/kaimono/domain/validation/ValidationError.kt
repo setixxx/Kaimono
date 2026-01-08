@@ -26,4 +26,13 @@ sealed class ValidationError {
     data object ApartmentEmpty : ValidationError()
     data object ZipCodeEmpty : ValidationError()
     data object ZipCodeInvalidFormat : ValidationError()
+
+    data object CardNumberEmpty : ValidationError()
+    data object CardNumberInvalidFormat : ValidationError()
+    data object CardHolderNameEmpty : ValidationError()
+    data object ExpiryDateEmpty : ValidationError()
+    data object ExpiryDateInvalidFormat : ValidationError()
+    data object ExpiryDateExpired : ValidationError()
+    data object CvvEmpty : ValidationError()
+    data object CvvInvalidFormat : ValidationError()
 }

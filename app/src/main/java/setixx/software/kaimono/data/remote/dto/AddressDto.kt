@@ -4,11 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AddressesListResponse(
-    val addresses: List<AddressResponse>
-)
-
-@Serializable
 data class AddressResponse(
     val id: Long,
     val city: String,
@@ -40,14 +35,4 @@ data class CreateAddressRequest(
     val additionalInfo: String,
     @SerialName("is_default")
     val isDefault: Boolean
-)
-
-@Serializable
-data class SetDefaultAddressRequest(
-    val id: Long
-)
-
-@Serializable
-data class DeleteAddressRequest(
-    val id: Long
 )

@@ -94,4 +94,12 @@
     <string name="error_apartment_empty">Apartment cannot be empty</string>
     <string name="error_zip_code_empty">Postal code cannot be empty</string>
     <string name="error_zip_code_format">Invalid postal code format</string>
+    <string name="error_card_number_empty">Card number cannot be empty</string>
+    <string name="error_card_number_format">Invalid card number</string>
+    <string name="error_card_holder_empty">Card holder name cannot be empty</string>
+    <string name="error_card_date_empty">Expiry date cannot be empty</string>
+    <string name="error_card_date_format">Invalid expiry date</string>
+    <string name="error_card_date_expired">Card has expired</string>
+    <string name="error_card_cvv_empty">CVV cannot be empty</string>
+    <string name="error_card_cvv_format">Invalid CVV</string>
 </resources>

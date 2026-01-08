@@ -6,9 +6,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import setixx.software.kaimono.data.repository.AddressRepositoryImpl
 import setixx.software.kaimono.data.repository.AuthRepositoryImpl
+import setixx.software.kaimono.data.repository.PaymentMethodRepositoryImpl
 import setixx.software.kaimono.data.repository.UserRepositoryImpl
 import setixx.software.kaimono.domain.repository.AddressRepository
 import setixx.software.kaimono.domain.repository.AuthRepository
+import setixx.software.kaimono.domain.repository.PaymentMethodRepository
 import setixx.software.kaimono.domain.repository.UserRepository
 import javax.inject.Singleton
 
@@ -28,4 +30,7 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun bindAddressRepository(addressRepositoryImpl: AddressRepositoryImpl): AddressRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindPaymentMethodRepository(paymentMethodRepositoryImpl: PaymentMethodRepositoryImpl): PaymentMethodRepository
 }

@@ -8,9 +8,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import setixx.software.kaimono.data.remote.dto.AddressResponse
 import setixx.software.kaimono.data.remote.dto.CreateAddressRequest
-import setixx.software.kaimono.data.remote.dto.DeleteAddressRequest
 import setixx.software.kaimono.data.remote.dto.DeleteAddressResponse
-import setixx.software.kaimono.data.remote.dto.SetDefaultAddressRequest
 
 interface AddressApi {
     @GET("/addresses")

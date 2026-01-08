@@ -41,7 +41,8 @@ import setixx.software.kaimono.presentation.components.ListWithTwoIcons
 import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.account.address.AddressSheetContent
 import setixx.software.kaimono.presentation.account.address.AddressViewModel
-import setixx.software.kaimono.presentation.components.PaymentMethodsSheetContent
+import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsSheetContent
+import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsViewModel
 import setixx.software.kaimono.presentation.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -170,12 +171,20 @@ fun AccountScreen(
                 onDismissRequest = { showCardsBottomSheet = false },
                 sheetState = cardsSheetState
             ) {
+                val paymentMethodsViewModel: PaymentMethodsViewModel = hiltViewModel()
+
+
+                LaunchedEffect(Unit) {
+                    paymentMethodsViewModel.loadPaymentMethods()
+                }
+
                 PaymentMethodsSheetContent(
                     onClose = { showCardsBottomSheet = false },
                     onAddCard = {
                         showCardsBottomSheet = false
                         navController.navigate(Routes.AccountAddCard.route)
-                    }
+                    },
+                    viewModel = paymentMethodsViewModel
                 )
             }
         }

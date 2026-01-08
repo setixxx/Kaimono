@@ -13,6 +13,7 @@ import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.local.TokenRefresher
 import setixx.software.kaimono.data.remote.AddressApi
 import setixx.software.kaimono.data.remote.AuthApi
+import setixx.software.kaimono.data.remote.PaymentMethodApi
 import setixx.software.kaimono.data.remote.UserApi
 import setixx.software.kaimono.data.remote.interceptor.AuthInterceptor
 import setixx.software.kaimono.data.remote.interceptor.RefreshInterceptor
@@ -177,5 +178,25 @@ object NetworkModule {
             .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
             .create(AddressApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePaymentMethodApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): PaymentMethodApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(PaymentMethodApi::class.java)
     }
 }

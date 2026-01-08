@@ -2,38 +2,37 @@ package setixx.software.kaimono.data.repository
 
 import android.util.Log
 import retrofit2.HttpException
-import setixx.software.kaimono.data.remote.AddressApi
-import setixx.software.kaimono.data.remote.dto.AddressResponse
-import setixx.software.kaimono.data.remote.dto.CreateAddressRequest
+import setixx.software.kaimono.data.remote.PaymentMethodApi
+import setixx.software.kaimono.data.remote.dto.CreatePaymentMethodRequest
+import setixx.software.kaimono.data.remote.dto.PaymentMethodResponse
 import setixx.software.kaimono.domain.error.DomainError
-import setixx.software.kaimono.domain.model.Address
 import setixx.software.kaimono.domain.model.ApiResult
-import setixx.software.kaimono.domain.model.CreateAddress
-import setixx.software.kaimono.domain.repository.AddressRepository
+import setixx.software.kaimono.domain.model.CreatePaymentMethod
+import setixx.software.kaimono.domain.model.PaymentMethod
+import setixx.software.kaimono.domain.repository.PaymentMethodRepository
 import java.io.IOException
 import javax.inject.Inject
 
-class AddressRepositoryImpl @Inject constructor(
-    private val addressApi: AddressApi
-) : AddressRepository {
-    override suspend fun getAddress(): ApiResult<List<Address>> {
+class PaymentMethodRepositoryImpl @Inject constructor(
+    private val paymentMethodApi: PaymentMethodApi
+) : PaymentMethodRepository {
+    override suspend fun getPaymentMethods(): ApiResult<List<PaymentMethod>> {
         return try {
-            val response = addressApi.getAllAddresses()
-            val addresses = response.map {
-                Address(
+            val response = paymentMethodApi.getPaymentMethods()
+            val paymentMethods = response.map {
+                PaymentMethod(
                     id = it.id,
-                    city = it.city,
-                    street = it.street,
-                    house = it.house,
-                    apartment = it.apartment,
-                    code = it.code,
-                    additionalInfo = it.additionalInfo,
+                    cardNumberLast4 = it.cardNumberLast4,
+                    cardHolderName = it.cardHolderName,
+                    expiryMonth = it.expiryMonth,
+                    expiryYear = it.expiryYear,
+                    cvv = it.cvv,
                     isDefault = it.isDefault
                 )
             }
-            ApiResult.Success(addresses)
+            ApiResult.Success(paymentMethods)
         } catch (e: HttpException) {
-            Log.d("Address", e.message())
+            Log.d("Payment", e.message())
             val error = when (e.code()) {
                 401 -> DomainError.InvalidToken
                 500 -> DomainError.ServerInternal
@@ -43,35 +42,33 @@ class AddressRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            Log.d("Address", e.message.toString())
+            Log.d("Payment", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
 
-    override suspend fun addAddress(createAddress: CreateAddress): ApiResult<Address> {
+    override suspend fun addPaymentMethod(createPaymentMethod: CreatePaymentMethod): ApiResult<PaymentMethod> {
         return try {
-            val request = CreateAddressRequest(
-                city = createAddress.city,
-                street = createAddress.street,
-                house = createAddress.house,
-                apartment = createAddress.apartment,
-                code = createAddress.zipCode,
-                additionalInfo = createAddress.additionalInfo,
-                isDefault = createAddress.isDefault
+            val request = CreatePaymentMethodRequest(
+                cardNumber = createPaymentMethod.cardNumber,
+                cardHolderName = createPaymentMethod.cardHolderName,
+                expiryMonth = createPaymentMethod.expiryMonth,
+                expiryYear = createPaymentMethod.expiryYear,
+                cvv = createPaymentMethod.cvv,
+                isDefault = createPaymentMethod.isDefault
             )
-            val response = addressApi.createAddress(request)
+            val response = paymentMethodApi.createPaymentMethod(request)
             if (!response.isConsistentWith(request)) {
                 ApiResult.Error(DomainError.DataInconsistent)
             } else {
                 ApiResult.Success(
-                    Address(
+                    PaymentMethod(
                         id = response.id,
-                        city = response.city,
-                        street = response.street,
-                        house = response.house,
-                        apartment = response.apartment,
-                        code = response.code,
-                        additionalInfo = response.additionalInfo,
+                        cardNumberLast4 = response.cardNumberLast4,
+                        cardHolderName = response.cardHolderName,
+                        expiryMonth = response.expiryMonth,
+                        expiryYear = response.expiryYear,
+                        cvv = response.cvv,
                         isDefault = response.isDefault
                     )
                 )
@@ -87,22 +84,22 @@ class AddressRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
+            Log.d("Payment", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
 
-    override suspend fun setDefaultAddress(addressId: Long): ApiResult<Address> {
+    override suspend fun setDefaultPaymentMethod(paymentMethodId: Long): ApiResult<PaymentMethod> {
         return try {
-            val response = addressApi.setDefaultAddress(addressId)
+            val response = paymentMethodApi.setDefaultPaymentMethod(paymentMethodId)
             ApiResult.Success(
-                Address(
+                PaymentMethod(
                     id = response.id,
-                    city = response.city,
-                    street = response.street,
-                    house = response.house,
-                    apartment = response.apartment,
-                    code = response.code,
-                    additionalInfo = response.additionalInfo,
+                    cardNumberLast4 = response.cardNumberLast4,
+                    cardHolderName = response.cardHolderName,
+                    expiryMonth = response.expiryMonth,
+                    expiryYear = response.expiryYear,
+                    cvv = response.cvv,
                     isDefault = response.isDefault
                 )
             )
@@ -121,9 +118,9 @@ class AddressRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteAddress(addressId: Long): ApiResult<String> {
+    override suspend fun deletePaymentMethod(paymentMethodId: Long): ApiResult<String> {
         return try {
-            val response = addressApi.deleteAddress(addressId)
+            val response = paymentMethodApi.deletePaymentMethod(paymentMethodId)
             ApiResult.Success(response.message)
         } catch (e: HttpException) {
             val error = when (e.code()) {
@@ -140,13 +137,9 @@ class AddressRepositoryImpl @Inject constructor(
         }
     }
 }
-
-private fun AddressResponse.isConsistentWith(request: CreateAddressRequest): Boolean {
-    return city == request.city &&
-            street == request.street &&
-            house == request.house &&
-            apartment == request.apartment &&
-            code == request.code &&
-            additionalInfo == request.additionalInfo &&
-            isDefault == request.isDefault
+private fun PaymentMethodResponse.isConsistentWith(request: CreatePaymentMethodRequest): Boolean{
+    return cardNumberLast4 == request.cardNumber.takeLast(4) &&
+            cardHolderName == request.cardHolderName &&
+            expiryMonth == request.expiryMonth &&
+            expiryYear == request.expiryYear
 }

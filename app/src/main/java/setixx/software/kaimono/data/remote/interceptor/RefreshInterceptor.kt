@@ -1,5 +1,6 @@
 package setixx.software.kaimono.data.remote.interceptor
 
+import android.util.Log
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response

@@ -8,13 +8,15 @@ data class AddAddressViewModelState (
     val zipCode: String = "",
     val additionalInfo: String = "",
     val isDefault: Boolean = true,
+
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val isSuccess: Boolean = false,
+
     val cityError: String? = null,
     val streetError: String? = null,
     val houseError: String? = null,
     val apartmentError: String? = null,
     val zipCodeError: String? = null,
-    val additionalInfoError: String? = null,
-    val isSuccess: Boolean = false
+    val additionalInfoError: String? = null
 )
