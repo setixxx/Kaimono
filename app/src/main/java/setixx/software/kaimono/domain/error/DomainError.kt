@@ -1,4 +1,4 @@
-package setixx.software.kaimono.domain.validation
+package setixx.software.kaimono.domain.error
 
 sealed class DomainError {
     data object InvalidCredentials : DomainError()

@@ -2,7 +2,7 @@ package setixx.software.kaimono.presentation.common
 
 import android.content.Context
 import setixx.software.kaimono.R
-import setixx.software.kaimono.domain.validation.DomainError
+import setixx.software.kaimono.domain.error.DomainError
 
 class ErrorMapper(private val context: Context) {
 

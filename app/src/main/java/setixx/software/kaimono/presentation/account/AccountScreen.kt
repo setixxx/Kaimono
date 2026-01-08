@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material.icons.outlined.Reviews
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import setixx.software.kaimono.presentation.components.ListWithTwoIcons
 import setixx.software.kaimono.R
@@ -43,8 +46,11 @@ import setixx.software.kaimono.presentation.navigation.Routes
 @Composable
 fun AccountScreen(
     navController: NavController,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    viewModel: AccountViewModel
 ) {
+    val state by viewModel.state.collectAsState()
+
     var showCardsBottomSheet by remember { mutableStateOf(false) }
     var showAddressBottomSheet by remember { mutableStateOf(false) }
     val cardsSheetState = rememberModalBottomSheetState()
@@ -54,9 +60,7 @@ fun AccountScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(
-                            R.string.label_greeting,
-                            "Maxim"),
+                    Text(stringResource(R.string.label_greeting, state.name),
                         style = MaterialTheme.typography.headlineMedium
                     )
                 }
@@ -134,11 +138,16 @@ fun AccountScreen(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    onClick = onLogout
+                    onClick = {
+                        viewModel.logout(onLogout)
+                    },
+                    enabled = !state.isLoggingOut
                 ){
-                    Text(
-                        stringResource(R.string.action_logout)
-                    )
+                    if (state.isLoggingOut) {
+                        CircularProgressIndicator()
+                    } else {
+                        Text(stringResource(R.string.action_logout))
+                    }
                 }
             }
         }
@@ -173,10 +182,4 @@ fun AccountScreen(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun ProfileScreenPreview() {
-    AccountScreen(navController = NavController(LocalContext.current), onLogout = {})
 }

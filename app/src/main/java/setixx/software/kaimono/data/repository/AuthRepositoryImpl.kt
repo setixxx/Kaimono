@@ -3,11 +3,12 @@ package setixx.software.kaimono.data.repository
 import retrofit2.HttpException
 import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.remote.AuthApi
+import setixx.software.kaimono.data.remote.dto.RefreshTokenRequest
 import setixx.software.kaimono.data.remote.dto.SignInRequest
 import setixx.software.kaimono.data.remote.dto.SignUpRequest
 import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.model.AuthTokens
-import setixx.software.kaimono.domain.validation.DomainError
+import setixx.software.kaimono.domain.error.DomainError
 import setixx.software.kaimono.domain.model.User
 import setixx.software.kaimono.domain.repository.AuthRepository
 import java.io.IOException
@@ -64,8 +65,24 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout(): ApiResult<Unit> {
-        tokenManager.clearTokens()
-        return ApiResult.Success(Unit)
+        return try {
+            authApi.logout()
+            tokenManager.clearTokens()
+            ApiResult.Success(Unit)
+        } catch (e: HttpException) {
+            tokenManager.clearTokens()
+            val error = when (e.code()) {
+                500 -> DomainError.ServerInternal
+                else -> DomainError.HttpError(e.code(), e.message())
+            }
+            ApiResult.Error(error)
+        } catch (e: IOException) {
+            tokenManager.clearTokens()
+            ApiResult.Error(DomainError.NoInternet)
+        } catch (e: Exception) {
+            tokenManager.clearTokens()
+            ApiResult.Error(DomainError.Unknown(e.message))
+        }
     }
 
     override suspend fun getCurrentUser(): ApiResult<User> {
@@ -73,7 +90,27 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refreshAccessToken(): ApiResult<String> {
-        TODO("Not yet implemented")
+        return try {
+            val refreshToken = tokenManager.getRefreshToken()
+                ?: return ApiResult.Error(DomainError.InvalidToken)
+
+            val response = authApi.refreshToken(RefreshTokenRequest(refreshToken))
+            val tokens = AuthTokens(response.accessToken, response.refreshToken)
+            tokenManager.saveTokens(tokens)
+            ApiResult.Success(response.accessToken)
+        } catch (e: HttpException) {
+            tokenManager.clearTokens()
+            val error = when (e.code()) {
+                401 -> DomainError.InvalidToken
+                500 -> DomainError.ServerInternal
+                else -> DomainError.HttpError(e.code(), e.message())
+            }
+            ApiResult.Error(error)
+        } catch (e: IOException) {
+            ApiResult.Error(DomainError.NoInternet)
+        } catch (e: Exception) {
+            ApiResult.Error(DomainError.Unknown(e.message))
+        }
     }
 
     override suspend fun isLoggedIn(): Boolean {

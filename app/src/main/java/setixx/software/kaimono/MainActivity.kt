@@ -32,7 +32,6 @@ class MainActivity : ComponentActivity() {
 
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
-                val accountInfoViewModel = hiltViewModel<AccountInfoViewModel>()
 
                 Scaffold(
                     bottomBar = {
@@ -49,7 +48,6 @@ class MainActivity : ComponentActivity() {
                         },
                         navController = navController,
                         modifier = Modifier.padding(innerPadding),
-                        accountInfoViewModel = accountInfoViewModel
                     )
                 }
             }

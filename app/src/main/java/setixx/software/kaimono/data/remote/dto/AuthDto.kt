@@ -27,3 +27,14 @@ data class SignUpResponse(
     @SerialName("public_id")
     val publicId: String
 )
+
+@Serializable
+data class RefreshTokenRequest(
+    val refreshToken: String
+)
+
+@Serializable
+data class RefreshTokenResponse(
+    val accessToken: String,
+    val refreshToken: String
+)

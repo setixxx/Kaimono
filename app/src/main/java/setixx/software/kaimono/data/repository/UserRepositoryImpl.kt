@@ -6,7 +6,7 @@ import setixx.software.kaimono.data.remote.UserApi
 import setixx.software.kaimono.data.remote.dto.UpdateUserInfoRequest
 import setixx.software.kaimono.data.remote.dto.UpdateUserInfoResponse
 import setixx.software.kaimono.domain.model.ApiResult
-import setixx.software.kaimono.domain.validation.DomainError
+import setixx.software.kaimono.domain.error.DomainError
 import setixx.software.kaimono.domain.model.Gender
 import setixx.software.kaimono.domain.model.User
 import setixx.software.kaimono.domain.model.UserUpdate

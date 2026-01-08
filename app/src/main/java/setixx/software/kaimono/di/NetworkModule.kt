@@ -10,6 +10,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import setixx.software.kaimono.data.local.TokenManager
+import setixx.software.kaimono.data.local.TokenRefresher
 import setixx.software.kaimono.data.remote.AuthApi
 import setixx.software.kaimono.data.remote.UserApi
 import setixx.software.kaimono.data.remote.interceptor.AuthInterceptor
@@ -24,7 +25,10 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(baseUrl: String): AuthApi {
+    fun provideAuthApi(
+        baseUrl: String,
+        okHttpClient: OkHttpClient
+    ): AuthApi {
         val networkJson = Json {
             ignoreUnknownKeys = true
         }
@@ -32,10 +36,37 @@ object NetworkModule {
         val contentType = "application/json".toMediaType()
 
         return Retrofit.Builder()
+            .client(okHttpClient)
             .baseUrl(baseUrl)
             .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
             .create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTokenRefresher(
+        authApi: AuthApi,
+        tokenManager: TokenManager
+    ): TokenRefresher {
+        return TokenRefresher(authApi, tokenManager)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(
+        tokenManager: TokenManager,
+        tokenRefresher: TokenRefresher
+    ): AuthInterceptor {
+        return AuthInterceptor(tokenManager, tokenRefresher)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .build()
     }
 
     @Provides
@@ -56,19 +87,5 @@ object NetworkModule {
             .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
             .create(UserApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideAuthInterceptor(tokenManager: TokenManager): AuthInterceptor {
-        return AuthInterceptor(tokenManager)
-    }
-
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
-            .build()
     }
 }
