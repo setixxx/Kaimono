@@ -83,12 +83,12 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
             ) {
-                CustomSearchBar(
+/*                CustomSearchBar(
                     onSearch = { },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                )*/
             }
         },
         floatingActionButton = {

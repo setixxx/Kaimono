@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
@@ -28,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.components.ListWithRadioAndTrailing
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AddressSheetContent(
     onClose: () -> Unit,
@@ -110,6 +113,8 @@ fun AddressSheetContent(
                 }
             }
         }
+        if (state.isLoading) ContainedLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

@@ -41,6 +41,9 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun onPhoneChange(phone: String){
+        val digitsOnly = phone.filter { it.isDigit() }
+        if (digitsOnly.length > 11) return
+
         _state.value = _state.value.copy(
             phone = phone,
             phoneError = null,

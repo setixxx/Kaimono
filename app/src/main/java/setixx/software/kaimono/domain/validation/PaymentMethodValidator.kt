@@ -10,7 +10,7 @@ class PaymentMethodValidator @Inject constructor() {
             return ValidationResult.Error(ValidationError.CardNumberEmpty)
         }
         val cleanNumber = cardNumber.replace(" ", "")
-        if (!cleanNumber.all { it.isDigit() } || cleanNumber.length != 14) {
+        if (!cleanNumber.all { it.isDigit() } || cleanNumber.length != 16) {
             return ValidationResult.Error(ValidationError.CardNumberInvalidFormat)
         }
         return ValidationResult.Success

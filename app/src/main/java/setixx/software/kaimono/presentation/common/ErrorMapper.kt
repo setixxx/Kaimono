@@ -32,6 +32,9 @@ class ErrorMapper(private val context: Context) {
             is DomainError.HttpError ->
                 context.getString(R.string.error_generic_api, error.message)
 
+            is DomainError.NotFound ->
+                context.getString(R.string.error_not_found)
+
             is DomainError.Unknown ->
                 context.getString(R.string.error_unknown, error.message ?: "")
         }

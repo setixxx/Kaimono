@@ -25,7 +25,7 @@ import javax.inject.Singleton
 object NetworkModule {
 
     @Provides
-    fun baseUrl() = "http://10.0.2.2:8080/"
+    fun baseUrl() = "http://192.168.1.93:8080/"
 
     @Provides
     @Singleton

@@ -1,11 +1,15 @@
 package setixx.software.kaimono.presentation.cart
 
+import androidx.compose.animation.animateBounds
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -37,7 +41,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,10 +52,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import setixx.software.kaimono.presentation.navigation.Routes
 import setixx.software.kaimono.R
+import setixx.software.kaimono.presentation.account.address.AddressSheetContent
+import setixx.software.kaimono.presentation.account.address.AddressViewModel
 import setixx.software.kaimono.presentation.components.ListWithTwoIcons
 import setixx.software.kaimono.presentation.components.ListWithPriceAndQuantity
 import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsSheetContent
 import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsViewModel
+import setixx.software.kaimono.presentation.components.SwipeableListWithPriceAndQuantity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +68,8 @@ fun CartScreen(
     deliveryFee: Double = 0.00,
     total: Double = 0.00
 ){
+    val haptics = LocalHapticFeedback.current
+
     data class CartItem(
         val id: Int,
         val name: String,
@@ -74,10 +85,10 @@ fun CartScreen(
     var cartItems by remember {
         mutableStateOf(
             listOf(
-                CartItem(1, "Product name 1", 1, 100.00),
-                CartItem(2, "Product name 2", 1, 100.00),
-                CartItem(3, "Product name 3", 1, 100.00),
-                CartItem(4, "Product name 4", 1, 100.00),
+                CartViewModelState(1, 1, "Product name 1", 100.00),
+                CartViewModelState(2, 1, "Product name 1", 100.00),
+                CartViewModelState(3, 1, "Product name 1", 100.00),
+                CartViewModelState(4, 1, "Product name 1", 100.00),
             )
         )
     }
@@ -118,56 +129,29 @@ fun CartScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
+/*
                 .verticalScroll(rememberScrollState(0))
+*/
         ) {
-            Column(
+            LazyColumn(
                 Modifier
                     .clip(MaterialTheme.shapes.large)
             ) {
-                cartItems.forEachIndexed { index, item ->
+                items(
+                    count = cartItems.size,
+                    key = { index -> cartItems[index].id }
+                ) { index ->
+                    Box(Modifier.animateItem().animateContentSize()){
+                        SwipeableListWithPriceAndQuantity(
+                            query = cartItems[index],
+                            onDismiss = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
 
-                    key(item.id) {
-                        val dismissState = rememberSwipeToDismissBoxState(
-                            confirmValueChange = { value ->
-                                if (value == SwipeToDismissBoxValue.EndToStart) {
-                                    cartItems = cartItems.filter { it.id != item.id }
-                                    true
-                                } else {
-                                    false
+                                cartItems = cartItems.toMutableList().apply {
+                                    removeAt(index)
                                 }
                             }
                         )
-
-                        SwipeToDismissBox(
-                            state = dismissState,
-                            backgroundContent = {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                                    horizontalArrangement = Arrangement.End,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.action_delete),
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            enableDismissFromStartToEnd = false,
-                            enableDismissFromEndToStart = true,
-                            gesturesEnabled = true
-                        ) {
-                            ListWithPriceAndQuantity(
-                                quantity = item.quantity,
-                                product = item.name,
-                                price = item.price,
-                                onClick = { /* если нужно — открыть детали */ }
-                            )
-                        }
-
                         if (index != cartItems.lastIndex) {
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.background,
@@ -267,13 +251,16 @@ fun CartScreen(
                 onDismissRequest = { showAddressBottomSheet = false },
                 sheetState = addressSheetState
             ) {
-/*                AddressSheetContent(
+                val addressViewModel: AddressViewModel = hiltViewModel()
+
+                AddressSheetContent(
                     onClose = { showAddressBottomSheet = false },
                     onAddAddress = {
                         showAddressBottomSheet = false
                         navController.navigate(Routes.AccountAddAddress.route)
                     },
-                )*/
+                    viewModel = addressViewModel
+                )
             }
         }
     }

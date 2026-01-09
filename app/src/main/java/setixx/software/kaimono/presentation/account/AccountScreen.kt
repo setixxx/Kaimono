@@ -67,8 +67,12 @@ fun AccountScreen(
 
     var showCardsBottomSheet by remember { mutableStateOf(false) }
     var showAddressBottomSheet by remember { mutableStateOf(false) }
-    val cardsSheetState = rememberModalBottomSheetState()
-    val addressSheetState = rememberModalBottomSheetState()
+    val cardsSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val addressSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     Scaffold(
         topBar = {

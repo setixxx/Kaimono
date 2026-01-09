@@ -28,7 +28,8 @@ fun ListWithRadioAndTrailing(
     header: String,
     modifier: Modifier = Modifier,
     onSelect: (Int) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    isTrailingIconVisible: Boolean = true
 ){
     Row(
         modifier = modifier
@@ -52,12 +53,14 @@ fun ListWithRadioAndTrailing(
         IconButton(
             onClick = onDelete
         ) {
-            Icon(
-                modifier = Modifier
-                    .size(24.dp),
-                imageVector = Icons.Outlined.Close,
-                contentDescription = stringResource(R.string.action_add_card)
-            )
+            if (isTrailingIconVisible){
+                Icon(
+                    modifier = Modifier
+                        .size(24.dp),
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = stringResource(R.string.action_add_card)
+                )
+            }
         }
     }
 }

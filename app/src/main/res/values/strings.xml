@@ -102,4 +102,6 @@
     <string name="error_card_date_expired">Card has expired</string>
     <string name="error_card_cvv_empty">CVV cannot be empty</string>
     <string name="error_card_cvv_format">Invalid CVV</string>
+    <string name="error_not_found">Not found</string>
+    <string name="label_cash_method">Cash</string>
 </resources>

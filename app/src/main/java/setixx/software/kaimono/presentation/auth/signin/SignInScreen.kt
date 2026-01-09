@@ -159,13 +159,3 @@ fun SignInScreen(
         }
     }
 }
-
-/*
-@Preview(showSystemUi = true)
-@Composable
-fun LoginScreenPreview(){
-    LoginScreen(
-        onSignInSuccess = {},
-        onNavigateToSignUp = {},
-        viewModel = SignInViewModel())
-}*/

@@ -1,5 +1,6 @@
 package setixx.software.kaimono.presentation.account.paymnetmethod
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,27 +75,49 @@ fun PaymentMethodsSheetContent(
                     .padding(vertical = 16.dp)
                     .clip(MaterialTheme.shapes.large)
             ) {
-                items(state.paymentMethods.size) { index ->
-                    val paymentMethod = state.paymentMethods[index]
-                    val month = paymentMethod.expiryMonth.toString().padStart(2, '0')
-                    val year = paymentMethod.expiryYear.toString().padStart(2, '0')
-                    
-                    ListWithRadioAndTrailing(
-                        index = index,
-                        selectedIndex = selectedIndex,
-                        header = "${stringResource(R.string.label_credit_card)} *${paymentMethod.cardNumberLast4} ($month/$year)",
-                        onSelect = {
-                            viewModel.setDefaultPaymentMethod(paymentMethod.id)
-                        },
-                        onDelete = {
-                            viewModel.deletePaymentMethod(paymentMethod.id)
-                        }
-                    )
+                items(
+                    count = state.paymentMethods.size,
+                    key = { index -> state.paymentMethods[index].id }
+                ) { index ->
+                    Box(Modifier.animateItem().animateContentSize()){
+                        val paymentMethod = state.paymentMethods[index]
+                        val month = paymentMethod.expiryMonth.toString().padStart(2, '0')
+                        val year = paymentMethod.expiryYear.toString().padStart(2, '0')
+
+                        ListWithRadioAndTrailing(
+                            index = index,
+                            selectedIndex = selectedIndex,
+                            header = "${stringResource(R.string.label_credit_card)} *${paymentMethod.cardNumberLast4} ($month/$year)",
+                            onSelect = {
+                                viewModel.setDefaultPaymentMethod(paymentMethod.id)
+                            },
+                            onDelete = {
+                                viewModel.deletePaymentMethod(paymentMethod.id)
+                            }
+                        )
+                        HorizontalDivider(
+                            color = if (state.paymentMethods.size == 1) MaterialTheme.colorScheme.surfaceContainer
+                            else MaterialTheme.colorScheme.background,
+                            thickness = 2.dp
+                        )
+                    }
+                }
+                item(key = "cash_method") {
                     HorizontalDivider(
-                        color = if (state.paymentMethods.size == 1) MaterialTheme.colorScheme.surfaceContainer
-                        else MaterialTheme.colorScheme.background, 
-                        thickness = 2.dp
+                        color = MaterialTheme.colorScheme.background, thickness = 2.dp
                     )
+                    Box(Modifier.animateItem()) {
+                        ListWithRadioAndTrailing(
+                            index = -1,
+                            selectedIndex = if (state.selectedPaymentMethod == null) -1 else -2,
+                            header = stringResource(R.string.label_cash_method),
+                            onSelect = {
+                                // viewModel.setCashPaymentMethod()
+                            },
+                            onDelete = {},
+                            isTrailingIconVisible = false
+                        )
+                    }
                 }
             }
 

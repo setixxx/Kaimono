@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +36,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import setixx.software.kaimono.R
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PasswordChangeSheetContent(
     onClose: () -> Unit,
@@ -59,7 +62,8 @@ fun PasswordChangeSheetContent(
     }
 
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
@@ -192,6 +196,8 @@ fun PasswordChangeSheetContent(
                 }
             }
         }
+
+        if (state.isLoading) ContainedLoadingIndicator(modifier = Modifier.align(Alignment.Center))
         
         SnackbarHost(
             hostState = snackBarHostState,
