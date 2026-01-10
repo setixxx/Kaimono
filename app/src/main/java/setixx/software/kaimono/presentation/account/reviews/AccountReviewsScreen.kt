@@ -1,5 +1,6 @@
 package setixx.software.kaimono.presentation.account.reviews
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -7,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import setixx.software.kaimono.R
-import setixx.software.kaimono.presentation.components.ReviewItem
+import setixx.software.kaimono.presentation.components.ReviewCardSquare
 import setixx.software.kaimono.presentation.navigation.Routes
 
 private data class ReviewData(
@@ -72,7 +72,7 @@ fun AccountReviewsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        stringResource(R.string.label_reviews),
+                        stringResource(R.string.label_your_reviews),
                         style = MaterialTheme.typography.headlineMedium
                     )
                 },
@@ -81,7 +81,8 @@ fun AccountReviewsScreen(
                         onClick = {
                             navController.navigate(Routes.Account.route){
                                 popUpTo(Routes.Account.route){ inclusive = true }
-                            }                        }
+                            }
+                        }
                     ) {
                         Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
                     }
@@ -93,20 +94,23 @@ fun AccountReviewsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 16.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             itemsIndexed(mockReviews, key = { _, item -> item.id }) { index, item ->
-                ReviewItem(
-                    productName = item.productName,
-                    reviewDate = item.reviewDate,
-                    rating = item.rating,
-                    reviewText = item.reviewText,
-                    imageUrl = item.imageUrl
+                ReviewCardSquare(
+                    username = "talisencrw",
+                    productName = "Vintage Denim Jacket",
+                    reviewDate = "November 10, 2025",
+                    reviewText = "Though not my very favourite movie about the infamous vampire, this is quite beautiful, we...",
+                    rating = "9 / 10",
+                    withImageAndDate = true,
+                    isExpanded = true,
+                    isEditable = false,
+                    onNavigateToReviews = {
+                        navController.navigate(Routes.ProductReviews.route)
+                    },
                 )
-
-                if (index < mockReviews.lastIndex) {
-                    Divider(color = MaterialTheme.colorScheme.outlineVariant)
-                }
             }
         }
     }

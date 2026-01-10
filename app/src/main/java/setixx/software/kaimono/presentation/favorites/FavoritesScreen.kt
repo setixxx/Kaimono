@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -29,31 +32,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.components.FavoriteItemCard
-import setixx.software.kaimono.presentation.components.ProductSheetContent
-
-private data class FavoriteItem(
-    val id: Int,
-    val imageUrl: String?,
-    val name: String,
-    val size: String,
-    val price: String
-)
-
-private val mockFavorites = listOf(
-    FavoriteItem(1, null, "Vintage Denim Jacket", "L", "$75.00"),
-    FavoriteItem(2, null, "Silk Blend Scarf", "One Size", "$45.50"),
-    FavoriteItem(3, null, "Leather Ankle Boots", "9", "$120.00"),
-    FavoriteItem(4, null, "Classic White T-Shirt", "M", "$25.00")
-)
-
+import setixx.software.kaimono.presentation.components.ProductCard
+import setixx.software.kaimono.presentation.navigation.Routes
+import setixx.software.kaimono.presentation.product.ProductScreen
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FavoritesScreen(
     navController: NavController
 ) {
-    var showProductBottomSheet by remember { mutableStateOf(false) }
-    val productSheetState = rememberModalBottomSheetState(true)
+    val listState = rememberLazyGridState()
 
     Scaffold(
         topBar = {
@@ -66,38 +54,27 @@ fun FavoritesScreen(
                 }
             )
         }
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) { paddingValues ->
+        LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
+            columns = GridCells.Adaptive(minSize = 160.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            state = listState,
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = paddingValues.calculateTopPadding(),
+                bottom = paddingValues.calculateBottomPadding()
+            )
         ) {
-            items(mockFavorites, key = { it.id }) { item ->
-                FavoriteItemCard(
-                    ImageBitmap.imageResource(R.drawable.placeholder),
-                    name = item.name,
-                    size = item.size,
-                    price = item.price,
-                    onClick = { showProductBottomSheet = true}
-                )
-            }
-        }
-        if (showProductBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showProductBottomSheet = false },
-                sheetState = productSheetState
-            ) {
-                ProductSheetContent(
-                    images = listOf(
-                        ImageBitmap.imageResource(R.drawable.placeholder),
-                        ImageBitmap.imageResource(R.drawable.placeholder),
-                        ImageBitmap.imageResource(R.drawable.placeholder),
-                    ),                    contentDescription = "",
+            items(20){ products ->
+                ProductCard(
+                    bitmap = ImageBitmap.imageResource(R.drawable.placeholder),
+                    contentDescription = "",
                     header = "Product name",
                     price = 100,
-                    onClose = { showProductBottomSheet = false }
+                    onClick = { navController.navigate(Routes.Product.route) }
                 )
             }
         }

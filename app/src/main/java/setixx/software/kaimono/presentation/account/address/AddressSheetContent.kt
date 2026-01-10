@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -90,9 +92,7 @@ fun AddressSheetContent(
                             viewModel.deleteAddress(address.id)
                         }
                     )
-                    HorizontalDivider(color = if (state.addresses.size == 1) MaterialTheme.colorScheme.surfaceContainer
-                    else MaterialTheme.colorScheme.background,
-                        thickness = 2.dp)
+                    HorizontalDivider(color = Color.Transparent, thickness = 2.dp)
                 }
             }
 
@@ -102,11 +102,23 @@ fun AddressSheetContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = onClose
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp),
+                    onClick = onClose,
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.outlineVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledContainerColor = MaterialTheme.colorScheme.outlineVariant,
+                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 ) {
                     Text(stringResource(R.string.action_close))
                 }
                 Button(
+                    modifier = Modifier
+                        .weight(2f)
+                        .padding(start = 4.dp),
                     onClick = onAddAddress
                 ) {
                     Text(stringResource(R.string.action_add_address))

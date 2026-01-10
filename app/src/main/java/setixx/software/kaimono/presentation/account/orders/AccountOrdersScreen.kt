@@ -59,7 +59,7 @@ fun AccountOrdersScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(3) { index ->
+            items(10) { index ->
                 val orderId = "#${12345 + index}"
                 val orderDate = "November ${10 - index}, 2025"
                 val orderStatus = if (index % 2 == 0) "Delivered" else "In processing"

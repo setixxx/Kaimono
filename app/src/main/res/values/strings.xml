@@ -37,6 +37,7 @@
     <string name="action_add_to_card">Add to card</string>
     <string name="label_select_size">Select size</string>
     <string name="label_description">Description</string>
+    <string name="label_information">Information</string>
     <string name="action_delete">Delete</string>
     <string name="label_password_change">Password change</string>
     <string name="action_change_password">Change</string>
@@ -104,4 +105,26 @@
     <string name="error_card_cvv_format">Invalid CVV</string>
     <string name="error_not_found">Not found</string>
     <string name="label_cash_method">Cash</string>
+    <string name="label_show_all_reviews">Show all</string>
+    <string name="label_edit_button">Edit</string>
+    <string name="label_your_reviews">Your reviews</string>
+    <string name="label_all_reviews">All reviews</string>
+    <string name="label_your_review">Your review</string>
+    <string name="hint_text_of_review">Text of review</string>
+    <string name="label_create_review">Create review</string>
+    <string name="label_edit_review">Edit review</string>
+    <string name="acton_update">Update</string>
+    <string name="acton_create">Create</string>
+    <string name="label_article_number">Article number</string>
+    <string name="label_categories">Categories</string>
+    <string name="label_filters">Filters</string>
+    <string name="action_done">Done</string>
+    <string name="label_sort_by">Sort by</string>
+    <string name="label_sort_order">Sort order</string>
+    <string name="label_price_range">Price range</string>
+    <string name="hint_min">Min</string>
+    <string name="hint_max">Max</string>
+    <string name="label_in_stock_only">In stock only</string>
+    <string name="action_apply_filters">Apply Filters</string>
+    <string name="action_clear_filters">Clear Filters</string>
 </resources>

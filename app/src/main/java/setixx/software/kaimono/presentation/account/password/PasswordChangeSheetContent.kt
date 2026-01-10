@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -183,11 +184,23 @@ fun PasswordChangeSheetContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = onClose
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp),
+                    onClick = onClose,
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.outlineVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledContainerColor = MaterialTheme.colorScheme.outlineVariant,
+                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 ) {
                     Text(stringResource(R.string.action_cancel))
                 }
                 Button(
+                    modifier = Modifier
+                        .weight(2f)
+                        .padding(start = 4.dp),
                     onClick = {
                         viewModel.changePassword()
                     }

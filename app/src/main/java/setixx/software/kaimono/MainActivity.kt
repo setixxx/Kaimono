@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,10 +32,12 @@ class MainActivity : ComponentActivity() {
 
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+                val shouldShowBottomBar = Routes.shouldShowBottomBar(currentRoute)
 
                 Scaffold(
+                    modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        if (Routes.shouldShowBottomBar(currentRoute)) {
+                        if (shouldShowBottomBar) {
                             BottomNavigationBar(navController = navController)
                         }
                     }
@@ -47,7 +49,9 @@ class MainActivity : ComponentActivity() {
                             finish()
                         },
                         navController = navController,
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier.fillMaxSize(),
+                        innerPadding = innerPadding,
+                        shouldShowBottomBar = shouldShowBottomBar
                     )
                 }
             }

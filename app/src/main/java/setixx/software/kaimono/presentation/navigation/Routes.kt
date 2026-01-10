@@ -14,6 +14,10 @@ sealed class Routes(
     object AccountReviews: Routes("AccountReviews", showBottomBar = false)
     object AccountAddCard: Routes("AccountAddCard", showBottomBar = false)
     object AccountAddAddress: Routes("AccountAddAddress", showBottomBar = false)
+    object Product: Routes("Product", showBottomBar = false)
+    object Search: Routes("Search", showBottomBar = false)
+    object ProductReviews: Routes("ProductReviews", showBottomBar = false)
+    object Filter: Routes("Filter", showBottomBar = false)
 
 
     companion object {
@@ -28,6 +32,10 @@ sealed class Routes(
                 AccountReviews.route -> AccountReviews.showBottomBar
                 AccountAddCard.route -> AccountAddCard.showBottomBar
                 AccountAddAddress.route -> AccountAddAddress.showBottomBar
+                Product.route -> Product.showBottomBar
+                Search.route -> Search.showBottomBar
+                ProductReviews.route -> ProductReviews.showBottomBar
+                Filter.route -> Filter.showBottomBar
                 else -> true
             }
         }

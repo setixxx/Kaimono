@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
@@ -23,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -96,15 +98,14 @@ fun PaymentMethodsSheetContent(
                             }
                         )
                         HorizontalDivider(
-                            color = if (state.paymentMethods.size == 1) MaterialTheme.colorScheme.surfaceContainer
-                            else MaterialTheme.colorScheme.background,
+                            color = Color.Transparent,
                             thickness = 2.dp
                         )
                     }
                 }
                 item(key = "cash_method") {
                     HorizontalDivider(
-                        color = MaterialTheme.colorScheme.background, thickness = 2.dp
+                        color = Color.Transparent, thickness = 2.dp
                     )
                     Box(Modifier.animateItem()) {
                         ListWithRadioAndTrailing(
@@ -112,7 +113,7 @@ fun PaymentMethodsSheetContent(
                             selectedIndex = if (state.selectedPaymentMethod == null) -1 else -2,
                             header = stringResource(R.string.label_cash_method),
                             onSelect = {
-                                // viewModel.setCashPaymentMethod()
+                                /*viewModel.setDefaultPaymentMethod(null)*/
                             },
                             onDelete = {},
                             isTrailingIconVisible = false
@@ -127,11 +128,23 @@ fun PaymentMethodsSheetContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = onClose
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp),
+                    onClick = onClose,
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.outlineVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledContainerColor = MaterialTheme.colorScheme.outlineVariant,
+                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 ) {
                     Text(stringResource(R.string.action_close))
                 }
                 Button(
+                    modifier = Modifier
+                        .weight(2f)
+                        .padding(start = 4.dp),
                     onClick = onAddCard
                 ) {
                     Text(stringResource(R.string.action_add_card))

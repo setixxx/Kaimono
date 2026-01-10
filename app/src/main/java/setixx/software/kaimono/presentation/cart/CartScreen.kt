@@ -88,7 +88,7 @@ fun CartScreen(
                 CartViewModelState(1, 1, "Product name 1", 100.00),
                 CartViewModelState(2, 1, "Product name 1", 100.00),
                 CartViewModelState(3, 1, "Product name 1", 100.00),
-                CartViewModelState(4, 1, "Product name 1", 100.00),
+                CartViewModelState(4, 1, "Product name 1", 100.00)
             )
         )
     }
@@ -127,23 +127,20 @@ fun CartScreen(
     ) {  innerPadding ->
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
-/*
-                .verticalScroll(rememberScrollState(0))
-*/
+                .verticalScroll(rememberScrollState())
         ) {
-            LazyColumn(
-                Modifier
+            Column(
+                modifier = Modifier
                     .clip(MaterialTheme.shapes.large)
+                    .animateContentSize()
             ) {
-                items(
-                    count = cartItems.size,
-                    key = { index -> cartItems[index].id }
-                ) { index ->
-                    Box(Modifier.animateItem().animateContentSize()){
+                cartItems.forEachIndexed { index, item ->
+                    key(item.id) {
                         SwipeableListWithPriceAndQuantity(
-                            query = cartItems[index],
+                            query = item,
                             onDismiss = {
                                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
 
