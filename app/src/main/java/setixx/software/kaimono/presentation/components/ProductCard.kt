@@ -28,6 +28,7 @@ fun ProductCard(
     contentDescription: String,
     header: String,
     price: Int,
+    rating: Double?,
     onClick: () -> Unit
 ){
     Column(
@@ -51,7 +52,15 @@ fun ProductCard(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
-        Text(price.toString() + stringResource(R.string.label_currency) + " • " + " 4.5",
+        Text(
+            text = buildString {
+            append(price)
+            append(stringResource(R.string.label_currency))
+            if (rating != null) {
+                append("  •  ")
+                append(rating)
+            }
+        },
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.outline,
             fontWeight = FontWeight.Normal,
@@ -69,6 +78,7 @@ fun ProductCardPreview(){
         "",
         "Product namessssssssssssssssssssssssssssssssssssssssss",
         100,
-        onClick = {}
+        onClick = {},
+        rating = null
     )
 }

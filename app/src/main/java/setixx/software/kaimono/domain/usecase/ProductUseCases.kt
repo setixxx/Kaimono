@@ -1,16 +1,17 @@
 package setixx.software.kaimono.domain.usecase
 
 import setixx.software.kaimono.domain.model.ApiResult
+import setixx.software.kaimono.domain.model.Product
 import setixx.software.kaimono.domain.model.ProductList
 import setixx.software.kaimono.domain.model.ProductRequest
 import setixx.software.kaimono.domain.repository.ProductRepository
 import javax.inject.Inject
 
-class SearchProductUseCase @Inject constructor(
+class SearchProductsUseCase @Inject constructor(
     private val productRepository: ProductRepository
 ) {
     suspend operator fun invoke(query: ProductRequest): ApiResult<ProductList> =
-        productRepository.getProducts(
+        productRepository.searchProducts(
             query = query.query,
             categoryIds = query.categoryIds,
             minPrice = query.minPrice,
@@ -21,4 +22,11 @@ class SearchProductUseCase @Inject constructor(
             page = query.page,
             pageSize = query.pageSize
         )
+}
+
+class GetProductByIdUseCase @Inject constructor(
+    private val productRepository: ProductRepository
+) {
+    suspend operator fun invoke(publicId: String): ApiResult<Product> =
+        productRepository.getProductById(publicId)
 }

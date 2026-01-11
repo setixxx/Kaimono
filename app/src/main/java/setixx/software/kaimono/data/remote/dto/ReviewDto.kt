@@ -40,7 +40,7 @@ data class ReviewResponse(
 
 @Serializable
 data class UpdateReviewRequest(
-    val rating: Short? = null,
+    val rating: Short,
     val comment: String? = null
 )
 

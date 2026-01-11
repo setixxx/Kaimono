@@ -1,11 +1,13 @@
 package setixx.software.kaimono.data.remote
 
+import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import setixx.software.kaimono.data.remote.dto.ProductListResponse
 import setixx.software.kaimono.data.remote.dto.ProductResponse
 
 interface ProductApi {
+    @GET("/products")
     suspend fun getProducts(
         @Query("query") query: String?,
         @Query("category_ids") categoryIds: String?,
@@ -17,5 +19,6 @@ interface ProductApi {
         @Query("page") page: Int?,
         @Query("page_size") pageSize: Int?
     ): ProductListResponse
+    @GET("/products/{id}")
     suspend fun getProductById(@Path("id") publicId: String): ProductResponse
 }

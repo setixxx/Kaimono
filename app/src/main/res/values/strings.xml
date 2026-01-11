@@ -16,6 +16,7 @@
     <string name="title_activity_auth">AuthActivity</string>
     <string name="title_payment_methods">Your payment methods</string>
     <string name="label_credit_card">Credit card</string>
+    <string name="label_cash">Cash</string>
     <string name="action_add_card">Add card</string>
     <string name="action_close">Close</string>
     <string name="label_greeting">Hello, %1$s</string>
@@ -104,7 +105,6 @@
     <string name="error_card_cvv_empty">CVV cannot be empty</string>
     <string name="error_card_cvv_format">Invalid CVV</string>
     <string name="error_not_found">Not found</string>
-    <string name="label_cash_method">Cash</string>
     <string name="label_show_all_reviews">Show all</string>
     <string name="label_edit_button">Edit</string>
     <string name="label_your_reviews">Your reviews</string>

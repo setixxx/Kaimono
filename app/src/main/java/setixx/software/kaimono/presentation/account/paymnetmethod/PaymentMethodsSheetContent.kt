@@ -89,36 +89,26 @@ fun PaymentMethodsSheetContent(
                         ListWithRadioAndTrailing(
                             index = index,
                             selectedIndex = selectedIndex,
-                            header = "${stringResource(R.string.label_credit_card)} *${paymentMethod.cardNumberLast4} ($month/$year)",
+                            header = "${
+                                if (paymentMethod.paymentType == "card") {
+                                    stringResource(R.string.label_credit_card)
+                                } else {
+                                    stringResource(R.string.label_cash)
+                                }
+                            } *${paymentMethod.cardNumberLast4} ($month/$year)",
                             onSelect = {
                                 viewModel.setDefaultPaymentMethod(paymentMethod.id)
                             },
                             onDelete = {
                                 viewModel.deletePaymentMethod(paymentMethod.id)
-                            }
-                        )
-                        HorizontalDivider(
-                            color = Color.Transparent,
-                            thickness = 2.dp
-                        )
-                    }
-                }
-                item(key = "cash_method") {
-                    HorizontalDivider(
-                        color = Color.Transparent, thickness = 2.dp
-                    )
-                    Box(Modifier.animateItem()) {
-                        ListWithRadioAndTrailing(
-                            index = -1,
-                            selectedIndex = if (state.selectedPaymentMethod == null) -1 else -2,
-                            header = stringResource(R.string.label_cash_method),
-                            onSelect = {
-                                /*viewModel.setDefaultPaymentMethod(null)*/
                             },
-                            onDelete = {},
-                            isTrailingIconVisible = false
+                            isTrailingIconVisible = if (paymentMethod.paymentType == "card") true else false
                         )
                     }
+                    HorizontalDivider(
+                        color = Color.Transparent,
+                        thickness = 2.dp
+                    )
                 }
             }
 

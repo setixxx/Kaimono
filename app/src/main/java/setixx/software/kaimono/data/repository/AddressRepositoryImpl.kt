@@ -16,7 +16,7 @@ import javax.inject.Inject
 class AddressRepositoryImpl @Inject constructor(
     private val addressApi: AddressApi
 ) : AddressRepository {
-    override suspend fun getAddress(): ApiResult<List<Address>> {
+    override suspend fun getAddresses(): ApiResult<List<Address>> {
         return try {
             val response = addressApi.getAllAddresses()
             val addresses = response.map {

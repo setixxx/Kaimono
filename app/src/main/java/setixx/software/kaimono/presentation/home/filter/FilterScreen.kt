@@ -1,4 +1,4 @@
-package setixx.software.kaimono.presentation.filter
+package setixx.software.kaimono.presentation.home.filter
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,12 +35,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,19 +67,23 @@ import setixx.software.kaimono.presentation.components.ListWithTwoIcons
 )
 @Composable
 fun FilterScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: FilterViewModel
 ) {
-    var selectedSortBy by remember { mutableStateOf("") }
-    var selectedSortOrder by remember { mutableStateOf("") }
-    var isCategoriesExpanded by remember { mutableStateOf(false) }
-    var selectedCategories by remember { mutableStateOf(setOf<String>()) }
-    var inStockOnly by remember { mutableStateOf(false) }
-    var minPrice by remember { mutableStateOf("") }
-    var maxPrice by remember { mutableStateOf("") }
+    val state by viewModel.state.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
 
-    val categories = listOf("Electronics", "Clothing", "Home", "Books", "Beauty", "Sports", "Toys", "Automotive")
-    val sortOptions = listOf("Price", "Name", "Date")
-    val sortOrderOptions = listOf("Ascending", "Descending")
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let { error ->
+            snackBarHostState.showSnackbar(
+                message = error,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.clearError()
+        }
+    }
+
+    var isCategoriesExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -94,6 +101,9 @@ fun FilterScreen(
                     }
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(snackBarHostState)
         }
     ) { paddingValues ->
         Column(
@@ -115,18 +125,18 @@ fun FilterScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                 ) {
-                    sortOptions.forEachIndexed { index, label ->
+                    state.sortBy.forEachIndexed { index, label ->
                         ToggleButton(
-                            checked = selectedSortBy == label,
-                            onCheckedChange = { selectedSortBy = label },
+                            checked = state.selectedSortBy == label,
+                            onCheckedChange = { viewModel.onSortByChange(label) },
                             modifier = Modifier.weight(1f),
                             shapes = when (index) {
                                 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                sortOptions.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                state.sortBy.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
                                 else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                             }
                         ) {
-                            if (selectedSortBy == label) {
+                            if (state.selectedSortBy == label) {
                                 Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(4.dp))
                             }
@@ -147,17 +157,17 @@ fun FilterScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                 ) {
-                    sortOrderOptions.forEachIndexed { index, label ->
+                    state.sortOrder.forEachIndexed { index, label ->
                         ToggleButton(
-                            checked = selectedSortOrder == label,
-                            onCheckedChange = { selectedSortOrder = label },
+                            checked = state.selectedSortOrder == label,
+                            onCheckedChange = { viewModel.onSortOrderChange(label) },
                             modifier = Modifier.weight(1f),
                             shapes = when (index) {
                                 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
                                 else -> ButtonGroupDefaults.connectedTrailingButtonShapes()
                             }
                         ) {
-                            if (selectedSortOrder == label) {
+                            if (state.selectedSortOrder == label) {
                                 Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(4.dp))
                             }
@@ -179,16 +189,16 @@ fun FilterScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     OutlinedTextField(
-                        value = minPrice,
-                        onValueChange = { minPrice = it },
+                        value = if (state.minPrice == null) "" else state.minPrice.toString(),
+                        onValueChange = { viewModel.onMinPriceChange(it.toInt()) },
                         modifier = Modifier.weight(1f),
                         label = { Text(stringResource(R.string.hint_min)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true
                     )
                     OutlinedTextField(
-                        value = maxPrice,
-                        onValueChange = { maxPrice = it },
+                        value = if (state.maxPrice == null) "" else state.maxPrice.toString(),
+                        onValueChange = { viewModel.onMaxPriceChange(it.toInt()) },
                         modifier = Modifier.weight(1f),
                         label = { Text(stringResource(R.string.hint_max)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -222,19 +232,18 @@ fun FilterScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        categories.forEach { category ->
-                            val isSelected = selectedCategories.contains(category)
+                        state.categories.forEach { category ->
                             ToggleButton(
-                                checked = isSelected,
+                                checked = state.selectedCategories.contains(category),
                                 onCheckedChange = {
-                                    selectedCategories = if (isSelected) selectedCategories - category else selectedCategories + category
+                                    viewModel.onCategorySelected(category)
                                 }
                             ) {
-                                if (isSelected) {
+                                if (state.selectedCategories.contains(category)) {
                                     Icon(Icons.Default.Check, null, modifier = Modifier.size(16.dp))
                                     Spacer(Modifier.width(4.dp))
                                 }
-                                Text(category)
+                                Text(category.name)
                             }
                         }
                     }
@@ -252,14 +261,14 @@ fun FilterScreen(
                     fontWeight = FontWeight.SemiBold
                 )
                 Switch(
-                    checked = inStockOnly,
-                    onCheckedChange = { inStockOnly = it }
+                    checked = state.inStockOnly,
+                    onCheckedChange = viewModel::onInStockOnlyChange
                 )
             }
 
             Row(){
                 Button(
-                    onClick = { },
+                    onClick = viewModel::clearFilters,
                     modifier = Modifier
                         .heightIn(ButtonDefaults.MediumContainerHeight)
                         .weight(1f)
@@ -276,7 +285,12 @@ fun FilterScreen(
                 }
 
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("filter_state", state)
+                        navController.popBackStack()
+                    },
                     modifier = Modifier
                         .heightIn(ButtonDefaults.MediumContainerHeight)
                         .weight(1f)
@@ -288,10 +302,4 @@ fun FilterScreen(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun FilterScreenPreview() {
-    FilterScreen(navController = rememberNavController())
 }

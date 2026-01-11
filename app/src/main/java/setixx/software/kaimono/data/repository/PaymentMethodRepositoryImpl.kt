@@ -22,6 +22,7 @@ class PaymentMethodRepositoryImpl @Inject constructor(
             val paymentMethods = response.map {
                 PaymentMethod(
                     id = it.id,
+                    paymentType = it.paymentType,
                     cardNumberLast4 = it.cardNumberLast4,
                     cardHolderName = it.cardHolderName,
                     expiryMonth = it.expiryMonth,
@@ -64,6 +65,7 @@ class PaymentMethodRepositoryImpl @Inject constructor(
                 ApiResult.Success(
                     PaymentMethod(
                         id = response.id,
+                        paymentType = response.paymentType,
                         cardNumberLast4 = response.cardNumberLast4,
                         cardHolderName = response.cardHolderName,
                         expiryMonth = response.expiryMonth,
@@ -95,6 +97,7 @@ class PaymentMethodRepositoryImpl @Inject constructor(
             ApiResult.Success(
                 PaymentMethod(
                     id = response.id,
+                    paymentType = response.paymentType,
                     cardNumberLast4 = response.cardNumberLast4,
                     cardHolderName = response.cardHolderName,
                     expiryMonth = response.expiryMonth,

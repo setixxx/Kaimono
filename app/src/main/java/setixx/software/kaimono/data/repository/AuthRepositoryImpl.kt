@@ -86,7 +86,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshAccessToken(): ApiResult<String> {
+    override suspend fun refreshTokens(): ApiResult<String> {
         return try {
             val refreshToken = tokenManager.getRefreshToken()
                 ?: return ApiResult.Error(DomainError.InvalidToken)

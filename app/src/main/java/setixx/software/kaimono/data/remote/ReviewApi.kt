@@ -11,8 +11,8 @@ import setixx.software.kaimono.data.remote.dto.ReviewResponse
 import setixx.software.kaimono.data.remote.dto.UpdateReviewRequest
 
 interface ReviewApi {
-    @GET("/reviews/{id}/reviews")
-    suspend fun getProductReviews(): List<ReviewResponse>
+    @GET("/products/{id}/reviews")
+    suspend fun getProductReviews(@Path("id") productId: String): List<ReviewResponse>
     @POST("/reviews")
     suspend fun createReview(createReviewRequest: CreateReviewRequest): ReviewResponse
     @GET("/reviews/my")

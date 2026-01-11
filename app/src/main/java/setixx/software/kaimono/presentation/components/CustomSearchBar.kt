@@ -22,18 +22,18 @@ import setixx.software.kaimono.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var query by rememberSaveable { mutableStateOf("") }
-
     SearchBar(
         modifier = modifier,
         inputField = {
             SearchBarDefaults.InputField(
                 query = query,
-                onQueryChange = { query = it },
-                onSearch = { onSearch(it) },
+                onQueryChange = onQueryChange,
+                onSearch = onSearch,
                 expanded = false,
                 onExpandedChange = { },
                 leadingIcon = {
@@ -55,5 +55,5 @@ fun CustomSearchBar(
 @Preview
 @Composable
 fun CustomSearchBarPreview(){
-    CustomSearchBar(onSearch = {})
+    CustomSearchBar(onSearch = {}, onQueryChange = {}, query = "")
 }

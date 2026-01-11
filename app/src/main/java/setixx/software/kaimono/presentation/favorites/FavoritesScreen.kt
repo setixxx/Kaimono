@@ -74,7 +74,8 @@ fun FavoritesScreen(
                     contentDescription = "",
                     header = "Product name",
                     price = 100,
-                    onClick = { navController.navigate(Routes.Product.route) }
+                    onClick = { navController.navigate(Routes.Product.route) },
+                    rating = null
                 )
             }
         }

@@ -16,14 +16,9 @@ data class Product(
     val isAvailable: Boolean,
     val categories: List<Category>,
     val sizes: List<Size>,
-    val images: List<Image>
-)
-
-data class Category(
-    val id: Long,
-    val name: String,
-    val description: String?,
-    val parentId: Long?
+    val images: List<Image>,
+    val averageRating: Double?,
+    val reviewCount: Long
 )
 
 data class Size(
@@ -43,8 +38,8 @@ data class Image(
 data class ProductRequest(
     val query: String? = null,
     val categoryIds: String? = null,
-    val minPrice: Double? = null,
-    val maxPrice: Double? = null,
+    val minPrice: Int? = null,
+    val maxPrice: Int? = null,
     val inStockOnly: Boolean? = null,
     val sortBy: String? = null,
     val sortOrder: String? = null,

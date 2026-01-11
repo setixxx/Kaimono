@@ -7,8 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import setixx.software.kaimono.presentation.account.AccountScreen
 import setixx.software.kaimono.presentation.account.AccountViewModel
@@ -21,7 +23,8 @@ import setixx.software.kaimono.presentation.account.orders.AccountOrdersScreen
 import setixx.software.kaimono.presentation.account.reviews.AccountReviewsScreen
 import setixx.software.kaimono.presentation.cart.CartScreen
 import setixx.software.kaimono.presentation.favorites.FavoritesScreen
-import setixx.software.kaimono.presentation.filter.FilterScreen
+import setixx.software.kaimono.presentation.home.filter.FilterScreen
+import setixx.software.kaimono.presentation.home.HomeViewModel
 import setixx.software.kaimono.presentation.product.ProductScreen
 import setixx.software.kaimono.presentation.product.reviews.ProductReviewsScreen
 
@@ -45,7 +48,13 @@ fun NavHost(
             modifier
         }
     ) {
-        composable(Routes.Home.route) { HomeScreen(navController) }
+        composable(Routes.Home.route) {
+            val homeViewModel = hiltViewModel<HomeViewModel>()
+            HomeScreen(
+                navController = navController,
+                viewModel = homeViewModel
+            )
+        }
         composable(Routes.Favorites.route) { FavoritesScreen(navController) }
         composable(Routes.Cart.route) { CartScreen(navController) }
 
@@ -62,19 +71,23 @@ fun NavHost(
                 )
             }
             composable(Routes.AccountInfo.route) {
-                val accountInfoViewModel = hiltViewModel<AccountInfoViewModel>()
                 AccountInfoScreen(
                     navController = navController,
-                    viewModel = accountInfoViewModel
+                    viewModel = hiltViewModel()
                 )
             }
             composable(Routes.AccountOrders.route) { AccountOrdersScreen(navController) }
             composable(Routes.AccountReviews.route) { AccountReviewsScreen(navController) }
             composable(Routes.AccountAddCard.route) { AddPaymentMethodScreen(navController) }
             composable(Routes.AccountAddAddress.route) { AddAddressScreen(navController) }
-            composable(Routes.Product.route) { ProductScreen(navController) }
+            composable(
+                route = Routes.Product.route,
+                arguments = listOf(navArgument("productId") { type = NavType.StringType })
+            ) {
+                ProductScreen(navController = navController, viewModel = hiltViewModel())
+            }
             composable(Routes.ProductReviews.route) { ProductReviewsScreen(navController) }
-            composable(Routes.Filter.route) { FilterScreen(navController) }
+            composable(Routes.Filter.route) { FilterScreen(navController, viewModel = hiltViewModel()) }
         }
     }
 }

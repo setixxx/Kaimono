@@ -14,7 +14,9 @@ sealed class Routes(
     object AccountReviews: Routes("AccountReviews", showBottomBar = false)
     object AccountAddCard: Routes("AccountAddCard", showBottomBar = false)
     object AccountAddAddress: Routes("AccountAddAddress", showBottomBar = false)
-    object Product: Routes("Product", showBottomBar = false)
+    object Product: Routes("Product/{productId}", showBottomBar = false){
+        fun createRoute(productId: String) = "Product/$productId"
+    }
     object Search: Routes("Search", showBottomBar = false)
     object ProductReviews: Routes("ProductReviews", showBottomBar = false)
     object Filter: Routes("Filter", showBottomBar = false)
@@ -22,22 +24,20 @@ sealed class Routes(
 
     companion object {
         fun shouldShowBottomBar(route: String?): Boolean {
-            return when (route) {
-                Home.route -> Home.showBottomBar
-                Favorites.route -> Favorites.showBottomBar
-                Cart.route -> Cart.showBottomBar
-                Account.route -> Account.showBottomBar
-                AccountInfo.route -> AccountInfo.showBottomBar
-                AccountOrders.route -> AccountOrders.showBottomBar
-                AccountReviews.route -> AccountReviews.showBottomBar
-                AccountAddCard.route -> AccountAddCard.showBottomBar
-                AccountAddAddress.route -> AccountAddAddress.showBottomBar
-                Product.route -> Product.showBottomBar
-                Search.route -> Search.showBottomBar
-                ProductReviews.route -> ProductReviews.showBottomBar
-                Filter.route -> Filter.showBottomBar
-                else -> true
+            if (route == null) return true
+
+            if (route.startsWith("Product")) {
+                return Product.showBottomBar
             }
+
+            val screens = listOf(
+                Home, Favorites, Cart, Account, AccountInfo,
+                AccountOrders, AccountReviews, AccountAddCard,
+                AccountAddAddress, Search, ProductReviews, Filter
+            )
+
+            return screens.find { it.route == route }?.showBottomBar ?: true
         }
+
     }
 }

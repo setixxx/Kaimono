@@ -13,7 +13,10 @@ import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.local.TokenRefresher
 import setixx.software.kaimono.data.remote.AddressApi
 import setixx.software.kaimono.data.remote.AuthApi
+import setixx.software.kaimono.data.remote.CategoryApi
 import setixx.software.kaimono.data.remote.PaymentMethodApi
+import setixx.software.kaimono.data.remote.ProductApi
+import setixx.software.kaimono.data.remote.ReviewApi
 import setixx.software.kaimono.data.remote.UserApi
 import setixx.software.kaimono.data.remote.interceptor.AuthInterceptor
 import setixx.software.kaimono.data.remote.interceptor.RefreshInterceptor
@@ -198,5 +201,65 @@ object NetworkModule {
             .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
             .create(PaymentMethodApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProductApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): ProductApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(ProductApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReviewApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): ReviewApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(ReviewApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): CategoryApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(CategoryApi::class.java)
     }
 }

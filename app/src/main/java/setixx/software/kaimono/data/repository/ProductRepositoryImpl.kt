@@ -16,11 +16,11 @@ import javax.inject.Inject
 class ProductRepositoryImpl @Inject constructor(
     private val productApi: ProductApi
 ) : ProductRepository {
-    override suspend fun getProducts(
+    override suspend fun searchProducts(
         query: String?,
         categoryIds: String?,
-        minPrice: Double?,
-        maxPrice: Double?,
+        minPrice: Int?,
+        maxPrice: Int?,
         inStockOnly: Boolean?,
         sortBy: String?,
         sortOrder: String?,
@@ -31,8 +31,8 @@ class ProductRepositoryImpl @Inject constructor(
             val response = productApi.getProducts(
                 query = query,
                 categoryIds = categoryIds,
-                minPrice = minPrice,
-                maxPrice = maxPrice,
+                minPrice = minPrice?.toDouble(),
+                maxPrice = maxPrice?.toDouble(),
                 inStockOnly = inStockOnly,
                 sortBy = sortBy,
                 sortOrder = sortOrder,
@@ -72,7 +72,9 @@ class ProductRepositoryImpl @Inject constructor(
                                 isPrimary = it.isPrimary,
                                 displayOrder = it.displayOrder
                             )
-                        }
+                        },
+                        averageRating = productResponse.averageRating,
+                        reviewCount = productResponse.reviewCount
                     )
                 },
                 totalCount = response.totalCount,
@@ -129,7 +131,9 @@ class ProductRepositoryImpl @Inject constructor(
                         isPrimary = it.isPrimary,
                         displayOrder = it.displayOrder
                     )
-                }
+                },
+                averageRating = response.averageRating,
+                reviewCount = response.reviewCount
             )
             ApiResult.Success(product)
         } catch (e: HttpException) {

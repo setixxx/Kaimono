@@ -1,0 +1,43 @@
+package setixx.software.kaimono.domain.usecase
+
+import setixx.software.kaimono.domain.model.AddCartItem
+import setixx.software.kaimono.domain.model.ApiResult
+import setixx.software.kaimono.domain.model.Cart
+import setixx.software.kaimono.domain.model.UpdateCartItem
+import setixx.software.kaimono.domain.repository.CartRepository
+import javax.inject.Inject
+
+class GetCartUseCase @Inject constructor(
+    private val cartRepository: CartRepository
+) {
+    suspend operator fun invoke(): ApiResult<Cart> =
+        cartRepository.getCart()
+}
+
+class ClearCartUseCase @Inject constructor(
+    private val cartRepository: CartRepository
+) {
+    suspend operator fun invoke(): ApiResult<Cart> =
+        cartRepository.clearCart()
+}
+
+class AddCartItemUseCase @Inject constructor(
+    private val cartRepository: CartRepository
+) {
+    suspend operator fun invoke(addCartItem: AddCartItem): ApiResult<Cart> =
+        cartRepository.addCartItem(addCartItem)
+}
+
+class UpdateCartItemUseCase @Inject constructor(
+    private val cartRepository: CartRepository
+) {
+    suspend operator fun invoke(cartItemId: Long, quantity: Int): ApiResult<Cart> =
+        cartRepository.updateCartItem(cartItemId, UpdateCartItem(quantity))
+}
+
+class DeleteCartItemUseCase @Inject constructor(
+    private val cartRepository: CartRepository
+) {
+    suspend operator fun invoke(cartItemId: Long): ApiResult<Cart> =
+        cartRepository.deleteCartItem(cartItemId)
+}
