@@ -8,7 +8,7 @@ data class Cart(
 
 data class CartItem(
     val id: Long,
-    val productId: Long,
+    val productPublicId: String,
     val productName: String,
     val productImage: String?,
     val size: String,
@@ -19,15 +19,11 @@ data class CartItem(
 
 data class AddCartItem(
     val productId: String,
-    val sizeId: Int,
+    val size: String,
     val quantity: Int
 )
 
 data class UpdateCartItem(
-    val sizeId: Long,
+    val size: String,
     val quantity: Int
-)
-
-data class DeleteCartItem(
-    val sizeId: Long
 )

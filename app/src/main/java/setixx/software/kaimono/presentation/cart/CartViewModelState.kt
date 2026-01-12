@@ -1,8 +1,19 @@
 package setixx.software.kaimono.presentation.cart
 
+import setixx.software.kaimono.domain.model.Address
+import setixx.software.kaimono.domain.model.Cart
+import setixx.software.kaimono.domain.model.CartItem
+import setixx.software.kaimono.domain.model.PaymentMethod
+
 data class CartViewModelState(
-    val id: Int = 0,
-    val quantity: Int = 0,
-    val name: String = "",
-    val price: Double = 0.00
+    val cart: Cart = Cart(0, emptyList(), ""),
+    val items: List<CartItem> = emptyList(),
+    val totalPrice: String = "",
+    val addresses: List<Address> = emptyList(),
+    val paymentMethods: List<PaymentMethod> = emptyList(),
+    val selectedAddress: Address? = null,
+    val selectedPaymentMethod: PaymentMethod? = null,
+    val isOrderCreated: Boolean = false,
+    val errorMessage: String? = null,
+    val isLoading: Boolean = false,
 )

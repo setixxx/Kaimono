@@ -22,13 +22,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import setixx.software.kaimono.domain.model.CartItem
 import setixx.software.kaimono.presentation.cart.CartViewModelState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SwipeableListWithPriceAndQuantity(
-    query: CartViewModelState,
-    onDismiss: () -> Unit
+    query: CartItem,
+    onDismiss: () -> Unit,
+    onOpen: () -> Unit = {}
 ){
     @Suppress("Deprecation")
     val dismissState = rememberSwipeToDismissBoxState(
@@ -76,9 +78,10 @@ fun SwipeableListWithPriceAndQuantity(
     ){
         ListWithPriceAndQuantity(
             quantity = query.quantity,
-            product = query.name,
-            price = query.price,
-            onClick = { /* если нужно — открыть детали */ }
+            size = query.size,
+            product = query.productName,
+            price = query.subtotal,
+            onClick = onOpen
         )
     }
 }

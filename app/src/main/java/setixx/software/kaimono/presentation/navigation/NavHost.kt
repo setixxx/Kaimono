@@ -18,6 +18,7 @@ import setixx.software.kaimono.presentation.home.HomeScreen
 import setixx.software.kaimono.presentation.account.address.AddAddressScreen
 import setixx.software.kaimono.presentation.account.paymnetmethod.AddPaymentMethodScreen
 import setixx.software.kaimono.presentation.account.orders.AccountOrdersScreen
+import setixx.software.kaimono.presentation.account.orders.OrderScreen
 import setixx.software.kaimono.presentation.account.reviews.AccountReviewScreen
 import setixx.software.kaimono.presentation.cart.CartScreen
 import setixx.software.kaimono.presentation.wishlist.WishlistScreen
@@ -90,6 +91,12 @@ fun NavHost(
                 arguments = listOf(navArgument("productId") { type = NavType.StringType })
             ) {
                 ReviewsScreen(navController, viewModel = hiltViewModel())
+            }
+            composable(
+                route = Routes.OrderDetails.route,
+                arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+            ) {
+                OrderScreen(navController, viewModel = hiltViewModel())
             }
             composable(Routes.Filter.route) { FilterScreen(navController) }
         }

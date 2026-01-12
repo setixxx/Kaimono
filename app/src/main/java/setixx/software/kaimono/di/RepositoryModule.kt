@@ -8,6 +8,7 @@ import setixx.software.kaimono.data.repository.AddressRepositoryImpl
 import setixx.software.kaimono.data.repository.AuthRepositoryImpl
 import setixx.software.kaimono.data.repository.CartRepositoryImpl
 import setixx.software.kaimono.data.repository.CategoryRepositoryImpl
+import setixx.software.kaimono.data.repository.OrderRepositoryImpl
 import setixx.software.kaimono.data.repository.PaymentMethodRepositoryImpl
 import setixx.software.kaimono.data.repository.ProductRepositoryImpl
 import setixx.software.kaimono.data.repository.ReviewRepositoryImpl
@@ -17,6 +18,7 @@ import setixx.software.kaimono.domain.repository.AddressRepository
 import setixx.software.kaimono.domain.repository.AuthRepository
 import setixx.software.kaimono.domain.repository.CartRepository
 import setixx.software.kaimono.domain.repository.CategoryRepository
+import setixx.software.kaimono.domain.repository.OrderRepository
 import setixx.software.kaimono.domain.repository.PaymentMethodRepository
 import setixx.software.kaimono.domain.repository.ProductRepository
 import setixx.software.kaimono.domain.repository.ReviewRepository
@@ -64,4 +66,7 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun bindCartRepository(cartRepositoryImpl: CartRepositoryImpl): CartRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindOrderRepository(orderRepositoryImpl: OrderRepositoryImpl): OrderRepository
 }

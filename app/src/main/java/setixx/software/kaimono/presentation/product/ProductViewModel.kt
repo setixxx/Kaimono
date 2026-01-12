@@ -8,14 +8,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import setixx.software.kaimono.domain.model.AddCartItem
 import setixx.software.kaimono.domain.model.AddWishListItem
 import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.model.Size
+import setixx.software.kaimono.domain.model.UpdateCartItem
+import setixx.software.kaimono.domain.usecase.AddCartItemUseCase
 import setixx.software.kaimono.domain.usecase.AddWishListItemUseCase
+import setixx.software.kaimono.domain.usecase.DeleteCartItemUseCase
 import setixx.software.kaimono.domain.usecase.DeleteWishListItemUseCase
+import setixx.software.kaimono.domain.usecase.GetCartUseCase
 import setixx.software.kaimono.domain.usecase.GetProductByIdUseCase
 import setixx.software.kaimono.domain.usecase.GetProductReviewsUseCase
 import setixx.software.kaimono.domain.usecase.GetUserWishListUseCase
+import setixx.software.kaimono.domain.usecase.UpdateCartItemUseCase
 import setixx.software.kaimono.presentation.common.ErrorMapper
 import javax.inject.Inject
 
@@ -26,6 +32,10 @@ class ProductViewModel @Inject constructor(
     private val getUserWishListUseCase: GetUserWishListUseCase,
     private val addWishListItemUseCase: AddWishListItemUseCase,
     private val deleteWishListItemUseCase: DeleteWishListItemUseCase,
+    private val getCartUseCase: GetCartUseCase,
+    private val addCartItemUseCase: AddCartItemUseCase,
+    private val updateCartItemUseCase: UpdateCartItemUseCase,
+    private val deleteCartItemUseCase: DeleteCartItemUseCase,
     private val errorMapper: ErrorMapper,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -39,6 +49,7 @@ class ProductViewModel @Inject constructor(
         productId?.let { id ->
             getProduct(id)
             getReviews(id)
+            getCart()
         }
     }
 
@@ -64,6 +75,7 @@ class ProductViewModel @Inject constructor(
                             selectedSize = product.sizes.firstOrNull()
                         )
                     }
+                    updateQuantityFromCart()
                 }
                 is ApiResult.Error -> {
                     _state.update {
@@ -107,17 +119,94 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+    private fun getCart() {
+        viewModelScope.launch {
+            when (val result = getCartUseCase()) {
+                is ApiResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            cartItems = result.data.items,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                    updateQuantityFromCart()
+                }
+                is ApiResult.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
+                }
+                is ApiResult.Loading -> {
+                    _state.update { it.copy(isLoading = true) }
+                }
+            }
+        }
+    }
+
+    private fun updateQuantityFromCart() {
+        val cartItem = _state.value.currentCartItem
+        _state.update { it.copy(quantity = cartItem?.quantity ?: 1) }
+    }
+
     fun onSizeSelected(size: Size) {
         _state.update { it.copy(selectedSize = size) }
+        updateQuantityFromCart()
     }
 
     fun incrementQuantity() {
-        _state.update { it.copy(quantity = it.quantity + 1) }
+        val nextQuantity = _state.value.quantity + 1
+        if (_state.value.isProductInCart) {
+            updateCartQuantity(nextQuantity)
+        } else {
+            _state.update { it.copy(quantity = nextQuantity) }
+        }
     }
 
     fun decrementQuantity() {
-        _state.update {
-            if (it.quantity > 1) it.copy(quantity = it.quantity - 1) else it
+        val currentQuantity = _state.value.quantity
+        if (currentQuantity > 1) {
+            val nextQuantity = currentQuantity - 1
+            if (_state.value.isProductInCart) {
+                updateCartQuantity(nextQuantity)
+            } else {
+                _state.update { it.copy(quantity = nextQuantity) }
+            }
+        } else if (currentQuantity == 1 && _state.value.isProductInCart) {
+            removeFromCart()
+        }
+    }
+
+    private fun removeFromCart() {
+        val cartItem = _state.value.currentCartItem ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            when (val result = deleteCartItemUseCase(cartItem.productPublicId, cartItem.size)) {
+                is ApiResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            cartItems = result.data.items,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                    updateQuantityFromCart()
+                }
+                is ApiResult.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
+                }
+                ApiResult.Loading -> {
+                    _state.update { it.copy(isLoading = true) }
+                }
+            }
         }
     }
 
@@ -128,13 +217,15 @@ class ProductViewModel @Inject constructor(
                 when (val result = deleteWishListItemUseCase(currentProduct.publicId)) {
                     is ApiResult.Success -> _state.update { it.copy(isFavorite = false) }
                     is ApiResult.Error -> {
-                        _state.value = _state.value.copy(
-                            isLoading = false,
-                            errorMessage = errorMapper.mapToMessage(result.error)
-                        )
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = errorMapper.mapToMessage(result.error)
+                            )
+                        }
                     }
                     ApiResult.Loading -> {
-                        _state.value = _state.value.copy(isLoading = true)
+                        _state.update { it.copy(isLoading = true) }
                     }
                 }
             } else {
@@ -144,14 +235,83 @@ class ProductViewModel @Inject constructor(
                         _state.update { it.copy(isFavorite = true) }
                     }
                     is ApiResult.Error -> {
-                        _state.value = _state.value.copy(
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = errorMapper.mapToMessage(result.error)
+                            )
+                        }
+                    }
+                    ApiResult.Loading -> {
+                        _state.update { it.copy(isLoading = true) }
+                    }
+                }
+            }
+        }
+    }
+
+    fun addToCart() {
+        val product = _state.value.product ?: return
+        val size = _state.value.selectedSize ?: return
+        val quantity = _state.value.quantity
+
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            val request = AddCartItem(product.publicId, size.size, quantity)
+            when (val result = addCartItemUseCase(request)) {
+                is ApiResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            cartItems = result.data.items,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                    updateQuantityFromCart()
+                }
+                is ApiResult.Error -> {
+                    _state.update {
+                        it.copy(
                             isLoading = false,
                             errorMessage = errorMapper.mapToMessage(result.error)
                         )
                     }
-                    ApiResult.Loading -> {
-                        _state.value = _state.value.copy(isLoading = true)
+                }
+                ApiResult.Loading -> {
+                    _state.update { it.copy(isLoading = true) }
+                }
+            }
+        }
+    }
+
+    private fun updateCartQuantity(newQuantity: Int) {
+        val cartItem = _state.value.currentCartItem ?: return
+        if (newQuantity < 1) return
+
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            val request = UpdateCartItem(cartItem.size, newQuantity)
+            when (val result = updateCartItemUseCase(cartItem.productPublicId, request)) {
+                is ApiResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            cartItems = result.data.items,
+                            isLoading = false,
+                            errorMessage = null
+                        )
                     }
+                    updateQuantityFromCart()
+                }
+                is ApiResult.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
+                }
+                ApiResult.Loading -> {
+                    _state.update { it.copy(isLoading = true) }
                 }
             }
         }

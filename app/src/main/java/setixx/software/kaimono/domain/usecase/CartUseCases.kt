@@ -3,7 +3,6 @@ package setixx.software.kaimono.domain.usecase
 import setixx.software.kaimono.domain.model.AddCartItem
 import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.model.Cart
-import setixx.software.kaimono.domain.model.DeleteCartItem
 import setixx.software.kaimono.domain.model.UpdateCartItem
 import setixx.software.kaimono.domain.repository.CartRepository
 import javax.inject.Inject
@@ -32,13 +31,13 @@ class AddCartItemUseCase @Inject constructor(
 class UpdateCartItemUseCase @Inject constructor(
     private val cartRepository: CartRepository
 ) {
-    suspend operator fun invoke(cartItemId: Long, updateCartItem: UpdateCartItem): ApiResult<Cart> =
+    suspend operator fun invoke(cartItemId: String, updateCartItem: UpdateCartItem): ApiResult<Cart> =
         cartRepository.updateCartItem(cartItemId, updateCartItem)
 }
 
 class DeleteCartItemUseCase @Inject constructor(
     private val cartRepository: CartRepository
 ) {
-    suspend operator fun invoke(cartItemId: Long, deleteCartItem: DeleteCartItem): ApiResult<Cart> =
-        cartRepository.deleteCartItem(cartItemId, deleteCartItem)
+    suspend operator fun invoke(cartItemId: String, size: String): ApiResult<Cart> =
+        cartRepository.deleteCartItem(cartItemId, size)
 }

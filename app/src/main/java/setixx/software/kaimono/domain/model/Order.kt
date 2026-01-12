@@ -1,6 +1,6 @@
 package setixx.software.kaimono.domain.model
 
-data class Orders(
+data class Order(
     val publicId: String,
     val status: String,
     val totalAmount: String,

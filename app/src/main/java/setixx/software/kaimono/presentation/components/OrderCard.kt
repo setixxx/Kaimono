@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import setixx.software.kaimono.R
 
@@ -40,10 +41,16 @@ fun OrderCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    modifier = Modifier
+                        .weight(1f),
                     text = stringResource(R.string.label_order) + " $orderId",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
+                    modifier = Modifier
+                        .weight(1f),
                     text = orderStatus,
                     style = MaterialTheme.typography.labelLarge,
                     color = if (orderStatus == stringResource(R.string.label_delivered))

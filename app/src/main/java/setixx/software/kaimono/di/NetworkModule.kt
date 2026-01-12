@@ -15,6 +15,7 @@ import setixx.software.kaimono.data.remote.AddressApi
 import setixx.software.kaimono.data.remote.AuthApi
 import setixx.software.kaimono.data.remote.CartApi
 import setixx.software.kaimono.data.remote.CategoryApi
+import setixx.software.kaimono.data.remote.OrderApi
 import setixx.software.kaimono.data.remote.PaymentMethodApi
 import setixx.software.kaimono.data.remote.ProductApi
 import setixx.software.kaimono.data.remote.ReviewApi
@@ -30,7 +31,7 @@ import javax.inject.Singleton
 object NetworkModule {
 
     @Provides
-    fun baseUrl() = "http://192.168.1.93:8080/"
+    fun baseUrl() = "http://172.26.195.163:8080/"
 
     @Provides
     @Singleton
@@ -303,5 +304,25 @@ object NetworkModule {
             .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
             .create(CartApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrderApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): OrderApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(OrderApi::class.java)
     }
 }

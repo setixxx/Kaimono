@@ -22,13 +22,16 @@ sealed class Routes(
         fun createRoute(productId: String?) = "Reviews/$productId"
     }
     object Filter: Routes("Filter", showBottomBar = false)
+    object OrderDetails: Routes("OrderDetails/{orderId}", showBottomBar = false){
+        fun createRoute(orderId: String) = "OrderDetails/$orderId"
+    }
 
 
     companion object {
         fun shouldShowBottomBar(route: String?): Boolean {
             if (route == null) return true
 
-            if (route.startsWith("Product") || route.startsWith("Reviews")) {
+            if (route.startsWith("Product") || route.startsWith("Reviews") || route.startsWith("OrderDetails")) {
                 return Product.showBottomBar
             }
 

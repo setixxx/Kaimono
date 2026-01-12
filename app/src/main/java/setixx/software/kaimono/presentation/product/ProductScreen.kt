@@ -2,6 +2,8 @@ package setixx.software.kaimono.presentation.product
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -141,8 +143,6 @@ fun ProductScreen(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Normal
                     )
-
-
 
                     Column(
                         modifier = Modifier
@@ -308,62 +308,101 @@ fun ProductScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Row(
+                    Box(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        contentAlignment = Alignment.Center
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .clip(MaterialTheme.shapes.extraLarge)
-                                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                                .padding(4.dp)
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = !state.isProductInCart,
+                            enter = fadeIn(),
+                            exit = fadeOut()
                         ) {
-                            FilledIconButton(
-                                onClick = { viewModel.decrementQuantity() },
-                                modifier = Modifier.size(40.dp),
-                                shape = MaterialTheme.shapes.large,
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                    contentColor = MaterialTheme.colorScheme.onSurface
-                                )
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp),
+                                onClick = { viewModel.addToCart() },
+                                shape = MaterialTheme.shapes.extraLarge,
+                                enabled = !state.isLoading
                             ) {
-                                Icon(Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(20.dp))
-                            }
-
-                            Text(
-                                text = state.quantity.toString(),
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            FilledIconButton(
-                                onClick = { viewModel.incrementQuantity() },
-                                modifier = Modifier.size(40.dp),
-                                shape = MaterialTheme.shapes.large,
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                    contentColor = MaterialTheme.colorScheme.onSurface
+                                Text(
+                                    text = stringResource(R.string.action_add_to_card),
+                                    style = MaterialTheme.typography.labelLarge
                                 )
-                            ) {
-                                Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(20.dp))
                             }
                         }
 
-                        Button(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp),
-                            onClick = { /*viewModel.addToCart() */ },
-                            shape = MaterialTheme.shapes.extraLarge,
-                            enabled = !state.isLoading
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = state.isProductInCart,
+                            enter = fadeIn(),
+                            exit = fadeOut()
                         ) {
-                            Text(
-                                text = stringResource(R.string.action_add_to_card),
-                                style = MaterialTheme.typography.labelLarge
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clip(MaterialTheme.shapes.extraLarge)
+                                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                                        .padding(4.dp)
+                                ) {
+                                    FilledIconButton(
+                                        onClick = { viewModel.decrementQuantity() },
+                                        modifier = Modifier.size(40.dp),
+                                        shape = MaterialTheme.shapes.large,
+                                        colors = IconButtonDefaults.filledIconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                            contentColor = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Remove,
+                                            contentDescription = "Decrease",
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+
+                                    Text(
+                                        text = state.quantity.toString(),
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                    FilledIconButton(
+                                        onClick = { viewModel.incrementQuantity() },
+                                        modifier = Modifier.size(40.dp),
+                                        shape = MaterialTheme.shapes.large,
+                                        colors = IconButtonDefaults.filledIconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                            contentColor = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Increase",
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+
+                                Button(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(48.dp),
+                                    onClick = { navController.navigate(Routes.Cart.route) },
+                                    shape = MaterialTheme.shapes.extraLarge,
+                                    enabled = !state.isLoading
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.label_already_in_cart),
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                            }
                         }
                     }
                 }
