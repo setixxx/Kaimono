@@ -13,6 +13,7 @@ import setixx.software.kaimono.data.local.TokenManager
 import setixx.software.kaimono.data.local.TokenRefresher
 import setixx.software.kaimono.data.remote.AddressApi
 import setixx.software.kaimono.data.remote.AuthApi
+import setixx.software.kaimono.data.remote.CartApi
 import setixx.software.kaimono.data.remote.CategoryApi
 import setixx.software.kaimono.data.remote.PaymentMethodApi
 import setixx.software.kaimono.data.remote.ProductApi
@@ -282,5 +283,25 @@ object NetworkModule {
             .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
             .create(WishlistApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCartApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): CartApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(CartApi::class.java)
     }
 }

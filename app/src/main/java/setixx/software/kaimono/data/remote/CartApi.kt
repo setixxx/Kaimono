@@ -1,0 +1,29 @@
+package setixx.software.kaimono.data.remote
+
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.Path
+import setixx.software.data.dto.AddToCartRequest
+import setixx.software.data.dto.CartResponse
+import setixx.software.data.dto.RemoveFromCartRequest
+import setixx.software.data.dto.UpdateCartItemRequest
+
+interface CartApi {
+    @GET("/cart")
+    suspend fun getCart(): CartResponse
+
+    @DELETE("/cart")
+    suspend fun clearCart(): CartResponse
+
+    @POST("/cart/items")
+    suspend fun addToCart(@Body request: AddToCartRequest): CartResponse
+
+    @PATCH("/cart/items/{id}")
+    suspend fun updateCartItem(@Path("id") id: Long, @Body request: UpdateCartItemRequest): CartResponse
+
+    @DELETE("/cart/items/{id}")
+    suspend fun removeFromCart(@Path("id") id: Long, @Body request: RemoveFromCartRequest): CartResponse
+}

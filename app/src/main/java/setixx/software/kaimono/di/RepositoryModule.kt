@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import setixx.software.kaimono.data.repository.AddressRepositoryImpl
 import setixx.software.kaimono.data.repository.AuthRepositoryImpl
+import setixx.software.kaimono.data.repository.CartRepositoryImpl
 import setixx.software.kaimono.data.repository.CategoryRepositoryImpl
 import setixx.software.kaimono.data.repository.PaymentMethodRepositoryImpl
 import setixx.software.kaimono.data.repository.ProductRepositoryImpl
@@ -14,6 +15,7 @@ import setixx.software.kaimono.data.repository.UserRepositoryImpl
 import setixx.software.kaimono.data.repository.WishlistRepositoryImpl
 import setixx.software.kaimono.domain.repository.AddressRepository
 import setixx.software.kaimono.domain.repository.AuthRepository
+import setixx.software.kaimono.domain.repository.CartRepository
 import setixx.software.kaimono.domain.repository.CategoryRepository
 import setixx.software.kaimono.domain.repository.PaymentMethodRepository
 import setixx.software.kaimono.domain.repository.ProductRepository
@@ -57,5 +59,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindWishlistRepository(wishlistRepositoryImpl: WishlistRepositoryImpl): WishlistRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCartRepository(cartRepositoryImpl: CartRepositoryImpl): CartRepository
 
 }

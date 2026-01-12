@@ -24,5 +24,10 @@ data class AddCartItem(
 )
 
 data class UpdateCartItem(
+    val sizeId: Long,
     val quantity: Int
+)
+
+data class DeleteCartItem(
+    val sizeId: Long
 )
