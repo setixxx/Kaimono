@@ -6,5 +6,7 @@ data class ReviewsSheetViewModelState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val isSuccess: Boolean = false,
-    val reviewId: String? = null
+    val reviewId: String? = null,
+    val productPublicId: String? = null,
+    val orderPublicId: String? = null
 )

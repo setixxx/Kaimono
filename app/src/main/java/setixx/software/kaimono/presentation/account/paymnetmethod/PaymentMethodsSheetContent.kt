@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
@@ -26,11 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.components.ListWithRadioAndTrailing
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PaymentMethodsSheetContent(
     onClose: () -> Unit,
@@ -77,38 +81,50 @@ fun PaymentMethodsSheetContent(
                     .padding(vertical = 16.dp)
                     .clip(MaterialTheme.shapes.large)
             ) {
-                items(
-                    count = state.paymentMethods.size,
-                    key = { index -> state.paymentMethods[index].id }
-                ) { index ->
-                    Box(Modifier.animateItem().animateContentSize()){
-                        val paymentMethod = state.paymentMethods[index]
-                        val month = paymentMethod.expiryMonth.toString().padStart(2, '0')
-                        val year = paymentMethod.expiryYear.toString().padStart(2, '0')
-
-                        ListWithRadioAndTrailing(
-                            index = index,
-                            selectedIndex = selectedIndex,
-                            header = "${
-                                if (paymentMethod.paymentType == "card") {
-                                    stringResource(R.string.label_credit_card)
-                                } else {
-                                    stringResource(R.string.label_cash)
-                                }
-                            } *${paymentMethod.cardNumberLast4} ($month/$year)",
-                            onSelect = {
-                                viewModel.setDefaultPaymentMethod(paymentMethod.id)
-                            },
-                            onDelete = {
-                                viewModel.deletePaymentMethod(paymentMethod.id)
-                            },
-                            isTrailingIconVisible = if (paymentMethod.paymentType == "card") true else false
+                if (state.paymentMethods.isEmpty() && !state.isLoading) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.label_no_payment_methods),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    HorizontalDivider(
-                        color = Color.Transparent,
-                        thickness = 2.dp
-                    )
+                } else {
+                    items(
+                        count = state.paymentMethods.size,
+                        key = { index -> state.paymentMethods[index].id }
+                    ) { index ->
+                        Box(Modifier.animateItem().animateContentSize()){
+                            val paymentMethod = state.paymentMethods[index]
+                            val month = paymentMethod.expiryMonth.toString().padStart(2, '0')
+                            val year = paymentMethod.expiryYear.toString().padStart(2, '0')
+
+                            ListWithRadioAndTrailing(
+                                index = index,
+                                selectedIndex = selectedIndex,
+                                header = if (paymentMethod.paymentType == "card") {
+                                    "${stringResource(R.string.label_credit_card)} *${paymentMethod.cardNumberLast4}" +  "($month/$year)"
+                                } else {
+                                    "${stringResource(R.string.label_cash)}"
+                                },
+                                onSelect = {
+                                    viewModel.setDefaultPaymentMethod(paymentMethod.id)
+                                },
+                                onDelete = {
+                                    viewModel.deletePaymentMethod(paymentMethod.id)
+                                },
+                                isTrailingIconVisible = if (paymentMethod.paymentType == "card") true else false
+                            )
+                        }
+                        HorizontalDivider(
+                            color = Color.Transparent,
+                            thickness = 2.dp
+                        )
+                    }
                 }
             }
 
@@ -141,6 +157,8 @@ fun PaymentMethodsSheetContent(
                 }
             }
         }
+        if (state.isLoading) ContainedLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

@@ -35,12 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import setixx.software.kaimono.R
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ReviewCardSquare(
     username: String,
+    imageUrl: String?,
     productName: String,
     reviewDate: String,
     reviewText: String?,
@@ -99,8 +101,8 @@ fun ReviewCardSquare(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     if (withImageAndDate){
-                        Image(
-                            bitmap = ImageBitmap.imageResource(R.drawable.placeholder),
+                        AsyncImage(
+                            model = imageUrl,
                             contentDescription = productName,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -226,22 +228,5 @@ fun ReviewCardSquare(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun ReviewCardSquarePreview() {
-    Box(modifier = Modifier.padding(16.dp)) {
-        ReviewCardSquare(
-            username = "John Doe",
-            productName = "Product Name",
-            reviewDate = "2023-01-01",
-            reviewText = null,
-            rating = "4.5",
-            withImageAndDate = false,
-            isExpanded = true,
-            isEditable = true
-        )
     }
 }

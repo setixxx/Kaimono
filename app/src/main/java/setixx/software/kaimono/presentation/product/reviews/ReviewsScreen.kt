@@ -110,7 +110,8 @@ fun ReviewsScreen(
                             isExpanded = true,
                             isEditable = true,
                             onUpdate = { showReviewBottomSheet = true },
-                            onDelete = { viewModel.deleteReview(ownReview.publicId) }
+                            onDelete = { viewModel.deleteReview(ownReview.publicId) },
+                            imageUrl = null
                         )
                     }
                 }
@@ -144,6 +145,7 @@ fun ReviewsScreen(
                         withImageAndDate = false,
                         isExpanded = true,
                         isEditable = false,
+                        imageUrl = null
                     )
                 }
             }

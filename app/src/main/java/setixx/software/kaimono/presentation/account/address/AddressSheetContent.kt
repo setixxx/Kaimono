@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import setixx.software.kaimono.R
@@ -79,20 +80,34 @@ fun AddressSheetContent(
                     .padding(vertical = 16.dp)
                     .clip(MaterialTheme.shapes.large)
             ) {
-                items(state.addresses.size) { index ->
-                    val address = state.addresses[index]
-                    ListWithRadioAndTrailing(
-                        index = index,
-                        selectedIndex = selectedIndex,
-                        header = "${address.city}, ${address.street}, ${address.house}",
-                        onSelect = {
-                            viewModel.setDefaultAddress(address.id)
-                        },
-                        onDelete = {
-                            viewModel.deleteAddress(address.id)
-                        }
-                    )
-                    HorizontalDivider(color = Color.Transparent, thickness = 2.dp)
+                if (state.addresses.isEmpty() && !state.isLoading) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.label_no_addresses),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                } else {
+                    items(state.addresses.size) { index ->
+                        val address = state.addresses[index]
+                        ListWithRadioAndTrailing(
+                            index = index,
+                            selectedIndex = selectedIndex,
+                            header = "${address.city}, ${address.street}, ${address.house}",
+                            onSelect = {
+                                viewModel.setDefaultAddress(address.id)
+                            },
+                            onDelete = {
+                                viewModel.deleteAddress(address.id)
+                            }
+                        )
+                        HorizontalDivider(color = Color.Transparent, thickness = 2.dp)
+                    }
                 }
             }
 

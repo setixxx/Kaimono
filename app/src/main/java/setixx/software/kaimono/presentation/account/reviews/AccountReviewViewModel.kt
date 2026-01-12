@@ -41,7 +41,7 @@ class AccountReviewViewModel @Inject constructor(
                             errorMessage = null
                         )
                     }
-                    fetchProductNames(reviews.mapNotNull { it.productPublicId }.distinct())
+                    fetchProductDetails(reviews.mapNotNull { it.productPublicId }.distinct())
                 }
                 is ApiResult.Error -> {
                     _state.update {
@@ -58,15 +58,20 @@ class AccountReviewViewModel @Inject constructor(
         }
     }
 
-    private fun fetchProductNames(productIds: List<String>) {
+    private fun fetchProductDetails(productIds: List<String>) {
         productIds.forEach { productId ->
             if (!_state.value.productNames.containsKey(productId)) {
                 viewModelScope.launch {
                     when (val result = getProductByIdUseCase(productId)) {
                         is ApiResult.Success -> {
+                            val product = result.data
+                            val primaryImageUrl = product.images.find { it.isPrimary }?.imageUrl 
+                                ?: product.images.firstOrNull()?.imageUrl
+                            
                             _state.update { currentState ->
                                 currentState.copy(
-                                    productNames = currentState.productNames + (productId to result.data.name)
+                                    productNames = currentState.productNames + (productId to product.name),
+                                    productImages = currentState.productImages + (productId to primaryImageUrl)
                                 )
                             }
                         }

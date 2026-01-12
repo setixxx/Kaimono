@@ -198,7 +198,7 @@ fun HomeScreen(
                     }
 
                     ProductCard(
-                        bitmap = ImageBitmap.imageResource(R.drawable.placeholder),
+                        imageUrl = state.products[index].images.firstOrNull()?.imageUrl,
                         contentDescription = state.products[index].name,
                         header = state.products[index].name,
                         price = state.products[index].basePrice.toDouble().toInt(),

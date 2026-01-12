@@ -1,6 +1,5 @@
 package setixx.software.kaimono.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,17 +11,15 @@ import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import setixx.software.kaimono.R
+import coil3.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductImageCarousel(
-    images: List<ImageBitmap>,
+    images: List<String>,
     modifier: Modifier = Modifier
 ) {
     if (images.isEmpty()) return
@@ -37,11 +34,11 @@ fun ProductImageCarousel(
         itemSpacing = 8.dp,
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) { i ->
-        Image(
+        AsyncImage(
             modifier = Modifier
                 .height(270.dp)
                 .maskClip(MaterialTheme.shapes.extraLarge),
-            bitmap = images[i],
+            model = images[i],
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -53,9 +50,9 @@ fun ProductImageCarousel(
 fun ProductImageCarouselPreview() {
     ProductImageCarousel(
         images = listOf(
-            ImageBitmap.imageResource(R.drawable.placeholder),
-            ImageBitmap.imageResource(R.drawable.placeholder),
-            ImageBitmap.imageResource(R.drawable.placeholder),
+            "https://example.com/image1.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image3.jpg",
         )
     )
 }

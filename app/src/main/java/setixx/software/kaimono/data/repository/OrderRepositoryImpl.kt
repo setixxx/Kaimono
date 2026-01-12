@@ -12,12 +12,10 @@ import setixx.software.kaimono.domain.model.DeliveryInfo
 import setixx.software.kaimono.domain.model.Order
 import setixx.software.kaimono.domain.model.OrderItem
 import setixx.software.kaimono.domain.model.PaymentInfo
-import setixx.software.kaimono.domain.model.PaymentMethod
 import setixx.software.kaimono.domain.model.PaymentMethodInfo
 import setixx.software.kaimono.domain.repository.OrderRepository
 import java.io.IOException
 import javax.inject.Inject
-import kotlin.collections.map
 
 class OrderRepositoryImpl @Inject constructor(
     private val orderApi: OrderApi
@@ -33,6 +31,7 @@ class OrderRepositoryImpl @Inject constructor(
                     createdAt = it.createdAt,
                     items = it.items.map { item ->
                         OrderItem(
+                            productPublicId = item.productPublicId,
                             productName = item.productName,
                             size = item.size,
                             quantity = item.quantity,
@@ -108,6 +107,7 @@ class OrderRepositoryImpl @Inject constructor(
                     createdAt = response.createdAt,
                     items = response.items.map { item ->
                         OrderItem(
+                            productPublicId = item.productPublicId,
                             productName = item.productName,
                             size = item.size,
                             quantity = item.quantity,
@@ -140,7 +140,7 @@ class OrderRepositoryImpl @Inject constructor(
                             paymentType = payment.paymentType,
                             transactionId = payment.transactionId,
                             paidAt = payment.paidAt,
-                            paymentMethod = payment.paymentMethod?.let { method ->
+                            paymentMethod = response.paymentInfo.paymentMethod?.let { method ->
                                 PaymentMethodInfo(
                                     cardNumberLast4 = method.cardNumberLast4,
                                     cardHolderName = method.cardHolderName
@@ -176,6 +176,7 @@ class OrderRepositoryImpl @Inject constructor(
                     createdAt = response.createdAt,
                     items = response.items.map { item ->
                         OrderItem(
+                            productPublicId = item.productPublicId,
                             productName = item.productName,
                             size = item.size,
                             quantity = item.quantity,
@@ -208,7 +209,7 @@ class OrderRepositoryImpl @Inject constructor(
                             paymentType = payment.paymentType,
                             transactionId = payment.transactionId,
                             paidAt = payment.paidAt,
-                            paymentMethod = payment.paymentMethod?.let { method ->
+                            paymentMethod = response.paymentInfo.paymentMethod?.let { method ->
                                 PaymentMethodInfo(
                                     cardNumberLast4 = method.cardNumberLast4,
                                     cardHolderName = method.cardHolderName

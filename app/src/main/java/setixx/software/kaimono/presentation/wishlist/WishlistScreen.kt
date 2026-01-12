@@ -108,7 +108,7 @@ fun WishlistScreen(
             ) {
                 items(state.wishlistItem.size) { index ->
                     ProductCard(
-                        bitmap = ImageBitmap.imageResource(R.drawable.placeholder),
+                        imageUrl = state.wishlistItem[index].productImage,
                         contentDescription = state.wishlistItem[index].productName,
                         header = state.wishlistItem[index].productName,
                         price = state.wishlistItem[index].basePrice.toDouble().toInt(),

@@ -55,9 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -116,7 +114,7 @@ fun ProductScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ProductImageCarousel(
-                        images = product.images.map { ImageBitmap.imageResource(R.drawable.placeholder) }
+                        images = product.images.map { it.imageUrl }
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -272,6 +270,7 @@ fun ProductScreen(
                                     withImageAndDate = false,
                                     isExpanded = false,
                                     isEditable = false,
+                                    imageUrl = null
                                 )
                             }
                         }

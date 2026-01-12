@@ -89,6 +89,8 @@ fun AccountReviewScreen(
         ) {
             items(state.reviews) { review ->
                 val productName = state.productNames[review.productPublicId] ?: ""
+                val productImage = review.productPublicId?.let { state.productImages[it] }
+                
                 ReviewCardSquare(
                     username = review.userName,
                     productName = productName,
@@ -98,9 +100,12 @@ fun AccountReviewScreen(
                     withImageAndDate = true,
                     isExpanded = true,
                     isEditable = false,
+                    imageUrl = productImage,
                     onNavigateToReviews = {
                         val productId = review.productPublicId
-                        navController.navigate(Routes.Reviews.createRoute(productId))
+                        if (productId != null) {
+                            navController.navigate(Routes.Reviews.createRoute(productId))
+                        }
                     },
                 )
             }

@@ -76,6 +76,9 @@ fun OrderScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     
     var showReviewSheet by remember { mutableStateOf(false) }
+    var selectedProductPublicId by remember { mutableStateOf<String?>(null) }
+    var selectedOrderPublicId by remember { mutableStateOf<String?>(null) }
+
     val scrollState = rememberScrollState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -174,7 +177,8 @@ fun OrderScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .background(MaterialTheme.colorScheme.surfaceContainer)
-                                        .clickable(onClick = {})
+                                        .clickable(onClick = {
+                                        })
                                         .padding(horizontal = 16.dp, vertical = 12.dp)
                                 ) {
                                     Row(
@@ -203,7 +207,11 @@ fun OrderScreen(
 
                                     if (order.status == "Доставлен" || order.status == "Delivered"){
                                         TextButton(
-                                            onClick = { showReviewSheet = true },
+                                            onClick = {
+                                                selectedProductPublicId = item.productPublicId
+                                                selectedOrderPublicId = order.publicId
+                                                showReviewSheet = true
+                                            },
                                             modifier = Modifier.align(Alignment.End),
                                             contentPadding = PaddingValues(0.dp)
                                         ) {
@@ -297,11 +305,21 @@ fun OrderScreen(
 
         if (showReviewSheet) {
             ModalBottomSheet(
-                onDismissRequest = { showReviewSheet = false },
+                onDismissRequest = { 
+                    showReviewSheet = false
+                    selectedProductPublicId = null
+                    selectedOrderPublicId = null
+                },
                 sheetState = sheetState
             ) {
                 ProductReviewSheet(
-                    onClose = { showReviewSheet = false }
+                    productPublicId = selectedProductPublicId,
+                    orderPublicId = selectedOrderPublicId,
+                    onClose = { 
+                        showReviewSheet = false
+                        selectedProductPublicId = null
+                        selectedOrderPublicId = null
+                    }
                 )
             }
         }
@@ -318,6 +336,7 @@ fun OrderScreenPreview() {
         createdAt = "2023-10-27T10:00:00Z",
         items = listOf(
             OrderItem(
+                productPublicId = "PROD-1",
                 productName = "T-Shirt",
                 size = "L",
                 quantity = 2,
@@ -325,6 +344,7 @@ fun OrderScreenPreview() {
                 subtotal = "1000.00"
             ),
             OrderItem(
+                productPublicId = "PROD-2",
                 productName = "Jeans",
                 size = "32",
                 quantity = 1,
