@@ -127,4 +127,5 @@
     <string name="label_in_stock_only">In stock only</string>
     <string name="action_apply_filters">Apply Filters</string>
     <string name="action_clear_filters">Clear Filters</string>
+    <string name="label_total_reviews">Total: %1$s</string>
 </resources>

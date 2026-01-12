@@ -18,6 +18,7 @@ import setixx.software.kaimono.data.remote.PaymentMethodApi
 import setixx.software.kaimono.data.remote.ProductApi
 import setixx.software.kaimono.data.remote.ReviewApi
 import setixx.software.kaimono.data.remote.UserApi
+import setixx.software.kaimono.data.remote.WishlistApi
 import setixx.software.kaimono.data.remote.interceptor.AuthInterceptor
 import setixx.software.kaimono.data.remote.interceptor.RefreshInterceptor
 import javax.inject.Named
@@ -261,5 +262,25 @@ object NetworkModule {
             .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
             .create(CategoryApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWishlistApi(
+        baseUrl: String,
+        @Named("protected") okHttpClient: OkHttpClient
+    ): WishlistApi {
+        val networkJson = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val contentType = "application/json".toMediaType()
+
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
+            .build()
+            .create(WishlistApi::class.java)
     }
 }

@@ -31,13 +31,13 @@ class GetUserReviewsUseCase @Inject constructor(
 class UpdateReviewUseCase @Inject constructor(
     private val reviewRepository: ReviewRepository
 ) {
-    suspend operator fun invoke(reviewId: Long, updateReview: UpdateReview): ApiResult<Review> =
-        reviewRepository.updateReview(reviewId, updateReview)
+    suspend operator fun invoke(reviewPublicId: String, updateReview: UpdateReview): ApiResult<Review> =
+        reviewRepository.updateReview(reviewPublicId, updateReview)
 }
 
 class DeleteReviewUseCase @Inject constructor(
     private val reviewRepository: ReviewRepository
 ) {
-    suspend operator fun invoke(reviewId: Long): ApiResult<String> =
-        reviewRepository.deleteReview(reviewId)
+    suspend operator fun invoke(reviewPublicId: String): ApiResult<String> =
+        reviewRepository.deleteReview(reviewPublicId)
 }

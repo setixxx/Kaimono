@@ -14,41 +14,51 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import setixx.software.kaimono.R
+import setixx.software.kaimono.domain.model.Review
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ProductReviewSheet(
+    review: Review? = null,
     onClose: () -> Unit = {},
-    isUpdate: Boolean = false
-){
-    var reviewText by remember { mutableStateOf("") }
+    isUpdate: Boolean = false,
+    viewModel: ReviewsSheetViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val options = listOf("1", "2", "3", "4", "5")
-    var selectedIndex by remember { mutableIntStateOf(0) }
 
+    LaunchedEffect(review) {
+        review?.let { viewModel.setReview(it) }
+    }
+
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess) {
+            onClose()
+            viewModel.resetSuccess()
+        }
+    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -59,36 +69,46 @@ fun ProductReviewSheet(
                 text = if (isUpdate) stringResource(R.string.label_edit_review) else stringResource(R.string.label_create_review),
                 style = MaterialTheme.typography.headlineSmall
             )
+
+            state.errorMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp, bottom = 16.dp),
-                value = reviewText,
+                value = state.reviewText,
                 minLines = 5,
                 maxLines = 5,
-                onValueChange = { reviewText = it },
+                onValueChange = { viewModel.onReviewTextChange(it) },
                 label = { Text(stringResource(R.string.hint_text_of_review)) },
                 singleLine = false,
-                enabled = true
+                enabled = !state.isLoading
             )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
             ) {
                 options.forEachIndexed { index, label ->
+                    val ratingValue = index + 1
                     ToggleButton(
-                        checked = selectedIndex == index,
-                        onCheckedChange = { selectedIndex = index },
+                        checked = state.rating == ratingValue,
+                        onCheckedChange = { viewModel.onRatingChange(ratingValue) },
                         modifier = Modifier.weight(1f),
-                        shapes =
-                            when (index) {
-                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            },
-                        enabled = true
+                        shapes = when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
+                        enabled = !state.isLoading
                     ) {
-                        if (selectedIndex == index) {
+                        if (state.rating == ratingValue) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = null,
@@ -100,9 +120,11 @@ fun ProductReviewSheet(
                     }
                 }
             }
+
             Row(
                 modifier = Modifier
-                    .padding(top = 8.dp),
+                    .padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
                     modifier = Modifier
@@ -116,7 +138,8 @@ fun ProductReviewSheet(
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         disabledContainerColor = MaterialTheme.colorScheme.outlineVariant,
                         disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    ),
+                    enabled = !state.isLoading
                 ) {
                     Text(text = stringResource(R.string.action_cancel))
                 }
@@ -125,18 +148,23 @@ fun ProductReviewSheet(
                         .weight(2f)
                         .padding(start = 4.dp),
                     onClick = {
-                        onClose()
-                    }
+                        if (isUpdate) {
+                            viewModel.updateReview()
+                        }
+                    },
+                    enabled = !state.isLoading
                 ) {
-                    Text(text = if (isUpdate) stringResource(R.string.acton_update) else stringResource(R.string.acton_create))
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(text = if (isUpdate) stringResource(R.string.acton_update) else stringResource(R.string.acton_create))
+                    }
                 }
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun ProductReviewSheetPreview(){
-    ProductReviewSheet()
 }

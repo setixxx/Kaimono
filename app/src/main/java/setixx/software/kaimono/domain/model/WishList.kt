@@ -9,11 +9,9 @@ data class WishListItem(
     val productPublicId: String,
     val productName: String,
     val productDescription: String,
-    val productImage: String,
+    val productImage: String?,
     val basePrice: String,
     val isAvailable: Boolean,
-    val selectedSizeId: Int,
-    val selectedSize: String,
     val availableSizes: List<WishListItemSize>,
     val addedAt: String
 )
@@ -27,10 +25,5 @@ data class WishListItemSize(
 )
 
 data class AddWishListItem(
-    val productPublicId: String,
-    val selectedSizeId: Int
-)
-
-data class UpdateWishListItem(
-    val id: Long
+    val productPublicId: String
 )

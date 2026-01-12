@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -23,7 +22,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ExpandLess
@@ -62,7 +60,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import setixx.software.kaimono.R
@@ -129,7 +126,7 @@ fun ProductScreen(
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold
                         )
-                        IconButton(onClick = { /*viewModel.toggleFavorite()*/ }) {
+                        IconButton(onClick = { viewModel.toggleFavorite() }) {
                             Icon(
                                 imageVector = if (state.isFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                                 contentDescription = "Favorite",
@@ -175,7 +172,6 @@ fun ProductScreen(
                                         .fillMaxWidth()
                                         .padding(horizontal = 16.dp),
                                     text = stringResource(R.string.label_article_number),
-                                    color = MaterialTheme.colorScheme.onSecondaryFixed,
                                     style = MaterialTheme.typography.bodySmall,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -244,7 +240,10 @@ fun ProductScreen(
                                 fontWeight = FontWeight.SemiBold,
                             )
                             FilledIconButton(
-                                onClick = { navController.navigate(Routes.ProductReviews.route) },
+                                onClick = {
+                                    val productId = product.publicId
+                                    navController.navigate(Routes.Reviews.createRoute(productId))
+                                },
                                 Modifier.size(IconButtonDefaults.extraSmallContainerSize(IconButtonDefaults.IconButtonWidthOption.Narrow)),
                                 shape = MaterialTheme.shapes.large,
                                 colors = IconButtonDefaults.filledIconButtonColors(
@@ -265,6 +264,11 @@ fun ProductScreen(
                         ) {
                             items(state.reviews) { review ->
                                 ReviewCardSquare(
+                                    username = review.userName,
+                                    productName = product.name,
+                                    reviewDate = review.createdAt,
+                                    reviewText = review.comment,
+                                    rating = review.rating.toString(),
                                     withImageAndDate = false,
                                     isExpanded = false,
                                     isEditable = false,

@@ -18,7 +18,9 @@ sealed class Routes(
         fun createRoute(productId: String) = "Product/$productId"
     }
     object Search: Routes("Search", showBottomBar = false)
-    object ProductReviews: Routes("ProductReviews", showBottomBar = false)
+    object Reviews: Routes("Reviews/{productId}", showBottomBar = false){
+        fun createRoute(productId: String?) = "Reviews/$productId"
+    }
     object Filter: Routes("Filter", showBottomBar = false)
 
 
@@ -26,14 +28,14 @@ sealed class Routes(
         fun shouldShowBottomBar(route: String?): Boolean {
             if (route == null) return true
 
-            if (route.startsWith("Product")) {
+            if (route.startsWith("Product") || route.startsWith("Reviews")) {
                 return Product.showBottomBar
             }
 
             val screens = listOf(
                 Home, Favorites, Cart, Account, AccountInfo,
                 AccountOrders, AccountReviews, AccountAddCard,
-                AccountAddAddress, Search, ProductReviews, Filter
+                AccountAddAddress, Search, Reviews, Filter
             )
 
             return screens.find { it.route == route }?.showBottomBar ?: true

@@ -2,10 +2,12 @@ package setixx.software.kaimono.domain.model
 
 data class Review(
     val id: Long,
+    val publicId: String,
     val userName: String,
     val rating: Short,
     val comment: String?,
-    val createdAt: String
+    val createdAt: String,
+    val productPublicId: String? = null
 )
 
 data class CreateReview(

@@ -1,5 +1,6 @@
 package setixx.software.kaimono.data.remote
 
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -14,11 +15,11 @@ interface ReviewApi {
     @GET("/products/{id}/reviews")
     suspend fun getProductReviews(@Path("id") productId: String): List<ReviewResponse>
     @POST("/reviews")
-    suspend fun createReview(createReviewRequest: CreateReviewRequest): ReviewResponse
+    suspend fun createReview(@Body createReviewRequest: CreateReviewRequest): ReviewResponse
     @GET("/reviews/my")
     suspend fun getUsersReview(): List<ReviewResponse>
     @PATCH("/reviews/{id}")
-    suspend fun updateReview(@Path("id") reviewId: Long, updateReviewRequest: UpdateReviewRequest): ReviewResponse
+    suspend fun updateReview(@Path("id") reviewPublicId: String, @Body updateReviewRequest: UpdateReviewRequest): ReviewResponse
     @DELETE("/reviews/{id}")
-    suspend fun deleteReview(@Path("id") reviewId: Long): DeleteReviewResponse
+    suspend fun deleteReview(@Path("id") reviewPublicId: String): DeleteReviewResponse
 }

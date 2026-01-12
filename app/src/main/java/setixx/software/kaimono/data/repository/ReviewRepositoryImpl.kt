@@ -23,10 +23,12 @@ class ReviewRepositoryImpl @Inject constructor(
             val reviews = response.map {
                 Review(
                     id = it.id,
+                    publicId = it.publicId,
                     userName = it.userName,
                     rating = it.rating,
                     comment = it.comment,
-                    createdAt = it.createdAt
+                    createdAt = it.createdAt,
+                    productPublicId = it.productPublicId
                 )
             }
             ApiResult.Success(reviews)
@@ -59,10 +61,12 @@ class ReviewRepositoryImpl @Inject constructor(
             ApiResult.Success(
                 Review(
                     id = response.id,
+                    publicId = response.publicId,
                     userName = response.userName,
                     rating = response.rating,
                     comment = response.comment,
-                    createdAt = response.createdAt
+                    createdAt = response.createdAt,
+                    productPublicId = response.productPublicId
                 )
             )
         } catch (e: HttpException) {
@@ -86,10 +90,12 @@ class ReviewRepositoryImpl @Inject constructor(
             val reviews = response.map {
                 Review(
                     id = it.id,
+                    publicId = it.publicId,
                     userName = it.userName,
                     rating = it.rating,
                     comment = it.comment,
-                    createdAt = it.createdAt
+                    createdAt = it.createdAt,
+                    productPublicId = it.productPublicId
                 )
             }
             ApiResult.Success(reviews)
@@ -109,7 +115,7 @@ class ReviewRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateReview(
-        reviewId: Long,
+        reviewPublicId: String,
         updateReview: UpdateReview
     ): ApiResult<Review> {
         return try {
@@ -117,14 +123,16 @@ class ReviewRepositoryImpl @Inject constructor(
                 rating = updateReview.rating,
                 comment = updateReview.comment
             )
-            val response = reviewApi.updateReview(reviewId, request)
+            val response = reviewApi.updateReview(reviewPublicId, request)
             ApiResult.Success(
                 Review(
                     id = response.id,
+                    publicId = response.publicId,
                     userName = response.userName,
                     rating = response.rating,
                     comment = response.comment,
-                    createdAt = response.createdAt
+                    createdAt = response.createdAt,
+                    productPublicId = response.productPublicId
                 )
             )
         } catch (e: HttpException) {
@@ -142,9 +150,9 @@ class ReviewRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteReview(reviewId: Long): ApiResult<String> {
+    override suspend fun deleteReview(reviewPublicId: String): ApiResult<String> {
         return try {
-            val response = reviewApi.deleteReview(reviewId)
+            val response = reviewApi.deleteReview(reviewPublicId)
             ApiResult.Success(response.message)
         } catch (e: HttpException) {
             val error = when (e.code()) {

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,60 +13,47 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import setixx.software.kaimono.R
+import setixx.software.kaimono.presentation.common.DateUtils
 import setixx.software.kaimono.presentation.components.ReviewCardSquare
 import setixx.software.kaimono.presentation.navigation.Routes
 
-private data class ReviewData(
-    val id: Int,
-    val productName: String,
-    val reviewDate: String,
-    val rating: Int,
-    val reviewText: String,
-    val imageUrl: String?
-)
-
-private val mockReviews = listOf(
-    ReviewData(
-        1,
-        "Vintage Denim Jacket",
-        "November 10, 2025",
-        4,
-        "Great jacket! Fits well and the quality is superb for the price. Would definitely recommend.",
-        null
-    ),
-    ReviewData(
-        2,
-        "Leather Ankle Boots",
-        "November 5, 2025",
-        5,
-        "Absolutely in love with these boots. They are comfortable and look amazing.",
-        null
-    ),
-    ReviewData(
-        3,
-        "Classic White T-Shirt",
-        "October 28, 2025",
-        3,
-        "It's an okay t-shirt. A bit thin for my liking, but the fit is good.",
-        null
-    )
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountReviewsScreen(
-    navController: NavController
+fun AccountReviewScreen(
+    navController: NavController,
+    viewModel: AccountReviewViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let { error ->
+            snackBarHostState.showSnackbar(
+                message = error,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.clearError()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -88,7 +75,10 @@ fun AccountReviewsScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = {
+            SnackbarHost(snackBarHostState)
+        },
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -97,18 +87,20 @@ fun AccountReviewsScreen(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            itemsIndexed(mockReviews, key = { _, item -> item.id }) { index, item ->
+            items(state.reviews) { review ->
+                val productName = state.productNames[review.productPublicId] ?: ""
                 ReviewCardSquare(
-                    username = "talisencrw",
-                    productName = "Vintage Denim Jacket",
-                    reviewDate = "November 10, 2025",
-                    reviewText = "Though not my very favourite movie about the infamous vampire, this is quite beautiful, we...",
-                    rating = "9 / 10",
+                    username = review.userName,
+                    productName = productName,
+                    reviewDate = DateUtils.formatTimestamp(review.createdAt),
+                    reviewText = review.comment,
+                    rating = review.rating.toString(),
                     withImageAndDate = true,
                     isExpanded = true,
                     isEditable = false,
                     onNavigateToReviews = {
-                        navController.navigate(Routes.ProductReviews.route)
+                        val productId = review.productPublicId
+                        navController.navigate(Routes.Reviews.createRoute(productId))
                     },
                 )
             }
@@ -118,6 +110,6 @@ fun AccountReviewsScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun AccountReviewsPreview() {
-    AccountReviewsScreen(navController = rememberNavController())
+fun AccountReviewPreview() {
+    AccountReviewScreen(navController = rememberNavController())
 }

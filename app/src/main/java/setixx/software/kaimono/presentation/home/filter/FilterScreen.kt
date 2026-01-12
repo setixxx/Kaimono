@@ -57,10 +57,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.components.ListWithTwoIcons
+import setixx.software.kaimono.presentation.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
     ExperimentalMaterial3ExpressiveApi::class
@@ -68,7 +70,7 @@ import setixx.software.kaimono.presentation.components.ListWithTwoIcons
 @Composable
 fun FilterScreen(
     navController: NavController,
-    viewModel: FilterViewModel
+    viewModel: FilterViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }

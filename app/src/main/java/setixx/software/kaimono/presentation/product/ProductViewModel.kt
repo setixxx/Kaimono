@@ -8,10 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import setixx.software.kaimono.domain.model.AddWishListItem
 import setixx.software.kaimono.domain.model.ApiResult
 import setixx.software.kaimono.domain.model.Size
+import setixx.software.kaimono.domain.usecase.AddWishListItemUseCase
+import setixx.software.kaimono.domain.usecase.DeleteWishListItemUseCase
 import setixx.software.kaimono.domain.usecase.GetProductByIdUseCase
 import setixx.software.kaimono.domain.usecase.GetProductReviewsUseCase
+import setixx.software.kaimono.domain.usecase.GetUserWishListUseCase
 import setixx.software.kaimono.presentation.common.ErrorMapper
 import javax.inject.Inject
 
@@ -19,6 +23,9 @@ import javax.inject.Inject
 class ProductViewModel @Inject constructor(
     private val getProductByIdUseCase: GetProductByIdUseCase,
     private val getProductReviewsUseCase: GetProductReviewsUseCase,
+    private val getUserWishListUseCase: GetUserWishListUseCase,
+    private val addWishListItemUseCase: AddWishListItemUseCase,
+    private val deleteWishListItemUseCase: DeleteWishListItemUseCase,
     private val errorMapper: ErrorMapper,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -38,13 +45,23 @@ class ProductViewModel @Inject constructor(
     private fun getProduct(id: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            when (val result = getProductByIdUseCase(id)) {
+            val productResult = getProductByIdUseCase(id)
+            val wishlistResult = getUserWishListUseCase()
+
+            when (productResult) {
                 is ApiResult.Success -> {
+                    val product = productResult.data
+                    val isFavorite = if (wishlistResult is ApiResult.Success) {
+                        wishlistResult.data.wishListItem.any { it.productPublicId == product.publicId }
+                    } else {
+                        false
+                    }
                     _state.update {
                         it.copy(
-                            product = result.data,
+                            product = product,
                             isLoading = false,
-                            selectedSize = result.data.sizes.firstOrNull()
+                            isFavorite = isFavorite,
+                            selectedSize = product.sizes.firstOrNull()
                         )
                     }
                 }
@@ -52,7 +69,7 @@ class ProductViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = errorMapper.mapToMessage(result.error)
+                            errorMessage = errorMapper.mapToMessage(productResult.error)
                         )
                     }
                 }
@@ -67,11 +84,18 @@ class ProductViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = getProductReviewsUseCase(id)) {
                 is ApiResult.Success -> {
-                    _state.update { it.copy(reviews = result.data) }
+                    _state.update {
+                        it.copy(
+                            reviews = result.data,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
                 is ApiResult.Error -> {
                     _state.update {
                         it.copy(
+                            isLoading = false,
                             errorMessage = errorMapper.mapToMessage(result.error)
                         )
                     }
@@ -97,51 +121,41 @@ class ProductViewModel @Inject constructor(
         }
     }
 
-/*    fun addToCart() {
+    fun toggleFavorite() {
         val currentProduct = _state.value.product ?: return
-        val selectedSize = _state.value.selectedSize ?: return
-
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            val request = AddCartItem(
-                productId = currentProduct.publicId,
-                sizeId = selectedSize.id.toInt(),
-                quantity = _state.value.quantity
-            )
-            when (val result = addItemToCartUseCase(request)) {
-                is ApiResult.Success -> {
-                    _state.update { it.copy(isLoading = false) }
-                    // Maybe show some success message or navigate
-                }
-                is ApiResult.Error -> {
-                    _state.update {
-                        it.copy(
+            if (_state.value.isFavorite) {
+                when (val result = deleteWishListItemUseCase(currentProduct.publicId)) {
+                    is ApiResult.Success -> _state.update { it.copy(isFavorite = false) }
+                    is ApiResult.Error -> {
+                        _state.value = _state.value.copy(
                             isLoading = false,
                             errorMessage = errorMapper.mapToMessage(result.error)
                         )
                     }
-                }
-                ApiResult.Loading -> {}
-            }
-        }
-    }*/
-
-/*    fun toggleFavorite() {
-        val currentProduct = _state.value.product ?: return
-        viewModelScope.launch {
-            if (_state.value.isFavorite) {
-                when (deleteWishListItemUseCase(currentProduct.publicId)) {
-                    is ApiResult.Success -> _state.update { it.copy(isFavorite = false) }
-                    else -> {}
+                    ApiResult.Loading -> {
+                        _state.value = _state.value.copy(isLoading = true)
+                    }
                 }
             } else {
-                when (addWishListItemUseCase(currentProduct.publicId)) {
-                    is ApiResult.Success -> _state.update { it.copy(isFavorite = true) }
-                    else -> {}
+                val request = AddWishListItem(currentProduct.publicId)
+                when (val result = addWishListItemUseCase(request)) {
+                    is ApiResult.Success -> {
+                        _state.update { it.copy(isFavorite = true) }
+                    }
+                    is ApiResult.Error -> {
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
+                    ApiResult.Loading -> {
+                        _state.value = _state.value.copy(isLoading = true)
+                    }
                 }
             }
         }
-    }*/
+    }
 
     fun clearError() {
         _state.update { it.copy(errorMessage = null) }

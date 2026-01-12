@@ -11,6 +11,7 @@ import setixx.software.kaimono.data.repository.PaymentMethodRepositoryImpl
 import setixx.software.kaimono.data.repository.ProductRepositoryImpl
 import setixx.software.kaimono.data.repository.ReviewRepositoryImpl
 import setixx.software.kaimono.data.repository.UserRepositoryImpl
+import setixx.software.kaimono.data.repository.WishlistRepositoryImpl
 import setixx.software.kaimono.domain.repository.AddressRepository
 import setixx.software.kaimono.domain.repository.AuthRepository
 import setixx.software.kaimono.domain.repository.CategoryRepository
@@ -18,6 +19,7 @@ import setixx.software.kaimono.domain.repository.PaymentMethodRepository
 import setixx.software.kaimono.domain.repository.ProductRepository
 import setixx.software.kaimono.domain.repository.ReviewRepository
 import setixx.software.kaimono.domain.repository.UserRepository
+import setixx.software.kaimono.domain.repository.WishlistRepository
 import javax.inject.Singleton
 
 @Module
@@ -51,4 +53,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindCategoryRepository(categoryRepositoryImpl: CategoryRepositoryImpl): CategoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWishlistRepository(wishlistRepositoryImpl: WishlistRepositoryImpl): WishlistRepository
+
 }

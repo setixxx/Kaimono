@@ -33,20 +33,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import setixx.software.kaimono.R
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ReviewCardSquare(
-    username: String = "talisencrw",
-    productName: String = "Vintage Denim Jacket",
-    reviewDate: String = "November 10, 2025",
-    reviewText: String = "Though not my very favourite movie about the infamous vampire, this is quite beautiful, we...",
-    rating: String = "9 / 10",
-    withImageAndDate: Boolean = true,
-    isExpanded: Boolean = true,
-    isEditable: Boolean = true,
+    username: String,
+    productName: String,
+    reviewDate: String,
+    reviewText: String?,
+    rating: String,
+    withImageAndDate: Boolean,
+    isExpanded: Boolean,
+    isEditable: Boolean,
     onNavigateToReviews: () -> Unit = {},
     onUpdate: () -> Unit = {},
     onDelete: () -> Unit = {}
@@ -123,14 +124,17 @@ fun ReviewCardSquare(
                 }
             }
 
-            Text(
-                text = reviewText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = if (isExpanded) 3 else 5,
-                overflow = TextOverflow.Ellipsis,
-                lineHeight = 20.sp
-            )
+            if (reviewText != null) {
+                Text(
+                    text = reviewText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = if (isExpanded) 3 else 5,
+                    minLines = if (!isExpanded) 5 else 1,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 20.sp
+                )
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -159,7 +163,7 @@ fun ReviewCardSquare(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = rating,
+                            text = "${rating} / 5",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Medium
                         )
@@ -171,7 +175,7 @@ fun ReviewCardSquare(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         FilledIconButton(
-                            onClick = { },
+                            onClick = { onDelete() },
                             modifier = Modifier.size(containerSize),
                             shape = MaterialTheme.shapes.large,
                             colors = IconButtonDefaults.filledIconButtonColors(
@@ -229,6 +233,15 @@ fun ReviewCardSquare(
 @Composable
 fun ReviewCardSquarePreview() {
     Box(modifier = Modifier.padding(16.dp)) {
-        ReviewCardSquare()
+        ReviewCardSquare(
+            username = "John Doe",
+            productName = "Product Name",
+            reviewDate = "2023-01-01",
+            reviewText = null,
+            rating = "4.5",
+            withImageAndDate = false,
+            isExpanded = true,
+            isEditable = true
+        )
     }
 }
