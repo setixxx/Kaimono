@@ -81,17 +81,16 @@ fun PaymentMethodsSheetContent(
                     .padding(vertical = 16.dp)
                     .clip(MaterialTheme.shapes.large)
             ) {
-                if (state.paymentMethods.isEmpty() && !state.isLoading) {
+                if (state.isLoading) {
                     item {
-                        Text(
-                            text = stringResource(R.string.label_no_payment_methods),
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillParentMaxWidth()
                                 .padding(vertical = 32.dp),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ContainedLoadingIndicator()
+                        }
                     }
                 } else {
                     items(
@@ -157,8 +156,6 @@ fun PaymentMethodsSheetContent(
                 }
             }
         }
-        if (state.isLoading) ContainedLoadingIndicator(modifier = Modifier.align(Alignment.Center))
-
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

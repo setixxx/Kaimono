@@ -1,6 +1,8 @@
 package setixx.software.kaimono.presentation.cart
 
+import android.graphics.Color
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -119,9 +122,7 @@ fun CartScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(Routes.Home.route) {
-                                popUpTo(Routes.Home.route) { inclusive = true }
-                            }
+                            navController.popBackStack()
                         }
                     ) {
                         Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
@@ -144,137 +145,126 @@ fun CartScreen(
         snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
                     .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState())
             ) {
-                Column(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.large)
-                        .animateContentSize()
-                ) {
-                    state.items.forEach { item ->
-                        key(item.id) {
-                            SwipeableListWithPriceAndQuantity(
-                                query = item,
-                                onDismiss = {
-                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    viewModel.deleteCartItem(item.productPublicId, item.size)
-                                },
-                                onOpen = {
-                                    navController.navigate(Routes.Product.createRoute(item.productPublicId))
-                                }
-                            )
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.background,
-                                thickness = 2.dp
-                            )
-                        }
+                items(
+                    count = state.items.size,
+                    key = { index -> state.items[index].id }
+                ) { index ->
+                    Column(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.large)
+                            .animateItem()
+                    ) {
+                        SwipeableListWithPriceAndQuantity(
+                            query = state.items[index],
+                            onDismiss = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                viewModel.deleteCartItem(state.items[index].productPublicId, state.items[index].size)
+                            },
+                            onOpen = {
+                                navController.navigate(Routes.Product.createRoute(state.items[index].productPublicId))
+                            }
+                        )
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.background,
+                            thickness = 2.dp
+                        )
                     }
                 }
 
                 if (state.items.isNotEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .clip(shape = MaterialTheme.shapes.large)
-                    ) {
-                        val paymentLabel = state.selectedPaymentMethod?.let {
-                            "${
-                                if (it.paymentType == "card") {
-                                    stringResource(R.string.label_credit_card)
-                                } else {
-                                    stringResource(R.string.label_cash)
-                                }
-                            } *${it.cardNumberLast4} (${it.expiryMonth}/${it.expiryYear})"
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .clip(shape = MaterialTheme.shapes.large)
+                                .animateItem()
+                                .animateContentSize()
+                        ) {
+                            val paymentLabel = state.selectedPaymentMethod?.let {
+                                "${
+                                    if (it.paymentType == "card") {
+                                        stringResource(R.string.label_credit_card)
+                                    } else {
+                                        stringResource(R.string.label_cash)
+                                    }
+                                } *${it.cardNumberLast4} (${it.expiryMonth}/${it.expiryYear})"
+                            }
+                                ?: stringResource(R.string.label_payment_methods)
+
+                            ListWithTwoIcons(
+                                icon = Icons.Outlined.CreditCard,
+                                contentDescription = stringResource(R.string.label_payment_methods),
+                                header = paymentLabel,
+                                onClick = {
+                                    showCardsBottomSheet = true
+                                },
+                                trailingIcon = Icons.Outlined.ChevronRight
+                            )
                         }
-                            ?: stringResource(R.string.label_payment_methods)
-                        
-                        ListWithTwoIcons(
-                            icon = Icons.Outlined.CreditCard,
-                            contentDescription = stringResource(R.string.label_payment_methods),
-                            header = paymentLabel,
-                            onClick = {
-                                showCardsBottomSheet = true
-                            },
-                            trailingIcon = Icons.Outlined.ChevronRight
-                        )
-                    }
 
-                    Column(
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.large)
-                    ) {
-                        val addressLabel = state.selectedAddress?.let { "${it.city}, ${it.street} ${it.house}" }
-                            ?: stringResource(R.string.label_address)
-                            
-                        ListWithTwoIcons(
-                            icon = Icons.Outlined.LocationOn,
-                            contentDescription = stringResource(R.string.label_address),
-                            header = addressLabel,
-                            onClick = {
-                                showAddressBottomSheet = true
-                            },
-                            trailingIcon = Icons.Outlined.ChevronRight
-                        )
-                    }
+                        Column(
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.large)
+                                .animateItem()
+                                .animateContentSize()
+                        ) {
+                            val addressLabel = state.selectedAddress?.let { "${it.city}, ${it.street} ${it.house}" }
+                                ?: stringResource(R.string.label_address)
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                            .padding(top = 24.dp, bottom = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(R.string.label_delivery_fee),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                        Text(
-                            deliveryFee.toString() + stringResource(R.string.label_currency),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
+                            ListWithTwoIcons(
+                                icon = Icons.Outlined.LocationOn,
+                                contentDescription = stringResource(R.string.label_address),
+                                header = addressLabel,
+                                onClick = {
+                                    showAddressBottomSheet = true
+                                },
+                                trailingIcon = Icons.Outlined.ChevronRight
+                            )
+                        }
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                            .padding(bottom = 80.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(R.string.label_total),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            state.totalPrice + stringResource(R.string.label_currency),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                                .padding(top = 16.dp, bottom = 80.dp)
+                                .animateItem()
+                                .animateContentSize(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                stringResource(R.string.label_total),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                state.totalPrice + stringResource(R.string.label_currency),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
                 } else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Your cart is empty",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.onBackground),
+                        ){
+                            Text(
+                                text = stringResource(R.string.label_empty_cart),
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
                 }
-            }
-
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
 

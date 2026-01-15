@@ -38,7 +38,7 @@ import setixx.software.kaimono.presentation.components.ListWithRadioAndTrailing
 fun AddressSheetContent(
     onClose: () -> Unit,
     onAddAddress: () -> Unit,
-    viewModel: AddressViewModel
+    viewModel: AddressViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -92,6 +92,12 @@ fun AddressSheetContent(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                } else if (state.isLoading) {
+                    item {
+                        ContainedLoadingIndicator(
+                            modifier = Modifier.padding(vertical = 32.dp)
+                        )
+                    }
                 } else {
                     items(state.addresses.size) { index ->
                         val address = state.addresses[index]
@@ -140,7 +146,6 @@ fun AddressSheetContent(
                 }
             }
         }
-        if (state.isLoading) ContainedLoadingIndicator(modifier = Modifier.align(Alignment.Center))
 
         SnackbarHost(
             hostState = snackBarHostState,

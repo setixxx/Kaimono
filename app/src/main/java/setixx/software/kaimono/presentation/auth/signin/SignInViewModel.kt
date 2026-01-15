@@ -51,9 +51,7 @@ class SignInViewModel @Inject constructor(
     }
 
     fun onSignInClick(onSuccess: () -> Unit) {
-/*
         if (!validateInput()) return
-*/
 
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, errorMessage = null)
