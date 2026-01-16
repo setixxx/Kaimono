@@ -132,5 +132,10 @@
     <string name="label_total_reviews">Total: %1$s</string>
     <string name="label_already_in_cart">Already in cart</string>
     <string name="label_empty_cart">Your cart is empty</string>
+    <string name="label_empty_wishlist">Your wishlist is empty</string>
     <string name="label_size">Size: %1$s</string>
+    <string name="label_product_not_found">Products not found</string>
+    <string name="label_order_structure">Order structure</string>
+    <string name="label_delivery_info">Delivery info</string>
+    <string name="label_payment_method">Payment method</string>
 </resources>

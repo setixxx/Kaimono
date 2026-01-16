@@ -1,0 +1,12 @@
+package software.setixx.kaimono.domain.repository
+
+import software.setixx.kaimono.domain.model.ApiResult
+import software.setixx.kaimono.domain.model.AuthTokens
+
+interface AuthRepository {
+    suspend fun signIn(email: String, password: String): ApiResult<AuthTokens>
+    suspend fun signUp(email: String, phone: String, password: String): ApiResult<String>
+    suspend fun logout(): ApiResult<Unit>
+    suspend fun refreshTokens(): ApiResult<String>
+    suspend fun isLoggedIn(): Boolean
+}

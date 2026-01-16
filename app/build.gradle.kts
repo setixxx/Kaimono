@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "setixx.software.kaimono"
+    namespace = "software.setixx.kaimono"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "setixx.software.kaimono"
+        applicationId = "software.setixx.kaimono"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
