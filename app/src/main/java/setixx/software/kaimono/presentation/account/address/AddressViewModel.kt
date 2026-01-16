@@ -32,7 +32,6 @@ class AddressViewModel @Inject constructor(
     fun loadAddresses() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-
             when (val result = getAddressesUseCase()) {
                 is ApiResult.Success -> {
                     _state.value = _state.value.copy(

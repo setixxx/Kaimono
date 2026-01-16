@@ -236,7 +236,7 @@ fun OrderScreen(
 
                         order.deliveryInfo?.let { delivery ->
                             Text(
-                                text = stringResource(R.string.label_address),
+                                text = stringResource(R.string.label_addresses),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -249,7 +249,7 @@ fun OrderScreen(
                                 
                                 ListWithTwoIcons(
                                     icon = Icons.Outlined.LocationOn,
-                                    contentDescription = stringResource(R.string.label_address),
+                                    contentDescription = stringResource(R.string.label_addresses),
                                     header = addressText,
                                     onClick = {}
                                 )
@@ -277,13 +277,11 @@ fun OrderScreen(
                                 modifier = Modifier.clip(MaterialTheme.shapes.large)
                             ) {
                                 val paymentMethodText = if (payment.paymentMethod != null) {
-                                    "${
-                                        if (payment.paymentType == "card") {
-                                            stringResource(R.string.label_credit_card)
-                                        } else {
-                                            stringResource(R.string.label_cash)
-                                        }
-                                    } *${payment.paymentMethod.cardNumberLast4}"
+                                    if (payment.paymentType == "card") {
+                                        stringResource(R.string.label_card) + " " + payment.paymentMethod.cardNumberLast4
+                                    } else {
+                                        stringResource(R.string.label_cash)
+                                    }
                                 } else {
                                     payment.paymentType
                                 }

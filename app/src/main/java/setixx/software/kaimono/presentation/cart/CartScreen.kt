@@ -1,6 +1,5 @@
 package setixx.software.kaimono.presentation.cart
 
-import android.graphics.Color
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.ArrowBack
@@ -20,7 +17,6 @@ import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -37,7 +33,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,9 +50,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import setixx.software.kaimono.R
-import setixx.software.kaimono.presentation.account.address.AddressSheetContent
+import setixx.software.kaimono.presentation.account.address.AddressSheet
 import setixx.software.kaimono.presentation.account.address.AddressViewModel
-import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsSheetContent
+import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsSheet
 import setixx.software.kaimono.presentation.account.paymnetmethod.PaymentMethodsViewModel
 import setixx.software.kaimono.presentation.components.ListWithTwoIcons
 import setixx.software.kaimono.presentation.components.SwipeableListWithPriceAndQuantity
@@ -187,13 +182,11 @@ fun CartScreen(
                                 .animateContentSize()
                         ) {
                             val paymentLabel = state.selectedPaymentMethod?.let {
-                                "${
-                                    if (it.paymentType == "card") {
-                                        stringResource(R.string.label_credit_card)
-                                    } else {
-                                        stringResource(R.string.label_cash)
-                                    }
-                                } *${it.cardNumberLast4} (${it.expiryMonth}/${it.expiryYear})"
+                                if (it.paymentType == "card") {
+                                    stringResource(R.string.label_card) + " " + it.cardNumberLast4
+                                } else {
+                                    stringResource(R.string.label_cash)
+                                }
                             }
                                 ?: stringResource(R.string.label_payment_methods)
 
@@ -215,11 +208,11 @@ fun CartScreen(
                                 .animateContentSize()
                         ) {
                             val addressLabel = state.selectedAddress?.let { "${it.city}, ${it.street} ${it.house}" }
-                                ?: stringResource(R.string.label_address)
+                                ?: stringResource(R.string.label_addresses)
 
                             ListWithTwoIcons(
                                 icon = Icons.Outlined.LocationOn,
-                                contentDescription = stringResource(R.string.label_address),
+                                contentDescription = stringResource(R.string.label_addresses),
                                 header = addressLabel,
                                 onClick = {
                                     showAddressBottomSheet = true
@@ -279,7 +272,7 @@ fun CartScreen(
                     paymentMethodsViewModel.loadPaymentMethods()
                 }
 
-                PaymentMethodsSheetContent(
+                PaymentMethodsSheet(
                     onClose = { 
                         showCardsBottomSheet = false
                         viewModel.loadPaymentMethods()
@@ -304,7 +297,7 @@ fun CartScreen(
                     addressViewModel.loadAddresses()
                 }
 
-                AddressSheetContent(
+                AddressSheet(
                     onClose = { 
                         showAddressBottomSheet = false
                         viewModel.loadAddresses()

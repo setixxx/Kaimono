@@ -1,5 +1,6 @@
-package setixx.software.kaimono.presentation.account.address
+package setixx.software.kaimono.presentation.account.paymnetmethod
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,12 +8,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -27,18 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import setixx.software.kaimono.R
 import setixx.software.kaimono.presentation.components.ListWithRadioAndTrailing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun AddressSheetContent(
+fun PaymentMethodsSheet(
     onClose: () -> Unit,
-    onAddAddress: () -> Unit,
-    viewModel: AddressViewModel = hiltViewModel()
+    onAddCard: () -> Unit,
+    viewModel: PaymentMethodsViewModel
 ) {
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -53,12 +59,12 @@ fun AddressSheetContent(
         }
     }
 
-    val selectedIndex = remember(state.addresses, state.selectedAddress) {
-        val selectedId = state.selectedAddress?.id
+    val selectedIndex = remember(state.paymentMethods, state.selectedPaymentMethod) {
+        val selectedId = state.selectedPaymentMethod?.id
         if (selectedId != null) {
-            state.addresses.indexOfFirst { it.id == selectedId }
+            state.paymentMethods.indexOfFirst { it.id == selectedId }
         } else {
-            state.addresses.indexOfFirst { it.isDefault }
+            state.paymentMethods.indexOfFirst { it.isDefault }
         }
     }
 
@@ -72,47 +78,74 @@ fun AddressSheetContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.title_addresses),
+                text = stringResource(R.string.title_payment_methods),
                 style = MaterialTheme.typography.headlineSmall
             )
             LazyColumn(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
-                    .clip(MaterialTheme.shapes.large)
+                    .clip(MaterialTheme.shapes.large),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
             ) {
-                if (state.addresses.isEmpty() && !state.isLoading) {
+                if (state.isLoading) {
                     item {
-                        Text(
-                            text = stringResource(R.string.label_no_addresses),
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillParentMaxWidth()
                                 .padding(vertical = 32.dp),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                } else if (state.isLoading) {
-                    item {
-                        ContainedLoadingIndicator(
-                            modifier = Modifier.padding(vertical = 32.dp)
-                        )
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ContainedLoadingIndicator()
+                        }
                     }
                 } else {
-                    items(state.addresses.size) { index ->
-                        val address = state.addresses[index]
-                        ListWithRadioAndTrailing(
-                            index = index,
-                            selectedIndex = selectedIndex,
-                            header = "${address.city}, ${address.street}, ${address.house}",
-                            onSelect = {
-                                viewModel.setDefaultAddress(address.id)
+                    items(
+                        count = state.paymentMethods.size,
+                        key = { index -> state.paymentMethods[index].id }
+                    ) { index ->
+                        val paymentMethod = state.paymentMethods[index]
+                        val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+
+                        SegmentedListItem(
+                            selected = index == selectedIndex,
+                            onClick = { viewModel.setDefaultPaymentMethod(paymentMethod.id) },
+                            colors = colors,
+                            shapes = ListItemDefaults.segmentedShapes(index = index, count = state.paymentMethods.size),
+                            leadingContent = {
+                                RadioButton(
+                                    selected = index == selectedIndex,
+                                    onClick = {
+                                        viewModel.setDefaultPaymentMethod(paymentMethod.id)
+                                    }
+                                )
                             },
-                            onDelete = {
-                                viewModel.deleteAddress(address.id)
+                            content = {
+                                Text(
+                                    text = if (paymentMethod.paymentType == "card") {
+                                        stringResource(R.string.label_card) + " " + paymentMethod.cardNumberLast4
+                                    } else {
+                                        stringResource(R.string.label_cash)
+                                    },
+                                    style = MaterialTheme.typography.labelLarge,
+                                )
+                            },
+                            trailingContent = if (paymentMethod.paymentType == "card"){
+                                {
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.deletePaymentMethod(paymentMethod.id)
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Delete,
+                                            contentDescription = stringResource(R.string.action_delete)
+                                        )
+                                    }
+                                }
+                            } else {
+                                null
                             }
                         )
-                        HorizontalDivider(color = Color.Transparent, thickness = 2.dp)
                     }
                 }
             }
@@ -140,13 +173,12 @@ fun AddressSheetContent(
                     modifier = Modifier
                         .weight(2f)
                         .padding(start = 4.dp),
-                    onClick = onAddAddress
+                    onClick = onAddCard
                 ) {
-                    Text(stringResource(R.string.action_add_address))
+                    Text(stringResource(R.string.action_add_card))
                 }
             }
         }
-
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

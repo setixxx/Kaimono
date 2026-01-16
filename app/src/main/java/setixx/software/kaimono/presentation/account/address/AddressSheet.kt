@@ -1,5 +1,6 @@
-package setixx.software.kaimono.presentation.account.paymnetmethod
+package setixx.software.kaimono.presentation.account.address
 
+import androidx.compose.animation.animateBounds
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,12 +9,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -26,20 +33,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import setixx.software.kaimono.R
-import setixx.software.kaimono.presentation.components.ListWithRadioAndTrailing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun PaymentMethodsSheetContent(
+fun AddressSheet(
     onClose: () -> Unit,
-    onAddCard: () -> Unit,
-    viewModel: PaymentMethodsViewModel
+    onAddAddress: () -> Unit,
+    viewModel: AddressViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -54,12 +59,12 @@ fun PaymentMethodsSheetContent(
         }
     }
 
-    val selectedIndex = remember(state.paymentMethods, state.selectedPaymentMethod) {
-        val selectedId = state.selectedPaymentMethod?.id
+    val selectedIndex = remember(state.addresses, state.selectedAddress) {
+        val selectedId = state.selectedAddress?.id
         if (selectedId != null) {
-            state.paymentMethods.indexOfFirst { it.id == selectedId }
+            state.addresses.indexOfFirst { it.id == selectedId }
         } else {
-            state.paymentMethods.indexOfFirst { it.isDefault }
+            state.addresses.indexOfFirst { it.isDefault }
         }
     }
 
@@ -73,15 +78,29 @@ fun PaymentMethodsSheetContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.title_payment_methods),
+                text = stringResource(R.string.title_addresses),
                 style = MaterialTheme.typography.headlineSmall
             )
             LazyColumn(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .clip(MaterialTheme.shapes.large)
+                    .animateContentSize(),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
             ) {
-                if (state.isLoading) {
+                if (state.addresses.isEmpty() && !state.isLoading) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.label_no_addresses),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                } else if (state.isLoading) {
                     item {
                         Box(
                             modifier = Modifier
@@ -94,34 +113,43 @@ fun PaymentMethodsSheetContent(
                     }
                 } else {
                     items(
-                        count = state.paymentMethods.size,
-                        key = { index -> state.paymentMethods[index].id }
+                        count = state.addresses.size,
+                        key = { index -> state.addresses[index].id }
                     ) { index ->
-                        Box(Modifier.animateItem().animateContentSize()){
-                            val paymentMethod = state.paymentMethods[index]
-                            val month = paymentMethod.expiryMonth.toString().padStart(2, '0')
-                            val year = paymentMethod.expiryYear.toString().padStart(2, '0')
+                        val address = state.addresses[index]
+                        val colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
 
-                            ListWithRadioAndTrailing(
-                                index = index,
-                                selectedIndex = selectedIndex,
-                                header = if (paymentMethod.paymentType == "card") {
-                                    "${stringResource(R.string.label_credit_card)} *${paymentMethod.cardNumberLast4}" +  "($month/$year)"
-                                } else {
-                                    "${stringResource(R.string.label_cash)}"
-                                },
-                                onSelect = {
-                                    viewModel.setDefaultPaymentMethod(paymentMethod.id)
-                                },
-                                onDelete = {
-                                    viewModel.deletePaymentMethod(paymentMethod.id)
-                                },
-                                isTrailingIconVisible = if (paymentMethod.paymentType == "card") true else false
-                            )
-                        }
-                        HorizontalDivider(
-                            color = Color.Transparent,
-                            thickness = 2.dp
+                        SegmentedListItem(
+                            selected = index == selectedIndex,
+                            onClick = { viewModel.setDefaultAddress(address.id) },
+                            colors = colors,
+                            shapes = ListItemDefaults.segmentedShapes(index = index, count = state.addresses.size),
+                            leadingContent = {
+                                RadioButton(
+                                    selected = index == selectedIndex,
+                                    onClick = {
+                                        viewModel.setDefaultAddress(address.id)
+                                    }
+                                )
+                            },
+                            content = {
+                                Text(
+                                    text = "${address.city}, ${address.street}, ${address.house}",
+                                    style = MaterialTheme.typography.labelLarge,
+                                )
+                            },
+                            trailingContent = {
+                                IconButton(
+                                    onClick = {
+                                        viewModel.deleteAddress(address.id)
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Delete,
+                                        contentDescription = stringResource(R.string.action_delete)
+                                    )
+                                }
+                            }
                         )
                     }
                 }
@@ -150,12 +178,13 @@ fun PaymentMethodsSheetContent(
                     modifier = Modifier
                         .weight(2f)
                         .padding(start = 4.dp),
-                    onClick = onAddCard
+                    onClick = onAddAddress
                 ) {
-                    Text(stringResource(R.string.action_add_card))
+                    Text(stringResource(R.string.action_add_address))
                 }
             }
         }
+
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

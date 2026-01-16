@@ -16,7 +16,7 @@
     <string name="title_activity_auth">AuthActivity</string>
     <string name="title_payment_methods">Your payment methods</string>
     <string name="label_no_payment_methods">You have no saved payment methods yet</string>
-    <string name="label_credit_card">Credit card</string>
+    <string name="label_card">Card</string>
     <string name="label_cash">Cash</string>
     <string name="action_add_card">Add card</string>
     <string name="action_close">Close</string>
@@ -32,7 +32,7 @@
     <string name="action_checkout">Check out</string>
     <string name="label_delivery_fee">Delivery fee</string>
     <string name="label_total">Total</string>
-    <string name="label_address">Address</string>
+    <string name="label_addresses">Addresses</string>
     <string name="title_addresses">Your addresses</string>
     <string name="label_no_addresses">You have no saved addresses yet</string>
     <string name="action_add_address">Add address</string>
