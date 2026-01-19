@@ -133,9 +133,24 @@
     <string name="label_already_in_cart">Already in cart</string>
     <string name="label_empty_cart">Your cart is empty</string>
     <string name="label_empty_wishlist">Your wishlist is empty</string>
+    <string name="label_empty_orders">You haven\'t any orders yet</string>
+    <string name="label_empty_reviews">You haven\'t any reviews yet</string>
     <string name="label_size">Size: %1$s</string>
     <string name="label_product_not_found">Products not found</string>
     <string name="label_order_structure">Order structure</string>
     <string name="label_delivery_info">Delivery info</string>
     <string name="label_payment_method">Payment method</string>
+    <string name="label_empty_product_reviews">There are no reviews</string>
+    <string name="label_clear_wishlist">Clear wishlist</string>
+    <string name="label_clear_cart">Clear cart</string>
+    <string name="label_delete_review">Delete review</string>
+    <string name="label_clear_wishlist_description">Are you sure you want to clear your wishlist?</string>
+    <string name="label_clear_cart_description">Are you sure you want to clear your cart?</string>
+    <string name="label_delete_review_description">Are you sure you want to delete your review?</string>
+    <string name="action_clear">Clear</string>
+    <string name="label_home">Home</string>
+    <string name="label_wishlist">Wishlist</string>
+    <string name="label_account">Account</string>
+    <string name="error_address_empty">Please select a delivery address</string>
+    <string name="error_cart_empty">Your cart is empty</string>
 </resources>

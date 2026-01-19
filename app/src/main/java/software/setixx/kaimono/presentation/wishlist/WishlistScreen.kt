@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -20,6 +21,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -55,6 +58,31 @@ fun WishlistScreen(
         }
     }
 
+    if (state.isDialogOpen){
+        AlertDialog(
+            onDismissRequest = { viewModel.onIsDialogOpen(false) },
+            title = { Text(text = stringResource(R.string.label_clear_wishlist)) },
+            text = { Text(text = stringResource(R.string.label_clear_wishlist_description)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.clearWishlist()
+                        viewModel.onIsDialogOpen(false)
+                    }
+                ) {
+                    Text(text = stringResource(R.string.action_clear))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.onIsDialogOpen(false) }
+                ) {
+                    Text(text = stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,13 +93,15 @@ fun WishlistScreen(
                     )
                 },
                 actions = {
-                    IconButton(
-                        onClick = { viewModel.clearWishlist() },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = null,
-                        )
+                    if (!state.wishlistItem.isEmpty() && !state.isLoading){
+                        IconButton(
+                            onClick = { viewModel.onIsDialogOpen(true) },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
             )

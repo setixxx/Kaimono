@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import software.setixx.kaimono.domain.model.ApiResult
 import software.setixx.kaimono.domain.model.PasswordUpdate
@@ -28,102 +29,123 @@ class PasswordChangeViewModel @Inject constructor(
     val state: StateFlow<PasswordChangeState> = _state.asStateFlow()
 
     fun onCurrentPasswordChange(currentPassword: String) {
-        _state.value = _state.value.copy(
-            currentPassword = currentPassword,
-            currentPasswordError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                currentPassword = currentPassword,
+                currentPasswordError = null,
+                errorMessage = null
+            )
+        }
     }
+
     fun onNewPasswordChange(newPassword: String) {
-        _state.value = _state.value.copy(
-            newPassword = newPassword,
-            newPasswordError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                newPassword = newPassword,
+                newPasswordError = null,
+                errorMessage = null
+            )
+        }
     }
+
     fun onConfirmPasswordChange(confirmPassword: String) {
-        _state.value = _state.value.copy(
-            confirmPassword = confirmPassword,
-            confirmPasswordError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                confirmPassword = confirmPassword,
+                confirmPasswordError = null,
+                errorMessage = null
+            )
+        }
     }
 
     fun toggleOldPasswordVisibility() {
-        _state.value = _state.value.copy(
-            isOldPasswordVisible = !_state.value.isOldPasswordVisible
-        )
+        _state.update {
+            it.copy(isOldPasswordVisible = !it.isOldPasswordVisible)
+        }
     }
 
     fun toggleNewPasswordVisibility() {
-        _state.value = _state.value.copy(
-            isNewPasswordVisible = !_state.value.isNewPasswordVisible
-        )
+        _state.update {
+            it.copy(isNewPasswordVisible = !it.isNewPasswordVisible)
+        }
     }
 
     fun toggleConfirmPasswordVisibility() {
-        _state.value = _state.value.copy(
-            isConfirmPasswordVisible = !_state.value.isConfirmPasswordVisible
-        )
+        _state.update {
+            it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible)
+        }
     }
 
     fun changePassword() {
         if (!validateInput()) return
 
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            val currentState = _state.value
 
             val request = PasswordUpdate(
-                currentPassword = _state.value.currentPassword,
-                newPassword = _state.value.newPassword,
-                confirmPassword = _state.value.confirmPassword
+                currentPassword = currentState.currentPassword,
+                newPassword = currentState.newPassword,
+                confirmPassword = currentState.confirmPassword
             )
 
             when (val result = updatePasswordUseCase(request)) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        isSuccess = true
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isSuccess = true
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
+
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
     }
 
     fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.update { it.copy(errorMessage = null) }
     }
 
     private fun validateInput(): Boolean {
-        val newPasswordResult = passwordValidator.validate(_state.value.newPassword)
+        val currentState = _state.value
+        val newPasswordResult = passwordValidator.validate(currentState.newPassword)
         val confirmPasswordResult = passwordValidator.validateConfirmation(
-            _state.value.newPassword,
-            _state.value.confirmPassword
+            currentState.newPassword,
+            currentState.confirmPassword
         )
 
         var isValid = true
+        var newPasswordError: String? = null
+        var confirmPasswordError: String? = null
 
         if (newPasswordResult is ValidationResult.Error) {
-            _state.value = _state.value.copy(
-                newPasswordError = validationErrorMapper.mapToMessage(newPasswordResult.error)
-            )
+            newPasswordError = validationErrorMapper.mapToMessage(newPasswordResult.error)
             isValid = false
         }
 
         if (confirmPasswordResult is ValidationResult.Error) {
-            _state.value = _state.value.copy(
-                confirmPasswordError = validationErrorMapper.mapToMessage(confirmPasswordResult.error)
-            )
+            confirmPasswordError = validationErrorMapper.mapToMessage(confirmPasswordResult.error)
             isValid = false
+        }
+
+        _state.update {
+            it.copy(
+                newPasswordError = newPasswordError,
+                confirmPasswordError = confirmPasswordError
+            )
         }
 
         return isValid

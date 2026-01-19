@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import software.setixx.kaimono.domain.usecase.SignUpUseCase
 import javax.inject.Inject
@@ -33,138 +34,163 @@ class SignUpViewModel @Inject constructor(
     val state: StateFlow<SignUpState> = _state.asStateFlow()
 
     fun onEmailChange(email: String) {
-        _state.value = _state.value.copy(
-            email = email,
-            emailError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                email = email,
+                emailError = null,
+                errorMessage = null
+            )
+        }
     }
 
-    fun onPhoneChange(phone: String){
+    fun onPhoneChange(phone: String) {
         val digitsOnly = phone.filter { it.isDigit() }
         if (digitsOnly.length > 11) return
 
-        _state.value = _state.value.copy(
-            phone = phone,
-            phoneError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                phone = phone,
+                phoneError = null,
+                errorMessage = null
+            )
+        }
     }
 
     fun onPasswordChange(password: String) {
-        _state.value = _state.value.copy(
-            password = password,
-            passwordError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                password = password,
+                passwordError = null,
+                errorMessage = null
+            )
+        }
     }
 
     fun onConfirmPasswordChange(confirmPassword: String) {
-        _state.value = _state.value.copy(
-            confirmPassword = confirmPassword,
-            confirmPasswordError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                confirmPassword = confirmPassword,
+                confirmPasswordError = null,
+                errorMessage = null
+            )
+        }
     }
 
     fun togglePasswordVisibility() {
-        _state.value = _state.value.copy(
-            isPasswordVisible = !_state.value.isPasswordVisible
-        )
+        _state.update {
+            it.copy(isPasswordVisible = !it.isPasswordVisible)
+        }
     }
 
     fun toggleConfirmPasswordVisibility() {
-        _state.value = _state.value.copy(
-            isConfirmPasswordVisible = !_state.value.isConfirmPasswordVisible
-        )
+        _state.update {
+            it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible)
+        }
     }
 
     fun onSignUpClick(onSuccess: () -> Unit) {
         if (!validateInput()) return
 
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            val currentState = _state.value
 
             when (val result = signUpUseCase(
-                email = _state.value.email.trim(),
-                phone = _state.value.phone,
-                password = _state.value.password
+                email = currentState.email.trim(),
+                phone = currentState.phone,
+                password = currentState.password
             )) {
                 is ApiResult.Success -> {
                     val signInResult = signInUseCase(
-                        email = _state.value.email.trim(),
-                        password = _state.value.password
+                        email = currentState.email.trim(),
+                        password = currentState.password
                     )
                     when (signInResult) {
                         is ApiResult.Success -> {
-                            _state.value = _state.value.copy(isLoading = false)
+                            _state.update { it.copy(isLoading = false) }
                             onSuccess()
                         }
+
                         is ApiResult.Error -> {
-                            _state.value = _state.value.copy(
-                                isLoading = false,
-                                errorMessage = errorMapper.mapToMessage(signInResult.error)
-                            )
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    errorMessage = errorMapper.mapToMessage(signInResult.error)
+                                )
+                            }
                         }
+
                         else -> {
-                            _state.value = _state.value.copy(isLoading = false)
+                            _state.update { it.copy(isLoading = false) }
                         }
                     }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
-                else -> {}
+
+                else -> {
+                    _state.update { it.copy(isLoading = false) }
+                }
             }
         }
     }
 
     private fun validateInput(): Boolean {
-        val emailResult = emailValidator.validate(_state.value.email)
-        val phoneResult = phoneValidator.validate(_state.value.phone)
-        val passwordResult = passwordValidator.validate(_state.value.password)
+        val currentState = _state.value
+        val emailResult = emailValidator.validate(currentState.email)
+        val phoneResult = phoneValidator.validate(currentState.phone)
+        val passwordResult = passwordValidator.validate(currentState.password)
         val confirmPasswordResult = passwordValidator.validateConfirmation(
-            _state.value.password,
-            _state.value.confirmPassword
+            currentState.password,
+            currentState.confirmPassword
         )
 
         var isValid = true
+        var emailError: String? = null
+        var phoneError: String? = null
+        var passwordError: String? = null
+        var confirmPasswordError: String? = null
 
         if (emailResult is ValidationResult.Error) {
-            _state.value = _state.value.copy(
-                emailError = validationErrorMapper.mapToMessage(emailResult.error)
-            )
+            emailError = validationErrorMapper.mapToMessage(emailResult.error)
             isValid = false
         }
 
         if (phoneResult is ValidationResult.Error) {
-            _state.value = _state.value.copy(
-                phoneError = validationErrorMapper.mapToMessage(phoneResult.error)
-            )
+            phoneError = validationErrorMapper.mapToMessage(phoneResult.error)
             isValid = false
         }
 
         if (passwordResult is ValidationResult.Error) {
-            _state.value = _state.value.copy(
-                passwordError = validationErrorMapper.mapToMessage(passwordResult.error)
-            )
+            passwordError = validationErrorMapper.mapToMessage(passwordResult.error)
             isValid = false
         }
 
         if (confirmPasswordResult is ValidationResult.Error) {
-            _state.value = _state.value.copy(
-                confirmPasswordError = validationErrorMapper.mapToMessage(confirmPasswordResult.error)
-            )
+            confirmPasswordError = validationErrorMapper.mapToMessage(confirmPasswordResult.error)
             isValid = false
+        }
+
+        _state.update {
+            it.copy(
+                emailError = emailError,
+                phoneError = phoneError,
+                passwordError = passwordError,
+                confirmPasswordError = confirmPasswordError
+            )
         }
 
         return isValid
     }
 
     fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.update { it.copy(errorMessage = null) }
     }
 }

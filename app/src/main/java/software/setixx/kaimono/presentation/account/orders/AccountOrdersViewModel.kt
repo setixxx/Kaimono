@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import software.setixx.kaimono.domain.model.ApiResult
 import software.setixx.kaimono.domain.usecase.GetOrdersUseCase
@@ -27,29 +28,33 @@ class AccountOrdersViewModel @Inject constructor(
 
     fun loadOrders() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
             when (val result = getOrdersUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        orders = result.data,
-                        isLoading = false,
-                        errorMessage = null
-                    )
+                    _state.update {
+                        it.copy(
+                            orders = result.data,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
     }
 
     fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.update { it.copy(errorMessage = null) }
     }
 }

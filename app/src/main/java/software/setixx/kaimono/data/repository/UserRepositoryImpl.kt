@@ -34,7 +34,6 @@ class UserRepositoryImpl @Inject constructor(
             )
             ApiResult.Success(user)
         } catch (e: HttpException) {
-            Log.d("UserInfo", e.message())
             val error = when (e.code()) {
                 401 -> DomainError.InvalidToken
                 500 -> DomainError.ServerInternal
@@ -44,7 +43,6 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            Log.d("UserInfo", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
@@ -67,7 +65,6 @@ class UserRepositoryImpl @Inject constructor(
                 ApiResult.Success(userUpdate)
             }
         } catch (e: HttpException) {
-            Log.d("UserUpdate", e.message())
             val error = when (e.code()) {
                 400 -> DomainError.InvalidData
                 401 -> DomainError.InvalidToken
@@ -78,7 +75,6 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            Log.d("UserUpdate", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
@@ -89,11 +85,9 @@ class UserRepositoryImpl @Inject constructor(
                 oldPassword = updatePassword.currentPassword,
                 newPassword = updatePassword.newPassword
             )
-            Log.d("PasswordUpdate", request.toString())
             val response = userApi.updatePassword(request)
             ApiResult.Success(response.passwordUpdateStatus)
         } catch (e: HttpException) {
-            Log.d("PasswordUpdate", e.message())
             val error = when (e.code()) {
                 400 -> DomainError.InvalidData
                 401 -> DomainError.InvalidToken
@@ -104,7 +98,6 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            Log.d("PasswordUpdate", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }

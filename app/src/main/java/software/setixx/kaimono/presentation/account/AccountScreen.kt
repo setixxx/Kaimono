@@ -60,6 +60,13 @@ fun AccountScreen(
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val cardsSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val addressSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let { error ->
             snackBarHostState.showSnackbar(
@@ -69,15 +76,6 @@ fun AccountScreen(
             viewModel.clearError()
         }
     }
-
-    var showCardsBottomSheet by remember { mutableStateOf(false) }
-    var showAddressBottomSheet by remember { mutableStateOf(false) }
-    val cardsSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
-    val addressSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
 
     data class AccountItems(
         val leadingContent: ImageVector,
@@ -107,17 +105,13 @@ fun AccountScreen(
             Icons.Outlined.Payment,
             stringResource(R.string.label_payment_methods),
             stringResource(R.string.label_payment_methods),
-            onClick = {
-                showCardsBottomSheet = true
-            }
+            onClick = { viewModel.onIsPaymentMethodsSheetOpen(true) }
         ),
         AccountItems(
             Icons.Outlined.LocationOn,
             stringResource(R.string.label_addresses),
             stringResource(R.string.label_addresses),
-            onClick = {
-                showAddressBottomSheet = true
-            }
+            onClick = { viewModel.onIsAddressesSheetOpen(true) }
         )
     )
 
@@ -215,9 +209,9 @@ fun AccountScreen(
             }
         }
 
-        if (showCardsBottomSheet) {
+        if (state.isPaymentMethodsSheetOpen) {
             ModalBottomSheet(
-                onDismissRequest = { showCardsBottomSheet = false },
+                onDismissRequest = { viewModel.onIsPaymentMethodsSheetOpen(false) },
                 sheetState = cardsSheetState
             ) {
                 val paymentMethodsViewModel: PaymentMethodsViewModel = hiltViewModel()
@@ -228,9 +222,9 @@ fun AccountScreen(
                 }
 
                 PaymentMethodsSheet(
-                    onClose = { showCardsBottomSheet = false },
+                    onClose = { viewModel.onIsPaymentMethodsSheetOpen(false) },
                     onAddCard = {
-                        showCardsBottomSheet = false
+                        viewModel.onIsPaymentMethodsSheetOpen(false)
                         navController.navigate(Routes.AccountAddCard.route)
                     },
                     viewModel = paymentMethodsViewModel
@@ -238,9 +232,9 @@ fun AccountScreen(
             }
         }
 
-        if (showAddressBottomSheet) {
+        if (state.isAddressesSheetOpen) {
             ModalBottomSheet(
-                onDismissRequest = { showAddressBottomSheet = false },
+                onDismissRequest = { viewModel.onIsAddressesSheetOpen(false) },
                 sheetState = addressSheetState
             ) {
                 val addressViewModel: AddressViewModel = hiltViewModel()
@@ -250,9 +244,9 @@ fun AccountScreen(
                 }
 
                 AddressSheet(
-                    onClose = { showAddressBottomSheet = false },
+                    onClose = { viewModel.onIsAddressesSheetOpen(false) },
                     onAddAddress = {
-                        showAddressBottomSheet = false
+                        viewModel.onIsAddressesSheetOpen(false)
                         navController.navigate(Routes.AccountAddAddress.route)
                     },
                     viewModel = addressViewModel

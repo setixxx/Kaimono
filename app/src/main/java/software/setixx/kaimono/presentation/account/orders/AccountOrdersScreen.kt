@@ -1,5 +1,6 @@
 package software.setixx.kaimono.presentation.account.orders
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +12,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,7 +43,7 @@ import software.setixx.kaimono.presentation.common.DateUtils
 import software.setixx.kaimono.presentation.components.OrderCard
 import software.setixx.kaimono.presentation.navigation.Routes
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AccountOrdersScreen(
     navController: NavController,
@@ -84,30 +88,40 @@ fun AccountOrdersScreen(
             SnackbarHost(snackBarHostState)
         },
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            if (state.isLoading && state.orders.isEmpty()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(state.orders) { order ->
-                        OrderCard(
-                            modifier = Modifier.clickable {
-                                navController.navigate(Routes.OrderDetails.createRoute(order.publicId))
-                            },
-                            orderId = order.publicId,
-                            orderDate = DateUtils.formatTimestamp(order.createdAt),
-                            orderStatus = order.status,
-                            orderTotal = "${order.totalAmount} ${stringResource(R.string.label_currency)}"
-                        )
-                    }
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ){
+                ContainedLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        } else if (state.orders.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = stringResource(R.string.label_empty_orders),
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(state.orders) { order ->
+                    OrderCard(
+                        modifier = Modifier.clickable {
+                            navController.navigate(Routes.OrderDetails.createRoute(order.publicId))
+                        },
+                        orderId = order.publicId,
+                        orderDate = DateUtils.formatTimestamp(order.createdAt),
+                        orderStatus = order.status,
+                        orderTotal = "${order.totalAmount} ${stringResource(R.string.label_currency)}"
+                    )
                 }
             }
         }

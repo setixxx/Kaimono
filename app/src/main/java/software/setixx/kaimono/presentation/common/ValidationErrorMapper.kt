@@ -88,6 +88,12 @@ class ValidationErrorMapper(private val context: Context) {
 
             ValidationError.CvvInvalidFormat ->
                 context.getString(R.string.error_card_cvv_format)
+
+            ValidationError.AddressEmpty ->
+                context.getString(R.string.error_address_empty)
+
+            ValidationError.CartEmpty ->
+                context.getString(R.string.error_cart_empty)
         }
     }
 }

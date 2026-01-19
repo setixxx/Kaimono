@@ -11,16 +11,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -40,7 +45,7 @@ import software.setixx.kaimono.R
 import software.setixx.kaimono.presentation.common.DateUtils
 import software.setixx.kaimono.presentation.components.ReviewCardSquare
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ReviewsScreen(
     navController: NavController,
@@ -53,9 +58,37 @@ fun ReviewsScreen(
         skipPartiallyExpanded = true
     )
 
+    if (state.isDialogOpen){
+        AlertDialog(
+            onDismissRequest = { viewModel.onIsDialogOpen(false) },
+            title = { Text(text = stringResource(R.string.label_delete_review)) },
+            text = { Text(text = stringResource(R.string.label_delete_review_description)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteReview(state.ownReview!!.publicId)
+                        viewModel.onIsDialogOpen(false)
+                    }
+                ) {
+                    Text(text = stringResource(R.string.action_delete))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.onIsDialogOpen(false) }
+                ) {
+                    Text(text = stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let {
-            snackBarHostState.showSnackbar(it)
+        state.errorMessage?.let { error ->
+            snackBarHostState.showSnackbar(
+                message = error,
+                duration = SnackbarDuration.Short
+            )
             viewModel.clearError()
         }
     }
@@ -82,59 +115,78 @@ fun ReviewsScreen(
         },
         snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                state.ownReview?.let { ownReview ->
-                    item {
-                        Text(
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            text = stringResource(R.string.label_your_review),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Normal
-                        )
-                        ReviewCardSquare(
-                            username = ownReview.userName,
-                            productName = "",
-                            reviewDate = DateUtils.formatTimestamp(ownReview.createdAt),
-                            reviewText = ownReview.comment ?: "",
-                            rating = ownReview.rating.toString(),
-                            withImageAndDate = false,
-                            isExpanded = true,
-                            isEditable = true,
-                            onUpdate = { showReviewBottomSheet = true },
-                            onDelete = { viewModel.deleteReview(ownReview.publicId) },
-                            imageUrl = null
-                        )
-                    }
-                }
-
+            state.ownReview?.let { ownReview ->
                 item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    Text(
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        text = stringResource(R.string.label_your_review),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Normal
+                    )
+                    ReviewCardSquare(
+                        username = ownReview.userName,
+                        productName = "",
+                        reviewDate = DateUtils.formatTimestamp(ownReview.createdAt),
+                        reviewText = ownReview.comment ?: "",
+                        rating = ownReview.rating.toString(),
+                        withImageAndDate = false,
+                        isExpanded = true,
+                        isEditable = true,
+                        onUpdate = { showReviewBottomSheet = true },
+                        onDelete = { viewModel.onIsDialogOpen(true) },
+                        imageUrl = null
+                    )
+                }
+            }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = stringResource(R.string.label_all_reviews),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Normal
+                    )
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = stringResource(R.string.label_total_reviews, " ${state.reviews.size}"),
+                    )
+                }
+            }
+            if (state.reviews.isEmpty() && !state.isLoading){
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
                         Text(
-                            modifier = Modifier.padding(top = 8.dp),
-                            text = stringResource(R.string.label_all_reviews),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Normal
-                        )
-                        Text(
-                            modifier = Modifier.padding(top = 8.dp),
-                            text = stringResource(R.string.label_total_reviews, " ${state.reviews.size}"),
+                            text = stringResource(R.string.label_empty_product_reviews),
                         )
                     }
                 }
-
+            } else if (state.isLoading){
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        ContainedLoadingIndicator()
+                    }
+                }
+            } else {
                 items(state.reviews) { review ->
                     ReviewCardSquare(
                         username = review.userName,
@@ -148,20 +200,6 @@ fun ReviewsScreen(
                         imageUrl = null
                     )
                 }
-            }
-
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-
-            state.errorMessage?.let { error ->
-                Text(
-                    text = error,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp)
-                )
             }
         }
 

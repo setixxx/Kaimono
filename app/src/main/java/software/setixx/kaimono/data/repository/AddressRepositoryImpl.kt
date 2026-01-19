@@ -33,7 +33,6 @@ class AddressRepositoryImpl @Inject constructor(
             }
             ApiResult.Success(addresses)
         } catch (e: HttpException) {
-            Log.d("Address", e.message())
             val error = when (e.code()) {
                 401 -> DomainError.InvalidToken
                 500 -> DomainError.ServerInternal
@@ -43,7 +42,6 @@ class AddressRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            Log.d("Address", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }

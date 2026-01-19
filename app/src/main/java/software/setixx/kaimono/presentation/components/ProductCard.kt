@@ -35,15 +35,16 @@ fun ProductCard(
             .width(176.dp)
             .clip(MaterialTheme.shapes.large)
             .then( if (isEnable) Modifier.clickable { onClick() } else Modifier )
-            .then( if (isEnable) Modifier.background(MaterialTheme.colorScheme.surfaceContainer) else Modifier )
+            .then( if (!isEnable) Modifier.background(MaterialTheme.colorScheme.surfaceContainer) else Modifier )
     ){
         AsyncImage(
             model = imageUrl,
             contentDescription = contentDescription,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f),
-            contentScale = ContentScale.Crop
+                .aspectRatio(1f)
+                .clip(MaterialTheme.shapes.large),
+            contentScale = ContentScale.Crop,
         )
         Text(header,
             style = MaterialTheme.typography.titleSmall,

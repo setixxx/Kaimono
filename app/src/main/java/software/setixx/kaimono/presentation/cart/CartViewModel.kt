@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import software.setixx.kaimono.domain.model.ApiResult
 import software.setixx.kaimono.domain.model.CreateOrder
@@ -14,7 +15,11 @@ import software.setixx.kaimono.domain.usecase.DeleteCartItemUseCase
 import software.setixx.kaimono.domain.usecase.GetAddressesUseCase
 import software.setixx.kaimono.domain.usecase.GetCartUseCase
 import software.setixx.kaimono.domain.usecase.GetPaymentMethodsUseCase
+import software.setixx.kaimono.domain.validation.AddressValidator
+import software.setixx.kaimono.domain.validation.CartValidator
+import software.setixx.kaimono.domain.validation.ValidationResult
 import software.setixx.kaimono.presentation.common.ErrorMapper
+import software.setixx.kaimono.presentation.common.ValidationErrorMapper
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,7 +30,10 @@ class CartViewModel @Inject constructor(
     private val createOrderUseCase: CreateOrderUseCase,
     private val getAddressesUseCase: GetAddressesUseCase,
     private val getPaymentMethodsUseCase: GetPaymentMethodsUseCase,
-    private val errorMapper: ErrorMapper
+    private val errorMapper: ErrorMapper,
+    private val addressValidator: AddressValidator,
+    private val cartValidator: CartValidator,
+    private val validationErrorMapper: ValidationErrorMapper
 ) : ViewModel() {
     private val _state = MutableStateFlow(CartViewModelState())
     val state = _state.asStateFlow()
@@ -38,25 +46,31 @@ class CartViewModel @Inject constructor(
 
     fun loadCart() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
             when (val result = getCartUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        cart = result.data,
-                        items = result.data.items,
-                        totalPrice = result.data.totalPrice,
-                        isLoading = false,
-                        errorMessage = null
-                    )
+                    _state.update {
+                        it.copy(
+                            cart = result.data,
+                            items = result.data.items,
+                            totalPrice = result.data.totalPrice,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
+
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
@@ -66,17 +80,26 @@ class CartViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = getAddressesUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        addresses = result.data,
-                        selectedAddress = result.data.find { it.isDefault } ?: result.data.firstOrNull()
-                    )
+                    _state.update {
+                        it.copy(
+                            addresses = result.data,
+                            selectedAddress = result.data.find { it.isDefault }
+                                ?: result.data.firstOrNull()
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
-                else -> {}
+
+                else -> {
+                    _state.update { it.copy(isLoading = false) }
+                }
             }
         }
     }
@@ -85,42 +108,57 @@ class CartViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = getPaymentMethodsUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        paymentMethods = result.data,
-                        selectedPaymentMethod = result.data.find { it.isDefault } ?: result.data.firstOrNull()
-                    )
+                    _state.update {
+                        it.copy(
+                            paymentMethods = result.data,
+                            selectedPaymentMethod = result.data.find { it.isDefault }
+                                ?: result.data.firstOrNull()
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
-                else -> {}
+
+                else -> {
+                    _state.update { it.copy(isLoading = false) }
+                }
             }
         }
     }
 
     fun clearCart() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
             when (val result = clearCartUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        cart = result.data,
-                        items = result.data.items,
-                        totalPrice = result.data.totalPrice,
-                        isLoading = false,
-                        errorMessage = null
-                    )
+                    _state.update {
+                        it.copy(
+                            cart = result.data,
+                            items = result.data.items,
+                            totalPrice = result.data.totalPrice,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
+
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
@@ -128,85 +166,113 @@ class CartViewModel @Inject constructor(
 
     fun deleteCartItem(cartItemId: String, size: String) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
             when (val result = deleteCartItemUseCase(cartItemId, size)) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        cart = result.data,
-                        items = result.data.items,
-                        totalPrice = result.data.totalPrice,
-                        isLoading = false,
-                        errorMessage = null
-                    )
+                    _state.update {
+                        it.copy(
+                            cart = result.data,
+                            items = result.data.items,
+                            totalPrice = result.data.totalPrice,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
+
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
     }
 
     fun createOrder() {
-        val selectedAddress = _state.value.selectedAddress
-        if (selectedAddress == null) {
-            _state.value = _state.value.copy(errorMessage = "Please select a delivery address")
-            return
-        }
-
-        if (_state.value.items.isEmpty()) {
-            _state.value = _state.value.copy(errorMessage = "Your cart is empty")
-            return
-        }
+        val currentState = _state.value
+        if (!validate()) return
 
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-            val result = createOrderUseCase(
-                if (_state.value.selectedPaymentMethod?.paymentType == "card") {
-                    CreateOrder(
-                        addressId = selectedAddress.id,
-                        paymentMethodId = _state.value.selectedPaymentMethod?.id,
-                        paymentMethod = "card"
-                    )
-                } else {
-                    CreateOrder(
-                        addressId = selectedAddress.id,
-                        paymentMethodId = _state.value.selectedPaymentMethod?.id,
-                        paymentMethod = "cash"
-                    )
-                }
-            )
-            when (result) {
+            _state.update { it.copy(isLoading = true) }
+            val createOrder = if (currentState.selectedPaymentMethod?.paymentType == "card") {
+                CreateOrder(
+                    addressId = currentState.selectedAddress!!.id,
+                    paymentMethodId = currentState.selectedPaymentMethod.id,
+                    paymentMethod = "card"
+                )
+            } else {
+                CreateOrder(
+                    addressId = currentState.selectedAddress!!.id,
+                    paymentMethodId = currentState.selectedPaymentMethod?.id,
+                    paymentMethod = "cash"
+                )
+            }
+
+            when (val result = createOrderUseCase(createOrder)) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        isOrderCreated = true,
-                        errorMessage = null
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isOrderCreated = true,
+                            errorMessage = null
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
+
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
     }
 
     fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.update { it.copy(errorMessage = null) }
     }
 
+    fun onIsAddressesSheetOpen(value: Boolean) = _state.update { it.copy(isAddressesSheetOpen = value) }
+
+    fun onIsPaymentMethodsSheetOpen(value: Boolean) =
+        _state.update { it.copy(isPaymentMethodsSheetOpen = value) }
+
+    fun onIsDialogOpen(value: Boolean) = _state.update { it.copy(isDialogOpen = value) }
+
     fun resetOrderCreated() {
-        _state.value = _state.value.copy(isOrderCreated = false)
+        _state.update { it.copy(isOrderCreated = false) }
+    }
+
+    private fun validate(): Boolean {
+        val currentState = _state.value
+        val addressResult = addressValidator.validateAddress(currentState.selectedAddress)
+        val cartResult = cartValidator.validateCart(currentState.cart)
+        val addressError = if (addressResult is ValidationResult.Error) validationErrorMapper.mapToMessage(addressResult.error) else null
+        val cartError = if (cartResult is ValidationResult.Error) validationErrorMapper.mapToMessage(cartResult.error) else null
+        val hasError = addressError != null || cartError != null
+        if (hasError) {
+            _state.update {
+                it.copy(
+                    errorMessage = addressError
+                )
+            }
+            return false
+        }
+        return true
     }
 }

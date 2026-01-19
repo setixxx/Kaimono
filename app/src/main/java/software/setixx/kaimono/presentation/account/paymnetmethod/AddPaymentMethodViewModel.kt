@@ -1,12 +1,12 @@
 package software.setixx.kaimono.presentation.account.paymnetmethod
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import software.setixx.kaimono.domain.model.ApiResult
 import software.setixx.kaimono.domain.model.CreatePaymentMethod
@@ -32,106 +32,128 @@ class AddPaymentMethodViewModel @Inject constructor(
         val digitsOnly = cardNumber.filter { it.isDigit() }
         if (digitsOnly.length > 16) return
 
-        _state.value = _state.value.copy(
-            cardNumber = digitsOnly,
-            cardNumberError = null,
-            errorMessage = null
-        )
-        Log.d("Card", _state.value.cardNumber)
+        _state.update {
+            it.copy(
+                cardNumber = digitsOnly,
+                cardNumberError = null,
+                errorMessage = null
+            )
+        }
     }
 
     fun onCardHolderNameChange(name: String) {
-        _state.value = _state.value.copy(
-            cardHolderName = name,
-            cardHolderNameError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                cardHolderName = name,
+                cardHolderNameError = null,
+                errorMessage = null
+            )
+        }
     }
 
     fun onExpiryDateChange(expiryDate: String) {
         val digitsOnly = expiryDate.filter { it.isDigit() }
         if (digitsOnly.length > 4) return
 
-        _state.value = _state.value.copy(
-            expiryDate = digitsOnly,
-            expiryDateError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                expiryDate = digitsOnly,
+                expiryDateError = null,
+                errorMessage = null
+            )
+        }
     }
 
     fun onCvvChange(cvv: String) {
         val digitsOnly = cvv.filter { it.isDigit() }
         if (digitsOnly.length > 3) return
 
-        _state.value = _state.value.copy(
-            cvv = digitsOnly,
-            cvvError = null,
-            errorMessage = null
-        )
+        _state.update {
+            it.copy(
+                cvv = digitsOnly,
+                cvvError = null,
+                errorMessage = null
+            )
+        }
     }
 
     fun savePaymentMethod() {
         if (!validateInput()) return
 
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            val currentState = _state.value
 
-            val month = _state.value.expiryDate.substring(0, 2).toShort()
+            val month = currentState.expiryDate.substring(0, 2).toShort()
 
-            val yearInput = _state.value.expiryDate.substring(2, 4)
+            val yearInput = currentState.expiryDate.substring(2, 4)
             val fullYear = "20$yearInput".toShort()
 
             val request = CreatePaymentMethod(
-                cardNumber = _state.value.cardNumber,
-                cardHolderName = _state.value.cardHolderName,
+                cardNumber = currentState.cardNumber,
+                cardHolderName = currentState.cardHolderName,
                 expiryMonth = month,
                 expiryYear = fullYear,
-                cvv = _state.value.cvv,
-                isDefault = _state.value.isDefault
+                cvv = currentState.cvv,
+                isDefault = currentState.isDefault
             )
 
             when (val result = addPaymentMethodUseCase(request)) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        isSuccess = true
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isSuccess = true
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
+
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
     }
 
     fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.update { it.copy(errorMessage = null) }
     }
 
     private fun validateInput(): Boolean {
-        val cardNumberResult = validator.validateCardNumber(_state.value.cardNumber)
-        val cardHolderResult = validator.validateCardHolderName(_state.value.cardHolderName)
-        val expiryDateResult = validator.validateExpiryDate(_state.value.expiryDate)
-        val cvvResult = validator.validateCvv(_state.value.cvv)
+        val currentState = _state.value
+        val cardNumberResult = validator.validateCardNumber(currentState.cardNumber)
+        val cardHolderResult = validator.validateCardHolderName(currentState.cardHolderName)
+        val expiryDateResult = validator.validateExpiryDate(currentState.expiryDate)
+        val cvvResult = validator.validateCvv(currentState.cvv)
 
-        val hasError = cardNumberResult is ValidationResult.Error ||
-                cardHolderResult is ValidationResult.Error ||
-                expiryDateResult is ValidationResult.Error ||
-                cvvResult is ValidationResult.Error
+        val cardNumberError = if (cardNumberResult is ValidationResult.Error) validationErrorMapper.mapToMessage(cardNumberResult.error) else null
+        val cardHolderNameError = if (cardHolderResult is ValidationResult.Error) validationErrorMapper.mapToMessage(cardHolderResult.error) else null
+        val expiryDateError = if (expiryDateResult is ValidationResult.Error) validationErrorMapper.mapToMessage(expiryDateResult.error) else null
+        val cvvError = if (cvvResult is ValidationResult.Error) validationErrorMapper.mapToMessage(cvvResult.error) else null
+
+        val hasError = cardNumberError != null ||
+                cardHolderNameError != null ||
+                expiryDateError != null ||
+                cvvError != null
 
         if (hasError) {
-            _state.value = _state.value.copy(
-                cardNumberError = if (cardNumberResult is ValidationResult.Error) validationErrorMapper.mapToMessage(cardNumberResult.error) else null,
-                cardHolderNameError = if (cardHolderResult is ValidationResult.Error) validationErrorMapper.mapToMessage(cardHolderResult.error) else null,
-                expiryDateError = if (expiryDateResult is ValidationResult.Error) validationErrorMapper.mapToMessage(expiryDateResult.error) else null,
-                cvvError = if (cvvResult is ValidationResult.Error) validationErrorMapper.mapToMessage(cvvResult.error) else null
-            )
+            _state.update {
+                it.copy(
+                    cardNumberError = cardNumberError,
+                    cardHolderNameError = cardHolderNameError,
+                    expiryDateError = expiryDateError,
+                    cvvError = cvvError
+                )
+            }
             return false
         }
         return true

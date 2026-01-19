@@ -6,4 +6,6 @@ data class AccountState(
     val nameError: String? = null,
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
-    )
+    val isPaymentMethodsSheetOpen: Boolean = false,
+    val isAddressesSheetOpen: Boolean = false
+)

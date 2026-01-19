@@ -51,7 +51,7 @@ class AccountReviewViewModel @Inject constructor(
                         )
                     }
                 }
-                ApiResult.Loading -> {
+                else -> {
                     _state.update { it.copy(isLoading = true) }
                 }
             }
@@ -83,7 +83,9 @@ class AccountReviewViewModel @Inject constructor(
                                 )
                             }
                         }
-                        else -> {}
+                        else -> {
+                            _state.update { it.copy(isLoading = false) }
+                        }
                     }
                 }
             }

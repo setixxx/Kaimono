@@ -16,4 +16,7 @@ data class CartViewModelState(
     val isOrderCreated: Boolean = false,
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
+    val isDialogOpen: Boolean = false,
+    val isPaymentMethodsSheetOpen: Boolean = false,
+    val isAddressesSheetOpen: Boolean = false
 )

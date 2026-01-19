@@ -26,53 +26,62 @@ class WishlistViewModel @Inject constructor(
         getWishlistItems()
     }
 
-    fun getWishlistItems(){
+    fun getWishlistItems() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-            when (val result = getWishlistUseCase()){
+            _state.update { it.copy(isLoading = true) }
+            when (val result = getWishlistUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        wishlist = result.data,
-                        wishlistItem = result.data.wishListItem,
-                        isLoading = false,
-                        errorMessage = null
-                    )
+                    _state.update {
+                        it.copy(
+                            wishlist = result.data,
+                            wishlistItem = result.data.wishListItem,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
+
                 ApiResult.Loading -> {
-                    _state.value = _state.value.copy(isLoading = true)
+                    _state.update { it.copy(isLoading = true) }
                 }
             }
         }
     }
 
-    fun clearWishlist(){
+    fun clearWishlist() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-            when (val result = clearWishListUseCase()){
+            _state.update { it.copy(isLoading = true) }
+            when (val result = clearWishListUseCase()) {
                 is ApiResult.Success -> {
                     getWishlistItems()
                 }
+
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
+
                 ApiResult.Loading -> {
-                    _state.value = _state.value.copy(isLoading = true)
+                    _state.update { it.copy(isLoading = true) }
                 }
             }
         }
     }
 
-    fun clearError() {
-        _state.update { it.copy(errorMessage = null) }
-    }
+    fun onIsDialogOpen(value: Boolean) = _state.update { it.copy(isDialogOpen = value) }
 
+    fun clearError() = _state.update { it.copy(errorMessage = null) }
 }

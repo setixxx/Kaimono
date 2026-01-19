@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import software.setixx.kaimono.domain.model.ApiResult
 import software.setixx.kaimono.domain.usecase.DeletePaymentMethodUseCase
@@ -31,25 +32,29 @@ class PaymentMethodsViewModel @Inject constructor(
 
     fun loadPaymentMethods() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
 
             when (val result = getPaymentMethodsUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        paymentMethods = result.data,
-                        selectedPaymentMethod = result.data.find { it.isDefault },
-                        errorMessage = null
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            paymentMethods = result.data,
+                            selectedPaymentMethod = result.data.find { it.isDefault },
+                            errorMessage = null
+                        )
+                    }
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
                 is ApiResult.Loading -> {
-                    _state.value = _state.value.copy(isLoading = true)
+                    _state.update { it.copy(isLoading = true) }
                 }
             }
         }
@@ -57,21 +62,23 @@ class PaymentMethodsViewModel @Inject constructor(
 
     fun setDefaultPaymentMethod(paymentMethodId: Long) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
 
             when (val result = setDefaultPaymentMethodUseCase(paymentMethodId)) {
                 is ApiResult.Success -> {
                     loadPaymentMethods()
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                     loadPaymentMethods()
                 }
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
@@ -79,26 +86,28 @@ class PaymentMethodsViewModel @Inject constructor(
 
     fun deletePaymentMethod(paymentMethodId: Long) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
 
             when (val result = deletePaymentMethodUseCase(paymentMethodId)) {
                 is ApiResult.Success -> {
                     loadPaymentMethods()
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
     }
 
     fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.update { it.copy(errorMessage = null) }
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -29,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -69,8 +71,6 @@ fun CartScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val haptics = LocalHapticFeedback.current
 
-    var showCardsBottomSheet by remember { mutableStateOf(false) }
-    var showAddressBottomSheet by remember { mutableStateOf(false) }
     val cardsSheetState = rememberModalBottomSheetState()
     val addressSheetState = rememberModalBottomSheetState()
 
@@ -88,6 +88,31 @@ fun CartScreen(
                 popUpTo(Routes.Cart.route) { inclusive = true }
             }
         }
+    }
+
+    if (state.isDialogOpen){
+        AlertDialog(
+            onDismissRequest = { viewModel.onIsDialogOpen(false) },
+            title = { Text(text = stringResource(R.string.label_clear_cart)) },
+            text = { Text(text = stringResource(R.string.label_clear_cart_description)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.clearCart()
+                        viewModel.onIsDialogOpen(false)
+                    }
+                ) {
+                    Text(text = stringResource(R.string.action_clear))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.onIsDialogOpen(false) }
+                ) {
+                    Text(text = stringResource(R.string.action_cancel))
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -126,7 +151,7 @@ fun CartScreen(
                 actions = {
                     if (state.items.isNotEmpty()) {
                         IconButton(
-                            onClick = { viewModel.clearCart() },
+                            onClick = { viewModel.onIsDialogOpen(true) },
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
@@ -194,7 +219,7 @@ fun CartScreen(
                             contentDescription = stringResource(R.string.label_payment_methods),
                             header = paymentLabel,
                             onClick = {
-                                showCardsBottomSheet = true
+                                viewModel.onIsPaymentMethodsSheetOpen(true)
                             },
                             trailingIcon = Icons.Outlined.ChevronRight
                         )
@@ -214,7 +239,7 @@ fun CartScreen(
                             contentDescription = stringResource(R.string.label_addresses),
                             header = addressLabel,
                             onClick = {
-                                showAddressBottomSheet = true
+                                viewModel.onIsAddressesSheetOpen(true)
                             },
                             trailingIcon = Icons.Outlined.ChevronRight
                         )
@@ -268,9 +293,9 @@ fun CartScreen(
             }
         }
 
-        if (showCardsBottomSheet) {
+        if (state.isPaymentMethodsSheetOpen) {
             ModalBottomSheet(
-                onDismissRequest = { showCardsBottomSheet = false },
+                onDismissRequest = { viewModel.onIsPaymentMethodsSheetOpen(false) },
                 sheetState = cardsSheetState
             ) {
                 val paymentMethodsViewModel: PaymentMethodsViewModel = hiltViewModel()
@@ -280,12 +305,12 @@ fun CartScreen(
                 }
 
                 PaymentMethodsSheet(
-                    onClose = { 
-                        showCardsBottomSheet = false
+                    onClose = {
+                        viewModel.onIsPaymentMethodsSheetOpen(false)
                         viewModel.loadPaymentMethods()
                     },
                     onAddCard = {
-                        showCardsBottomSheet = false
+                        viewModel.onIsPaymentMethodsSheetOpen(false)
                         navController.navigate(Routes.AccountAddCard.route)
                     },
                     viewModel = paymentMethodsViewModel
@@ -293,9 +318,9 @@ fun CartScreen(
             }
         }
 
-        if (showAddressBottomSheet) {
+        if (state.isAddressesSheetOpen) {
             ModalBottomSheet(
-                onDismissRequest = { showAddressBottomSheet = false },
+                onDismissRequest = { viewModel.onIsAddressesSheetOpen(false) },
                 sheetState = addressSheetState
             ) {
                 val addressViewModel: AddressViewModel = hiltViewModel()
@@ -305,12 +330,12 @@ fun CartScreen(
                 }
 
                 AddressSheet(
-                    onClose = { 
-                        showAddressBottomSheet = false
+                    onClose = {
+                        viewModel.onIsAddressesSheetOpen(false)
                         viewModel.loadAddresses()
                     },
                     onAddAddress = {
-                        showAddressBottomSheet = false
+                        viewModel.onIsAddressesSheetOpen(false)
                         navController.navigate(Routes.AccountAddAddress.route)
                     },
                     viewModel = addressViewModel

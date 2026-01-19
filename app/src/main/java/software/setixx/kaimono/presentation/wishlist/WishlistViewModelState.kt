@@ -8,4 +8,5 @@ data class WishlistViewModelState(
     val wishlistItem: List<WishListItem> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val isDialogOpen: Boolean = false
 )

@@ -33,7 +33,6 @@ class PaymentMethodRepositoryImpl @Inject constructor(
             }
             ApiResult.Success(paymentMethods)
         } catch (e: HttpException) {
-            Log.d("Payment", e.message())
             val error = when (e.code()) {
                 401 -> DomainError.InvalidToken
                 500 -> DomainError.ServerInternal
@@ -43,7 +42,6 @@ class PaymentMethodRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            Log.d("Payment", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }
@@ -86,7 +84,6 @@ class PaymentMethodRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            Log.d("Payment", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }

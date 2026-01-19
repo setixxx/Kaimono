@@ -1,8 +1,15 @@
 package software.setixx.kaimono.domain.validation
 
+import software.setixx.kaimono.domain.model.Address
 import javax.inject.Inject
 
 class AddressValidator @Inject constructor() {
+    fun validateAddress(address: Address?): ValidationResult {
+        if (address == null){
+            return ValidationResult.Error(ValidationError.AddressEmpty)
+        }
+        return ValidationResult.Success
+    }
 
     fun validateCity(city: String): ValidationResult {
         if (city.isBlank()) {

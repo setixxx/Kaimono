@@ -35,4 +35,6 @@ sealed class ValidationError {
     data object ExpiryDateExpired : ValidationError()
     data object CvvEmpty : ValidationError()
     data object CvvInvalidFormat : ValidationError()
+    data object AddressEmpty : ValidationError()
+    data object CartEmpty : ValidationError()
 }

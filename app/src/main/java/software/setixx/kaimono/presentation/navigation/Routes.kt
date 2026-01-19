@@ -1,14 +1,18 @@
 package software.setixx.kaimono.presentation.navigation
 
+import androidx.annotation.StringRes
+import software.setixx.kaimono.R
+
 sealed class Routes(
     val route: String,
-    val showBottomBar: Boolean = true
+    val showBottomBar: Boolean = true,
+    @StringRes val titleRes: Int? = null
 ) {
-    object Home : Routes("Home")
-    object Favorites : Routes("Favorites")
+    object Home : Routes("Home", titleRes = R.string.label_home)
+    object Wishlist : Routes("Wishlist", titleRes = R.string.label_wishlist)
     object Cart : Routes("Cart", showBottomBar = false)
     object AccountGraph : Routes("AccountGraph")
-    object Account : Routes("Account")
+    object Account : Routes("Account", titleRes = R.string.label_account)
     object AccountInfo : Routes("AccountInfo", showBottomBar = false)
     object AccountOrders: Routes("AccountOrders", showBottomBar = false)
     object AccountReviews: Routes("AccountReviews", showBottomBar = false)
@@ -36,7 +40,7 @@ sealed class Routes(
             }
 
             val screens = listOf(
-                Home, Favorites, Cart, Account, AccountInfo,
+                Home, Wishlist, Cart, Account, AccountInfo,
                 AccountOrders, AccountReviews, AccountAddCard,
                 AccountAddAddress, Search, Reviews, Filter
             )

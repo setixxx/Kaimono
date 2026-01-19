@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import software.setixx.kaimono.domain.model.ApiResult
 import software.setixx.kaimono.domain.usecase.DeleteAddressUseCase
@@ -30,24 +31,28 @@ class AddressViewModel @Inject constructor(
 
     fun loadAddresses() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
             when (val result = getAddressesUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(
-                        addresses = result.data,
-                        isLoading = false,
-                        errorMessage = null,
-                        selectedAddress = result.data.find { it.isDefault }
-                    )
+                    _state.update {
+                        it.copy(
+                            addresses = result.data,
+                            isLoading = false,
+                            errorMessage = null,
+                            selectedAddress = result.data.find { it.isDefault }
+                        )
+                    }
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
@@ -55,21 +60,23 @@ class AddressViewModel @Inject constructor(
 
     fun setDefaultAddress(addressId: Long) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
 
             when (val result = setDefaultAddressUseCase(addressId)) {
                 is ApiResult.Success -> {
                     loadAddresses()
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error),
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error),
+                        )
+                    }
                     loadAddresses()
                 }
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
@@ -77,26 +84,28 @@ class AddressViewModel @Inject constructor(
 
     fun deleteAddress(addressId: Long) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
 
             when (val result = deleteAddressUseCase(addressId)) {
                 is ApiResult.Success -> {
                     loadAddresses()
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
     }
 
     fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.update { it.copy(errorMessage = null) }
     }
 }

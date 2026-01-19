@@ -52,7 +52,7 @@ fun NavHost(
                 viewModel = hiltViewModel()
             )
         }
-        composable(Routes.Favorites.route) {
+        composable(Routes.Wishlist.route) {
             WishlistScreen(
                 navController = navController
             )

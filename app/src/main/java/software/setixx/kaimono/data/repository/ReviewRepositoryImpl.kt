@@ -33,7 +33,6 @@ class ReviewRepositoryImpl @Inject constructor(
             }
             ApiResult.Success(reviews)
         } catch (e: HttpException) {
-        Log.d("Address", e.message())
         val error = when (e.code()) {
             400 -> DomainError.InvalidData
             401 -> DomainError.InvalidToken
@@ -44,7 +43,6 @@ class ReviewRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             ApiResult.Error(DomainError.NoInternet)
         } catch (e: Exception) {
-            Log.d("Address", e.message.toString())
             ApiResult.Error(DomainError.Unknown(e.message))
         }
     }

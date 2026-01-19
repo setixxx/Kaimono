@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import software.setixx.kaimono.domain.model.ApiResult
 import software.setixx.kaimono.domain.usecase.GetCurrentUserUseCase
@@ -28,26 +29,30 @@ class AccountViewModel @Inject constructor(
 
     private fun loadUserInfo() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
 
             when (val result = getCurrentUserUseCase()) {
                 is ApiResult.Success -> {
                     val user = result.data
 
-                    _state.value = _state.value.copy(
-                        name = user.name,
-                        isLoading = false,
-                        errorMessage = null
-                    )
+                    _state.update {
+                        it.copy(
+                            name = user.name,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMapper.mapToMessage(result.error)
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                 }
                 else -> {
-                    _state.value = _state.value.copy(isLoading = false)
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
@@ -55,25 +60,33 @@ class AccountViewModel @Inject constructor(
 
     fun logout(onSuccess: () -> Unit) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoggingOut = true)
+            _state.update { it.copy(isLoggingOut = true) }
 
             when (logoutUseCase()) {
                 is ApiResult.Success -> {
-                    _state.value = _state.value.copy(isLoggingOut = false)
+                    _state.update { it.copy(isLoggingOut = false) }
                     onSuccess()
                 }
                 is ApiResult.Error -> {
-                    _state.value = _state.value.copy(isLoggingOut = false)
+                    _state.update { it.copy(isLoggingOut = false) }
                     onSuccess()
                 }
                 else -> {
-                    _state.value = _state.value.copy(isLoggingOut = false)
+                    _state.update { it.copy(isLoggingOut = false) }
                 }
             }
         }
     }
 
+    fun onIsPaymentMethodsSheetOpen(value: Boolean){
+        _state.update { it.copy(isPaymentMethodsSheetOpen = value) }
+    }
+
+    fun onIsAddressesSheetOpen(value: Boolean) {
+        _state.update { it.copy(isAddressesSheetOpen = value) }
+    }
+
     fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.update { it.copy(errorMessage = null) }
     }
 }

@@ -6,5 +6,6 @@ data class ReviewsScreenViewModelState(
     val ownReview: Review? = null,
     val reviews: List<Review> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isDialogOpen: Boolean = false
 )

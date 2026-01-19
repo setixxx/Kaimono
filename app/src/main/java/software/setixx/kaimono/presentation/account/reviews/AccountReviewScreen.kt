@@ -1,6 +1,7 @@
 package software.setixx.kaimono.presentation.account.reviews
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,7 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,7 +39,7 @@ import software.setixx.kaimono.presentation.common.DateUtils
 import software.setixx.kaimono.presentation.components.ReviewCardSquare
 import software.setixx.kaimono.presentation.navigation.Routes
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AccountReviewScreen(
     navController: NavController,
@@ -80,34 +84,54 @@ fun AccountReviewScreen(
             SnackbarHost(snackBarHostState)
         },
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(state.reviews) { review ->
-                val productName = state.productNames[review.productPublicId] ?: ""
-                val productImage = review.productPublicId?.let { state.productImages[it] }
-                
-                ReviewCardSquare(
-                    username = review.userName,
-                    productName = productName,
-                    reviewDate = DateUtils.formatTimestamp(review.createdAt),
-                    reviewText = review.comment,
-                    rating = review.rating.toString(),
-                    withImageAndDate = true,
-                    isExpanded = true,
-                    isEditable = false,
-                    imageUrl = productImage,
-                    onNavigateToReviews = {
-                        val productId = review.productPublicId
-                        if (productId != null) {
-                            navController.navigate(Routes.Reviews.createRoute(productId))
-                        }
-                    },
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ){
+                ContainedLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        } else if (state.reviews.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = stringResource(R.string.label_empty_reviews),
                 )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(state.reviews) { review ->
+                    val productName = state.productNames[review.productPublicId] ?: ""
+                    val productImage = review.productPublicId?.let { state.productImages[it] }
+
+                    ReviewCardSquare(
+                        username = review.userName,
+                        productName = productName,
+                        reviewDate = DateUtils.formatTimestamp(review.createdAt),
+                        reviewText = review.comment,
+                        rating = review.rating.toString(),
+                        withImageAndDate = true,
+                        isExpanded = true,
+                        isEditable = false,
+                        imageUrl = productImage,
+                        onNavigateToReviews = {
+                            val productId = review.productPublicId
+                            if (productId != null) {
+                                navController.navigate(Routes.Reviews.createRoute(productId))
+                            }
+                        },
+                    )
+                }
             }
         }
     }
