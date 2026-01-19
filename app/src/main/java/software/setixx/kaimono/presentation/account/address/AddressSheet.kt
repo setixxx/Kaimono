@@ -73,7 +73,8 @@ fun AddressSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .animateContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -83,8 +84,7 @@ fun AddressSheet(
             LazyColumn(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
-                    .clip(MaterialTheme.shapes.large)
-                    .animateContentSize(),
+                    .clip(MaterialTheme.shapes.large),
                 verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
             ) {
                 if (state.addresses.isEmpty() && !state.isLoading) {

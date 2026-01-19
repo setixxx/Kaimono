@@ -1,5 +1,6 @@
 package software.setixx.kaimono.presentation.account.orders
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,6 +35,12 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    fun refresh() {
+        orderId?.let {
+            loadOrder(it)
+        }
+    }
+
     fun loadOrder(id: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
@@ -44,6 +51,7 @@ class OrderViewModel @Inject constructor(
                         isLoading = false,
                         errorMessage = null
                     )
+                    loadWrittenReviews()
                 }
                 is ApiResult.Error -> {
                     _state.value = _state.value.copy(
@@ -61,25 +69,26 @@ class OrderViewModel @Inject constructor(
     fun loadWrittenReviews(){
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            for (item in _state.value.order!!.items){
-                when (val result = getUserReviewsUseCase()){
-                    is ApiResult.Success -> {
-                        val writtenReviews = result.data.filter { it.productPublicId == item.productPublicId }
-                        _state.value = _state.value.copy(
-                            writtenProductReviews = _state.value.writtenProductReviews + Pair(item, writtenReviews.isNotEmpty()),
-                            isLoading = false,
-                            errorMessage = null
-                        )
-                    }
-                    is ApiResult.Error -> {
-                        _state.value = _state.value.copy(
-                            isLoading = false,
-                            errorMessage = errorMapper.mapToMessage(result.error)
-                        )
-                    }
-                    else -> {
-                        _state.value = _state.value.copy(isLoading = false)
-                    }
+            when (val result = getUserReviewsUseCase()){
+                is ApiResult.Success -> {
+                    val userReviews = result.data
+                    val updatedMap = _state.value.order?.items?.associateWith { item ->
+                        userReviews.any { it.productPublicId == item.productPublicId }
+                    } ?: emptyMap()
+
+                    _state.value = _state.value.copy(
+                        writtenProductReviews = updatedMap,
+                        isLoading = false
+                    )
+                }
+                is ApiResult.Error -> {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        errorMessage = errorMapper.mapToMessage(result.error)
+                    )
+                }
+                else -> {
+                    _state.value = _state.value.copy(isLoading = false)
                 }
             }
         }

@@ -87,7 +87,6 @@ fun OrderScreen(
     var selectedProductPublicId by remember { mutableStateOf<String?>(null) }
     var selectedOrderPublicId by remember { mutableStateOf<String?>(null) }
 
-    val scrollState = rememberScrollState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(state.errorMessage) {
@@ -218,7 +217,8 @@ fun OrderScreen(
                                     style = MaterialTheme.typography.labelSmall,
                                 )
                             },
-                            trailingContent = if (order.status == "Доставлен" || order.status == "Delivered") {
+                            trailingContent = if ((order.status == "Доставлен" || order.status == "Delivered")
+                                && state.writtenProductReviews[orderItem] == false) {
                                 {
                                     Column(
                                         horizontalAlignment = Alignment.End,
@@ -349,6 +349,7 @@ fun OrderScreen(
                         showReviewSheet = false
                         selectedProductPublicId = null
                         selectedOrderPublicId = null
+                        viewModel.refresh()
                     }
                 )
             }
