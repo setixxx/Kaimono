@@ -7,5 +7,6 @@ data class AccountState(
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
     val isPaymentMethodsSheetOpen: Boolean = false,
-    val isAddressesSheetOpen: Boolean = false
+    val isAddressesSheetOpen: Boolean = false,
+    val isDialogOpen: Boolean = false,
 )

@@ -55,6 +55,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -139,7 +140,14 @@ fun FilterScreen(
                                 Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(4.dp))
                             }
-                            Text(label)
+                            Text(
+                                text = when (label){
+                                    "Price" -> stringResource(R.string.label_price)
+                                    "Name" -> stringResource(R.string.label_name)
+                                    "Date" -> stringResource(R.string.label_date)
+                                    else -> ""
+                                }
+                            )
                         }
                     }
                 }
@@ -170,7 +178,13 @@ fun FilterScreen(
                                 Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(4.dp))
                             }
-                            Text(label)
+                            Text(
+                                text = when (label){
+                                    "Ascending" -> stringResource(R.string.label_ascending)
+                                    "Descending" -> stringResource(R.string.label_descending)
+                                    else -> ""
+                                }
+                            )
                         }
                     }
                 }
@@ -280,7 +294,10 @@ fun FilterScreen(
                         disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
-                    Text(stringResource(R.string.action_clear_filters))
+                    Text(
+                        text = stringResource(R.string.action_clear_filters),
+                        textAlign = TextAlign.Center
+                    )
                 }
 
                 Button(
@@ -296,7 +313,10 @@ fun FilterScreen(
                         .padding(start = 4.dp),
                     shape = MaterialTheme.shapes.extraLarge
                 ) {
-                    Text(stringResource(R.string.action_apply_filters))
+                    Text(
+                        text = stringResource(R.string.action_apply_filters),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }

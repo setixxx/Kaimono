@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material.icons.outlined.Reviews
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +26,7 @@ import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -75,6 +77,31 @@ fun AccountScreen(
             )
             viewModel.clearError()
         }
+    }
+
+    if (state.isDialogOpen){
+        AlertDialog(
+            onDismissRequest = { viewModel.onIsDialogOpen(false) },
+            title = { Text(text = stringResource(R.string.label_logout)) },
+            text = { Text(text = stringResource(R.string.label_logout_description)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.onIsDialogOpen(false)
+                        viewModel.logout(onLogout)
+                    }
+                ) {
+                    Text(text = stringResource(R.string.action_logout))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.onIsDialogOpen(false) }
+                ) {
+                    Text(text = stringResource(R.string.action_cancel))
+                }
+            }
+        )
     }
 
     data class AccountItems(
@@ -196,7 +223,7 @@ fun AccountScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onClick = {
-                        viewModel.logout(onLogout)
+                        viewModel.onIsDialogOpen(true)
                     },
                     enabled = !state.isLoggingOut
                 ){

@@ -75,6 +75,7 @@ fun AccountInfoScreen(
 ){
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val updateSuccessMessage = stringResource(R.string.hint_personal_info_updated)
 
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let { error ->
@@ -83,6 +84,16 @@ fun AccountInfoScreen(
                 duration = SnackbarDuration.Short
             )
             viewModel.clearError()
+        }
+    }
+
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess){
+            snackBarHostState.showSnackbar(
+                message = updateSuccessMessage,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.onSuccessShown()
         }
     }
 

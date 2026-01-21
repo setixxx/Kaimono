@@ -128,6 +128,10 @@ class AddPaymentMethodViewModel @Inject constructor(
         _state.update { it.copy(errorMessage = null) }
     }
 
+    fun onSuccessShown() {
+        _state.update { it.copy(isSuccess = false) }
+    }
+
     private fun validateInput(): Boolean {
         val currentState = _state.value
         val cardNumberResult = validator.validateCardNumber(currentState.cardNumber)

@@ -62,13 +62,23 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoggingOut = true) }
 
-            when (logoutUseCase()) {
+            when (val result = logoutUseCase()) {
                 is ApiResult.Success -> {
-                    _state.update { it.copy(isLoggingOut = false) }
+                    _state.update {
+                        it.copy(
+                            isLoggingOut = false,
+                            errorMessage = null
+                        )
+                    }
                     onSuccess()
                 }
                 is ApiResult.Error -> {
-                    _state.update { it.copy(isLoggingOut = false) }
+                    _state.update {
+                        it.copy(
+                            isLoggingOut = false,
+                            errorMessage = errorMapper.mapToMessage(result.error)
+                        )
+                    }
                     onSuccess()
                 }
                 else -> {
@@ -88,5 +98,9 @@ class AccountViewModel @Inject constructor(
 
     fun clearError() {
         _state.update { it.copy(errorMessage = null) }
+    }
+
+    fun onIsDialogOpen(value: Boolean) {
+        _state.update { it.copy(isDialogOpen = value) }
     }
 }

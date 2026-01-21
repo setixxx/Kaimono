@@ -191,7 +191,7 @@ fun ReviewsScreen(
                     ReviewCardSquare(
                         username = review.userName,
                         productName = "",
-                        reviewDate = review.createdAt,
+                        reviewDate = DateUtils.formatTimestamp(review.createdAt),
                         reviewText = review.comment ?: "",
                         rating = review.rating.toString(),
                         withImageAndDate = false,

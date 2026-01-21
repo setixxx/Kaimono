@@ -45,6 +45,7 @@ fun AddPaymentMethodScreen(
 ){
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val updateSuccessMessage = stringResource(R.string.hint_card_added)
 
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let { error ->
@@ -58,6 +59,11 @@ fun AddPaymentMethodScreen(
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
+            snackBarHostState.showSnackbar(
+                message = updateSuccessMessage,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.onSuccessShown()
             navController.popBackStack()
         }
     }

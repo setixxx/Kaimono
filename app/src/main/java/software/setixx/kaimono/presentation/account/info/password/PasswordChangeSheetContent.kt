@@ -45,6 +45,7 @@ fun PasswordChangeSheetContent(
 ) {
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val updateSuccessMessage = stringResource(R.string.hint_password_updated)
 
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let { error ->
@@ -58,6 +59,11 @@ fun PasswordChangeSheetContent(
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
+            snackBarHostState.showSnackbar(
+                message = updateSuccessMessage,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.onSuccessShown()
             onClose()
         }
     }

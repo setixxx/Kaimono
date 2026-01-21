@@ -50,6 +50,8 @@ fun ProductReviewSheet(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val options = listOf("1", "2", "3", "4", "5")
+    val createSuccessMessage = stringResource(R.string.hint_review_created)
+    val updateSuccessMessage = stringResource(R.string.hint_review_updated)
 
     LaunchedEffect(review) {
         review?.let { viewModel.setReview(it) }
@@ -63,8 +65,16 @@ fun ProductReviewSheet(
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            onClose()
+            snackBarHostState.showSnackbar(
+                message = if (isUpdate){
+                    updateSuccessMessage
+                } else {
+                    createSuccessMessage
+                },
+                duration = SnackbarDuration.Short
+            )
             viewModel.resetSuccess()
+            onClose()
         }
     }
 
@@ -191,6 +201,9 @@ fun ProductReviewSheet(
                 }
             }
         }
-        SnackbarHost(snackBarHostState)
+        SnackbarHost(
+            hostState = snackBarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }

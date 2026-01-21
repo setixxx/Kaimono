@@ -43,6 +43,7 @@ fun AddAddressScreen(
 ){
     val state by viewModel.state.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val updateSuccessMessage = stringResource(R.string.hint_address_added)
 
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let { error ->
@@ -56,6 +57,11 @@ fun AddAddressScreen(
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
+            snackBarHostState.showSnackbar(
+                message = updateSuccessMessage,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.onSuccessShown()
             navController.popBackStack()
         }
     }

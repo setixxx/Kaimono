@@ -12,5 +12,5 @@ data class PasswordChangeState(
     val isSuccess: Boolean = false,
     val isOldPasswordVisible: Boolean = false,
     val isNewPasswordVisible: Boolean = false,
-    val isConfirmPasswordVisible: Boolean = false,
+    val isConfirmPasswordVisible: Boolean = false
 )

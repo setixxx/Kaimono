@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -70,6 +71,8 @@ fun CartScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val haptics = LocalHapticFeedback.current
+    val updateSuccessMessage = stringResource(R.string.hint_order_created)
+
 
     val cardsSheetState = rememberModalBottomSheetState()
     val addressSheetState = rememberModalBottomSheetState()
@@ -83,6 +86,10 @@ fun CartScreen(
 
     LaunchedEffect(state.isOrderCreated) {
         if (state.isOrderCreated) {
+            snackBarHostState.showSnackbar(
+                message = updateSuccessMessage,
+                duration = SnackbarDuration.Short
+            )
             viewModel.resetOrderCreated()
             navController.navigate(Routes.AccountOrders.route) {
                 popUpTo(Routes.Cart.route) { inclusive = true }

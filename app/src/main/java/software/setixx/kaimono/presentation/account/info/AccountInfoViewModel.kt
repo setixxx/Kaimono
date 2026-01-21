@@ -107,7 +107,8 @@ class AccountInfoViewModel @Inject constructor(
                             gender = data.gender.toString(),
                             isLoading = false,
                             errorMessage = null,
-                            isFieldsChanged = false
+                            isFieldsChanged = false,
+                            isSuccess = true
                         )
                     }
                 }
@@ -197,6 +198,10 @@ class AccountInfoViewModel @Inject constructor(
 
     fun clearError() {
         _state.update { it.copy(errorMessage = null) }
+    }
+
+    fun onSuccessShown(){
+        _state.update { it.copy(isSuccess = false) }
     }
 
     private fun validateInputs(): Boolean {

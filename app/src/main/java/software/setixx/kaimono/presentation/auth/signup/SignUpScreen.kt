@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import software.setixx.kaimono.R
 
@@ -73,11 +74,13 @@ fun SignUpScreen(
                 stringResource(R.string.label_sign_up),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
             )
             Text(
                 modifier = Modifier.padding(bottom = 24.dp),
                 text = stringResource(R.string.sublabel_sign_up),
                 style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
             )
             OutlinedTextField(
                 modifier = Modifier

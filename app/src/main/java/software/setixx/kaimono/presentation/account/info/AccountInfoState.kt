@@ -16,5 +16,6 @@ data class AccountInfoState(
     val dateOfBirthError: String? = null,
     val isSurnameChanged: Boolean = false,
     val isBirthdateChanged: Boolean = false,
-    val isFieldsChanged: Boolean = false
+    val isFieldsChanged: Boolean = false,
+    val isSuccess: Boolean = false
 )
